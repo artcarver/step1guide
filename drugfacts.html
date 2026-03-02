@@ -405,7 +405,7 @@ body::before {
   margin-left: 6px;
 }
 
-@media (pointer: coarse) {
+@media (max-width: 600px) {
   .header { 
     padding: 12px 14px 0; 
     transition: transform 0.3s ease-in-out;
@@ -3043,7 +3043,7 @@ const header = document.querySelector('.header');
 
 window.addEventListener('scroll', () => {
   // HARD GUARD: If screen is wider than mobile (laptop/desktop), STOP here.
-  if (window.matchMedia("(pointer: coarse)").matches) {
+  if (window.innerWidth <= 600) {
     header.classList.remove('header--hidden');
     return; 
   }
