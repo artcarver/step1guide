@@ -142,12 +142,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   .video-row .yield-bar-wrap,.video-row .reason-tag{display:none;}
   .col-hdr{grid-template-columns:24px 1fr 60px;}
 }
+.back-link {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-decoration: none;
+  margin-bottom: 14px;
+  transition: color 0.15s;
+}
+.back-link:hover {
+  color: var(--sakura2);
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-inner">
+    <a href="index.html" class="back-link">&#8592; Back to Hub</a>
     <p class="eyebrow">Sketchy Pharm · Step 1 Priority Planner</p>
     <h1 class="brand-title">What to Watch First</h1>
     <div class="brand-flourish"><div class="fl l"></div><div class="fd"></div><div class="fl r"></div></div>
