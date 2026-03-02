@@ -148,7 +148,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
 <div class="header">
   <div class="header-inner">
-    <button id="auth-btn" class="auth-btn">Log in to save progress</button>
     <p class="eyebrow">Sketchy Pharm · Step 1 Priority Planner</p>
     <h1 class="brand-title">What to Watch First</h1>
     <div class="brand-flourish"><div class="fl l"></div><div class="fd"></div><div class="fl r"></div></div>
@@ -369,16 +368,15 @@ const TIER_NAMES  = {1:"HIGH YIELD",2:"IMPORTANT",3:"REVIEW",4:"LOW YIELD"};
 const authBtn = document.getElementById('auth-btn');
 
 auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    currentUser = user;
-    authBtn.textContent = 'Log out';
-    await fetchStateFromFirebase();
+  if (!user) {
+    // Kick to index if not logged in
+    window.location.replace("index.html");
   } else {
-    currentUser = null;
-    watchedState = {};
-    authBtn.textContent = 'Log in to save progress';
+    // Allow any logged-in user to see their own tracker
+    currentUser = user;
+    await fetchStateFromFirebase();
+    updateAll();
   }
-  updateAll();
 });
 
 authBtn.addEventListener('click', () => {
