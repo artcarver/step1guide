@@ -2511,7 +2511,7 @@ function drugCardHTML(drug, colorClass, idx) {
       ${drug.se ? `<div class="info-row"><span class="info-label se">Side Effects</span><div class="info-text">${formatLines(drug.se)}</div></div>` : ''}
       ${drug.ci ? `<div class="info-row"><span class="info-label ci">Contraindications</span><div class="info-text">${formatLines(drug.ci)}</div></div>` : ''}
       ${drug.pk ? `<div class="info-row"><span class="info-label pk">Pharmacokinetics</span><div class="info-text">${formatLines(drug.pk)}</div></div>` : ''}
-      ${drug.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text">**Step 1 Pearl:** ${drug.pearl}</div></div>` : ''}
+      ${drug.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(drug.pearl)}</div></div>` : ''}
     </div>
   </div>`;
 }
