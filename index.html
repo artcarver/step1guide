@@ -386,23 +386,30 @@ const firebaseConfig = {
   appId: "1:970470066509:web:14c7300fb1dd882a038f04",
   measurementId: "G-2KVBCP4THR"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const authBtn = document.getElementById('auth-btn');
 
-// --- Auth & Sync Logic ---
+// --- Auth & Data Persistence Logic ---
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     authBtn.textContent = 'Log out';
-    // Fetch cloud date on login
-    const doc = await db.collection('users').doc(user.uid).get();
-    if (doc.exists && doc.data().examDate) {
-      localStorage.setItem('step1-exam-date', doc.data().examDate);
-      updateCountdown();
+    
+    // Attempt to pull saved exam date from Gwendalynn's cloud profile
+    try {
+      const doc = await db.collection('users').doc(user.uid).get();
+      if (doc.exists && doc.data().examDate) {
+        localStorage.setItem('step1-exam-date', doc.data().examDate);
+        updateCountdown();
+      }
+    } catch (error) {
+      console.error("Cloud sync failed:", error);
     }
   } else {
     authBtn.textContent = 'Log in to view secure tools';
+    // Clear local cache on logout for security
     localStorage.removeItem('step1-exam-date');
     updateCountdown();
   }
@@ -417,19 +424,21 @@ authBtn.addEventListener('click', () => {
   }
 });
 
-// Redirect Guard: Blocks personal tools if not logged in
+// Access Guard: Prevents unauthorized entry into personal tools
 document.querySelectorAll('.tool-card').forEach(card => {
   card.addEventListener('click', (e) => {
-    const secure = card.classList.contains('card-pharm') || 
-                   card.classList.contains('card-sketchy') || 
-                   card.classList.contains('card-dash');
-    if (secure && !auth.currentUser) {
+    const isSecure = card.classList.contains('card-pharm') || 
+                     card.classList.contains('card-sketchy') || 
+                     card.classList.contains('card-dash');
+    
+    if (isSecure && !auth.currentUser) {
       e.preventDefault();
-      alert("Personal study tools are secure. Log in to access your data.");
+      alert("Access Restricted: Please log in to view your personalized study data.");
     }
   });
 });
 
+// --- Content & UI Logic ---
 const QUOTES=[
   {q:"The art of medicine consists of <strong>amusing the patient</strong> while nature cures the disease.",a:"- Voltaire"},
   {q:"Medicine is a science of uncertainty and an <strong>art of probability</strong>.",a:"- William Osler"},
@@ -443,6 +452,7 @@ const QUOTES=[
   {q:"Fall down seven times, <strong>stand up eight</strong>.",a:"- Japanese Proverb (七転び八起き)"},
   {q:"The cherry blossom is beloved because it is <strong>here and then gone</strong> - a reminder to live fully now.",a:"- Japanese Tradition"},
 ];
+
 const today=new Date();
 const qi=today.getDate()%QUOTES.length;
 document.getElementById('daily-quote').innerHTML='"'+QUOTES[qi].q+'"';
@@ -451,44 +461,56 @@ document.getElementById('footer-date').textContent=today.toLocaleDateString('en-
 
 function updateCountdown(){
   const s=localStorage.getItem('step1-exam-date');
+  const daysEl = document.getElementById('cd-days');
+  const dateEl = document.getElementById('cd-date');
+
   if(!s){
-    document.getElementById('cd-days').textContent='—';
-    document.getElementById('cd-date').textContent='Not set';
+    daysEl.textContent='—';
+    dateEl.textContent='Not set';
     return;
   }
-  const exam=new Date(s+'T12:00:00'),now=new Date();
+
+  const exam=new Date(s+'T12:00:00'), now=new Date();
   now.setHours(0,0,0,0);
   const diff=Math.round((exam-now)/(1000*60*60*24));
-  document.getElementById('cd-days').textContent=diff>=0?diff:'0';
-  document.getElementById('cd-date').textContent=exam.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  if(diff<=30)document.getElementById('cd-days').style.color='var(--sakura2)';
-  else if(diff<=60)document.getElementById('cd-days').style.color='var(--c6)';
+  
+  daysEl.textContent = diff >= 0 ? diff : '0';
+  dateEl.textContent = exam.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+  // Visual urgency indicators
+  if(diff <= 30) daysEl.style.color = 'var(--sakura2)';
+  else if(diff <= 60) daysEl.style.color = 'var(--c6)';
+  else daysEl.style.color = 'var(--fuji)';
 }
 updateCountdown();
 
 function openModal(){
   const s=localStorage.getItem('step1-exam-date');
-  if(s)document.getElementById('date-input').value=s;
+  if(s) document.getElementById('date-input').value=s;
   document.getElementById('modal').classList.add('open');
 }
-function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 
 async function saveDate(){
-  const v=document.getElementById('date-input').value;
+  const v = document.getElementById('date-input').value;
   if(v){
-    localStorage.setItem('step1-exam-date',v);
-    // If logged in, save to Firestore for Gwendalynn's profile
+    // Update local UI immediately
+    localStorage.setItem('step1-exam-date', v);
+    updateCountdown();
+
+    // Persist to Gwendalynn's Firestore profile if authenticated
     if (auth.currentUser) {
       await db.collection('users').doc(auth.currentUser.uid).set({
         examDate: v
       }, { merge: true });
     }
-    updateCountdown();
   }
   closeModal();
 }
+
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
-function showAddHint(){alert('To add a new tool:\n\n1. Upload your HTML file to the same GitHub repo folder\n2. Copy a tool-card block in index.html\n3. Change the href, title, description, and color class\n4. Push to GitHub - done!');}
+function showAddHint(){alert('To add a new tool:\n\n1. Upload your HTML file to GitHub\n2. Copy a tool-card block in index.html\n3. Update the link and details\n4. Commit changes.');}
 </script>
 </body>
 </html>
