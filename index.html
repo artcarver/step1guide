@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Step 1 Study Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -19,6 +23,16 @@
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--ink);font-family:'Jost',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");}
+
+/* Auth Button */
+.auth-btn{
+  position:absolute;top:20px;right:44px;z-index:300;
+  background:var(--fuji);color:#fff;border:none;padding:8px 16px;
+  border-radius:8px;font-family:'DM Mono',monospace;font-size:11px;
+  cursor:pointer;letter-spacing:1px;text-transform:uppercase;
+  transition:background 0.2s;
+}
+.auth-btn:hover{background:var(--fuji2);}
 
 /* Fuji silhouette */
 .fuji-bg{position:fixed;bottom:0;left:0;right:0;height:45vh;pointer-events:none;z-index:0;opacity:0.055;}
@@ -188,7 +202,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 </head>
 <body>
 
-<!-- Falling petals -->
+<button id="auth-btn" class="auth-btn">Log in to view secure tools</button>
+
 <div class="petals" aria-hidden="true">
   <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
   <div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
@@ -197,7 +212,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   <div class="petal p13"></div><div class="petal p14"></div><div class="petal p15"></div>
 </div>
 
-<!-- Fuji silhouette -->
 <div class="fuji-bg" aria-hidden="true">
   <svg viewBox="0 0 1440 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" style="width:100%;height:100%;">
     <path d="M0 380 Q200 300 400 340 Q600 370 800 320 Q1000 280 1200 330 Q1340 355 1440 340 L1440 400 L0 400Z" fill="#c8b0c0" opacity="0.4"/>
@@ -244,7 +258,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
           <div class="card-meta"><span class="card-tag">Pharmacology</span><span class="card-arrow">↗</span></div>
         </div>
         <h2 class="card-title">Drug Facts Reference</h2>
-        <p class="card-desc">Complete Step 1 pharmacology — MOA, side effects, clinical pearls, and tier ratings across all systems.</p>
+        <p class="card-desc">Complete Step 1 pharmacology - MOA, side effects, clinical pearls, and tier ratings across all systems.</p>
         <div class="card-pills"><span class="pill">8 Systems</span><span class="pill">90+ Drugs</span><span class="pill">Searchable</span><span class="pill">Tier Ratings</span></div>
       </div>
     </a>
@@ -323,7 +337,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
       <div>
         <div class="qotd-label">Bootcamp · Daily</div>
         <div class="qotd-title">Question of the Day</div>
-        <div class="qotd-sub">Keep your streak alive — one question every day adds up.</div>
+        <div class="qotd-sub">Keep your streak alive - one question every day adds up.</div>
       </div>
     </div>
     <div class="qotd-cta">Open Today's Q ↗</div>
@@ -338,7 +352,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
   <div class="japan-callout">
     <div style="font-size:22px;flex-shrink:0;">🗻</div>
-    <div class="jc-text"><strong>Japan after Step 1 —</strong> Cherry blossoms, Mount Fuji, ramen at 2am. Every page you study now is a step closer. 頑張って (Ganbatte) — you've got this.</div>
+    <div class="jc-text"><strong>Japan after Step 1 -</strong> Cherry blossoms, Mount Fuji, ramen at 2am. Every page you study now is a step closer. 頑張って (Ganbatte) - you've got this.</div>
   </div>
 
   <footer class="footer">
@@ -361,18 +375,48 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 </div>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
+  authDomain: "sketchy-tracker.firebaseapp.com",
+  projectId: "sketchy-tracker",
+  storageBucket: "sketchy-tracker.firebasestorage.app",
+  messagingSenderId: "970470066509",
+  appId: "1:970470066509:web:14c7300fb1dd882a038f04",
+  measurementId: "G-2KVBCP4THR"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const authBtn = document.getElementById('auth-btn');
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    authBtn.textContent = 'Log out';
+  } else {
+    authBtn.textContent = 'Log in to view secure tools';
+  }
+});
+
+authBtn.addEventListener('click', () => {
+  if (auth.currentUser) {
+    auth.signOut();
+  } else {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(console.error);
+  }
+});
+
 const QUOTES=[
-  {q:"The art of medicine consists of <strong>amusing the patient</strong> while nature cures the disease.",a:"— Voltaire"},
-  {q:"Medicine is a science of uncertainty and an <strong>art of probability</strong>.",a:"— William Osler"},
-  {q:"The good physician treats the disease; the <strong>great physician treats the patient</strong> who has the disease.",a:"— William Osler"},
-  {q:"Wherever the art of medicine is loved, there is also a love of <strong>humanity</strong>.",a:"— Hippocrates"},
-  {q:"The practice of medicine is an art, not a trade; a <strong>calling</strong>, not a business.",a:"— William Osler"},
-  {q:"In nothing do men more nearly approach the gods than in <strong>giving health to men</strong>.",a:"— Cicero"},
-  {q:"The secret of the care of the patient is in <strong>caring for the patient</strong>.",a:"— Francis Peabody"},
-  {q:"It is more important to know what sort of person <strong>has a disease</strong> than to know what sort of disease a person has.",a:"— Hippocrates"},
-  {q:"After climbing a great hill, one only finds that there are <strong>many more hills to climb</strong>.",a:"— Nelson Mandela"},
-  {q:"Fall down seven times, <strong>stand up eight</strong>.",a:"— Japanese Proverb (七転び八起き)"},
-  {q:"The cherry blossom is beloved because it is <strong>here and then gone</strong> — a reminder to live fully now.",a:"— Japanese Tradition"},
+  {q:"The art of medicine consists of <strong>amusing the patient</strong> while nature cures the disease.",a:"- Voltaire"},
+  {q:"Medicine is a science of uncertainty and an <strong>art of probability</strong>.",a:"- William Osler"},
+  {q:"The good physician treats the disease; the <strong>great physician treats the patient</strong> who has the disease.",a:"- William Osler"},
+  {q:"Wherever the art of medicine is loved, there is also a love of <strong>humanity</strong>.",a:"- Hippocrates"},
+  {q:"The practice of medicine is an art, not a trade; a <strong>calling</strong>, not a business.",a:"- William Osler"},
+  {q:"In nothing do men more nearly approach the gods than in <strong>giving health to men</strong>.",a:"- Cicero"},
+  {q:"The secret of the care of the patient is in <strong>caring for the patient</strong>.",a:"- Francis Peabody"},
+  {q:"It is more important to know what sort of person <strong>has a disease</strong> than to know what sort of disease a person has.",a:"- Hippocrates"},
+  {q:"After climbing a great hill, one only finds that there are <strong>many more hills to climb</strong>.",a:"- Nelson Mandela"},
+  {q:"Fall down seven times, <strong>stand up eight</strong>.",a:"- Japanese Proverb (七転び八起き)"},
+  {q:"The cherry blossom is beloved because it is <strong>here and then gone</strong> - a reminder to live fully now.",a:"- Japanese Tradition"},
 ];
 const today=new Date();
 const qi=today.getDate()%QUOTES.length;
@@ -382,7 +426,7 @@ document.getElementById('footer-date').textContent=today.toLocaleDateString('en-
 
 function updateCountdown(){
   const s=localStorage.getItem('step1-exam-date');
-  if(!s){document.getElementById('cd-days').textContent='—';document.getElementById('cd-date').textContent='Not set';return;}
+  if(!s){document.getElementById('cd-days').textContent='-';document.getElementById('cd-date').textContent='Not set';return;}
   const exam=new Date(s+'T12:00:00'),now=new Date();
   now.setHours(0,0,0,0);
   const diff=Math.round((exam-now)/(1000*60*60*24));
@@ -405,7 +449,7 @@ function saveDate(){
   closeModal();
 }
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
-function showAddHint(){alert('To add a new tool:\n\n1. Upload your HTML file to the same GitHub repo folder\n2. Copy a tool-card block in index.html\n3. Change the href, title, description, and color class\n4. Push to GitHub — done!');}
+function showAddHint(){alert('To add a new tool:\n\n1. Upload your HTML file to the same GitHub repo folder\n2. Copy a tool-card block in index.html\n3. Change the href, title, description, and color class\n4. Push to GitHub - done!');}
 </script>
 </body>
 </html>
