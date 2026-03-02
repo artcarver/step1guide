@@ -2519,7 +2519,7 @@ function drugCardHTML(drug, colorClass, idx) {
 function formatLines(text) {
   if (!text) return text;
   
-  // Convert Markdown **bold** to HTML <strong>
+  // Convert Markdown **bold** to HTML <strong> for the new standardized style
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
   let parts = [];
