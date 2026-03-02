@@ -445,7 +445,7 @@ body::before {
 .tier-3 { background: rgba(138,110,16,0.07); color: #7a5e10; border: 1px solid rgba(138,110,16,0.25); }
 
 /* Full-window improvements */
-@media(min-width: 1400px) {
+@media(pointer: coarse) {
   .brand-title { font-size: 34px; }
 }
 .back-link {
@@ -486,16 +486,17 @@ body::before {
       </div>
     </div>
     <div class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('micro',this)"><span class="tab-dot" style="background:var(--micro)"></span>Antimicrobials</button>
-      <button class="tab-btn" onclick="switchTab('autonomic',this)"><span class="tab-dot" style="background:var(--auto)"></span>Autonomic</button>
-      <button class="tab-btn" onclick="switchTab('cv',this)"><span class="tab-dot" style="background:var(--cv)"></span>Cardiovascular &amp; Renal</button>
-      <button class="tab-btn" onclick="switchTab('blood',this)"><span class="tab-dot" style="background:var(--blood)"></span>Blood &amp; Inflammation</button>
-      <button class="tab-btn" onclick="switchTab('pulm',this)"><span class="tab-dot" style="background:var(--pulm)"></span>Smooth Muscle</button>
-      <button class="tab-btn" onclick="switchTab('gi',this)"><span class="tab-dot" style="background:var(--gi)"></span>GI &amp; Motility</button>
-      <button class="tab-btn" onclick="switchTab('endo',this)"><span class="tab-dot" style="background:var(--endo)"></span>Endocrine &amp; Reproductive</button>
-      <button class="tab-btn" onclick="switchTab('neuro',this)"><span class="tab-dot" style="background:var(--neuro)"></span>Neuro &amp; Psych</button>
-      <button class="tab-btn" onclick="switchTab('onco',this)"><span class="tab-dot" style="background:var(--onco)"></span>Antineoplastics</button>
-      <button class="tab-btn" onclick="switchTab('toxicology',this)"><span class="tab-dot" style="background:var(--toxic)"></span>Toxicology</button>
+      <div class="tabs" id="tabs">
+        <button class="tab-btn active" onclick="switchTab('micro',this)"><span class="tab-dot" style="background:var(--micro)"></span>Micro</button>
+        <button class="tab-btn" onclick="switchTab('autonomic',this)"><span class="tab-dot" style="background:var(--auto)"></span>Autonomics</button>
+        <button class="tab-btn" onclick="switchTab('cv',this)"><span class="tab-dot" style="background:var(--cv)"></span>Cardio &amp; Renal</button>
+        <button class="tab-btn" onclick="switchTab('blood',this)"><span class="tab-dot" style="background:var(--blood)"></span>Heme</button>
+        <button class="tab-btn" onclick="switchTab('pulm',this)"><span class="tab-dot" style="background:var(--pulm)"></span>Pulm</button>
+        <button class="tab-btn" onclick="switchTab('gi',this)"><span class="tab-dot" style="background:var(--gi)"></span>GI</button>
+        <button class="tab-btn" onclick="switchTab('endo',this)"><span class="tab-dot" style="background:var(--endo)"></span>Endo &amp; Repro</button>
+        <button class="tab-btn" onclick="switchTab('toxicology',this)"><span class="tab-dot" style="background:var(--toxic)"></span>Tox</button>
+        <button class="tab-btn" onclick="switchTab('neuro',this)"><span class="tab-dot" style="background:var(--neuro)"></span>Neuro &amp; Psych</button>
+        <button class="tab-btn" onclick="switchTab('onco',this)"><span class="tab-dot" style="background:var(--onco)"></span>Onc</button>
     </div>
   </div>
 </div>
@@ -3042,7 +3043,7 @@ const header = document.querySelector('.header');
 
 window.addEventListener('scroll', () => {
   // HARD GUARD: If screen is wider than mobile (laptop/desktop), STOP here.
-  if (window.innerWidth > 768) {
+  if (window.matchMedia("(pointer: coarse)").matches) {
     header.classList.remove('header--hidden');
     return; 
   }
