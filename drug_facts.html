@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Step 1 Pharmacology Reference — Gwendalynn Stilson</title>
+<title>Drug Facts — Step 1 Pharmacology Reference</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,34 +74,34 @@ body::before {
   z-index: 0;
 }
 
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
 /* ── HEADER ── */
 .header {
-  background: #c8b8d8;
-  background-image: linear-gradient(120deg, #c4b4d6 0%, #cebede 60%, #c0b4d4 100%);
-  border-bottom: 1px solid rgba(140,110,180,0.2);
+  background: #c4b4d6;
+  background-image: linear-gradient(120deg, #c0b0d2 0%, #cabdd8 55%, #bcb0d0 100%);
+  border-bottom: 1px solid rgba(90,56,120,0.18);
   padding: 24px 44px 0;
   position: sticky; top: 0; z-index: 200;
-  box-shadow: 0 1px 0 rgba(140,110,180,0.15), 0 8px 32px rgba(100,80,140,0.12);
+  box-shadow: 0 1px 0 rgba(90,56,120,0.12), 0 6px 24px rgba(90,68,140,0.1);
 }
 .header-inner { max-width: 1340px; margin: 0 auto; }
 .header-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
 
 .brand-super {
   font-family: 'DM Mono', monospace;
-  font-size: 10px; letter-spacing: 4px;
+  font-size: 9px; letter-spacing: 4px;
   color: #5a3878; text-transform: uppercase; margin-bottom: 6px;
 }
 .brand-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 30px; font-weight: 600;
-  color: #1e1030; line-height: 1;
+  color: #1a1028; line-height: 1;
   letter-spacing: -0.5px;
 }
-.brand-sub { font-size: 12px; color: rgba(40,20,70,0.5); margin-top: 5px; letter-spacing: 0.3px; }
+.brand-sub { font-size: 12px; color: rgba(26,16,40,0.5); margin-top: 5px; letter-spacing: 0.3px; }
 
 /* Decorative flourish */
 .brand-flourish {
@@ -122,17 +122,17 @@ body::before {
 .search-wrap { flex: 1; max-width: 400px; position: relative; }
 .search-input {
   width: 100%; padding: 10px 16px 10px 40px;
-  background: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.3);
   border: 1px solid rgba(90,56,120,0.2);
   border-radius: 20px;
-  color: #1e1030; font-family: 'Jost', sans-serif; font-size: 13px;
+  color: #1a1028; font-family: 'Jost', sans-serif; font-size: 13px;
   outline: none; transition: border-color 0.2s, background 0.2s;
   letter-spacing: 0.3px;
 }
-.search-input::placeholder { color: rgba(40,20,70,0.38); }
+.search-input::placeholder { color: rgba(26,16,40,0.38); }
 .search-input:focus {
   border-color: rgba(90,56,120,0.45);
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.5);
 }
 .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(40,20,70,0.38); font-size: 14px; pointer-events: none; }
 
@@ -142,12 +142,12 @@ body::before {
 .tab-btn {
   padding: 11px 18px; white-space: nowrap;
   background: transparent; border: none; cursor: pointer;
-  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
-  color: rgba(30,16,48,0.45); border-bottom: 2px solid transparent;
-  transition: all 0.2s; display: flex; align-items: center; gap: 7px;
+  font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(26,16,40,0.4); border-bottom: 2px solid transparent;
+  transition: all 0.18s; display: flex; align-items: center; gap: 7px;
 }
-.tab-btn:hover { color: rgba(30,16,48,0.75); }
-.tab-btn.active { color: #1e1030; border-bottom-color: #5a3878; }
+.tab-btn:hover { color: rgba(26,16,40,0.72); }
+.tab-btn.active { color: #1a1028; border-bottom-color: #5a3878; }
 .tab-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
 /* ── CONTENT ── */
@@ -269,14 +269,16 @@ body::before {
 .info-text { font-size: 12.5px; color: var(--ink2); line-height: 1.65; }
 .info-text strong { color: var(--ink); }
 .info-line {
-  padding: 4px 0;
-  border-bottom: 1px solid rgba(226,213,204,0.5);
+  padding: 5px 0 5px 10px;
+  border-bottom: 1px solid rgba(226,213,204,0.45);
+  border-left: 2px solid rgba(226,213,204,0.7);
   line-height: 1.6;
   font-size: 12.5px;
   color: var(--ink2);
+  margin-left: 2px;
 }
-.info-line:first-child { padding-top: 1px; }
-.info-line:last-child { border-bottom: none; padding-bottom: 1px; }
+.info-line:first-child { padding-top: 2px; }
+.info-line:last-child { border-bottom: none; padding-bottom: 2px; }
 .info-line strong { color: var(--ink); }
 
 .info-label.moa { background: #f0f4fd; color: #3a5080; border: 1px solid #c8d4f0; }
@@ -383,9 +385,9 @@ body::before {
   display: inline-block; vertical-align: middle;
   line-height: 1.6; flex-shrink: 0;
 }
-.tier-1 { background: linear-gradient(135deg, #d4607a1a, #d4607a38); color: #9e3a5a; border: 1px solid rgba(212,96,122,0.38); }
-.tier-2 { background: rgba(107,90,158,0.12); color: #4a3a7a; border: 1px solid rgba(107,90,158,0.3); }
-.tier-3 { background: rgba(138,112,96,0.12); color: #6a5040; border: 1px solid rgba(138,112,96,0.25); }
+.tier-1 { background: rgba(192,48,80,0.08); color: #c03050; border: 1px solid rgba(192,48,80,0.3); }
+.tier-2 { background: rgba(184,88,32,0.08); color: #b85820; border: 1px solid rgba(184,88,32,0.3); }
+.tier-3 { background: rgba(138,110,16,0.07); color: #7a5e10; border: 1px solid rgba(138,110,16,0.25); }
 
 /* Full-window improvements */
 @media(min-width: 1400px) {
@@ -415,14 +417,14 @@ body::before {
       </div>
     </div>
     <div class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('autonomic',this)"><span class="tab-dot" style="background:var(--auto)"></span>Autonomic</button>
-      <button class="tab-btn" onclick="switchTab('cv',this)"><span class="tab-dot" style="background:var(--cv)"></span>Cardiovascular</button>
-      <button class="tab-btn" onclick="switchTab('blood',this)"><span class="tab-dot" style="background:var(--blood)"></span>Blood</button>
-      <button class="tab-btn" onclick="switchTab('neuro',this)"><span class="tab-dot" style="background:var(--neuro)"></span>Neuro / Psych</button>
-      <button class="tab-btn" onclick="switchTab('micro',this)"><span class="tab-dot" style="background:var(--micro)"></span>Antimicrobials</button>
+      <button class="tab-btn active" onclick="switchTab('micro',this)"><span class="tab-dot" style="background:var(--micro)"></span>Antimicrobials</button>
+      <button class="tab-btn" onclick="switchTab('autonomic',this)"><span class="tab-dot" style="background:var(--auto)"></span>Autonomic</button>
+      <button class="tab-btn" onclick="switchTab('cv',this)"><span class="tab-dot" style="background:var(--cv)"></span>Cardiovascular &amp; Renal</button>
+      <button class="tab-btn" onclick="switchTab('blood',this)"><span class="tab-dot" style="background:var(--blood)"></span>Blood &amp; Inflammation</button>
+      <button class="tab-btn" onclick="switchTab('pulm',this)"><span class="tab-dot" style="background:var(--pulm)"></span>Smooth Muscle</button>
       <button class="tab-btn" onclick="switchTab('gi',this)"><span class="tab-dot" style="background:var(--gi)"></span>GI &amp; Endocrine</button>
-      <button class="tab-btn" onclick="switchTab('pulm',this)"><span class="tab-dot" style="background:var(--pulm)"></span>Pulm / Vascular</button>
-      <button class="tab-btn" onclick="switchTab('onco',this)"><span class="tab-dot" style="background:var(--onco)"></span>Oncology</button>
+      <button class="tab-btn" onclick="switchTab('neuro',this)"><span class="tab-dot" style="background:var(--neuro)"></span>Neuro &amp; Psych</button>
+      <button class="tab-btn" onclick="switchTab('onco',this)"><span class="tab-dot" style="background:var(--onco)"></span>Antineoplastics</button>
     </div>
   </div>
 </div>
@@ -437,7 +439,7 @@ body::before {
     </div>
   </div>
 
-  <div id="tab-autonomic" class="tab-panel active">
+  <div id="tab-autonomic" class="tab-panel">
     <div class="sys-intro bg-auto" style="border-color:rgba(181,90,112,0.2)">
       <div class="sys-intro-icon">⚡</div>
       <div>
@@ -452,7 +454,7 @@ body::before {
     <div class="sys-intro bg-cv" style="border-color:rgba(148,48,80,0.2)">
       <div class="sys-intro-icon">♥</div>
       <div>
-        <div class="sys-intro-title c-cv">Cardiovascular Pharmacology</div>
+        <div class="sys-intro-title c-cv">Cardiovascular &amp; Renal Pharmacology</div>
         <div class="sys-intro-text">The most tested drug system on Step 1. Know ACEi/ARBs cold — they appear in HF, HTN, CKD, and post-MI vignettes. Antiarrhythmic classes: think ion channels first, then drugs. Diuretic electrolyte effects are guaranteed questions.</div>
       </div>
     </div>
@@ -463,7 +465,7 @@ body::before {
     <div class="sys-intro bg-blood" style="border-color:rgba(138,58,110,0.2)">
       <div class="sys-intro-icon">🩸</div>
       <div>
-        <div class="sys-intro-title c-blood">Blood, Coagulation &amp; Inflammation</div>
+        <div class="sys-intro-title c-blood">Blood &amp; Inflammation</div>
         <div class="sys-intro-text">Anticoagulants appear on nearly every Step 1 exam — know reversal agents cold. Heparin-induced thrombocytopenia (HIT) is a classic trap. NSAIDs are the most-prescribed drugs in medicine; their mechanism and GI/renal toxicity are ubiquitous.</div>
       </div>
     </div>
@@ -474,14 +476,14 @@ body::before {
     <div class="sys-intro bg-neuro" style="border-color:rgba(107,90,158,0.2)">
       <div class="sys-intro-icon">🧠</div>
       <div>
-        <div class="sys-intro-title c-neuro">Neuro / Psychiatric Pharmacology</div>
+        <div class="sys-intro-title c-neuro">Neuro &amp; Psych</div>
         <div class="sys-intro-text">Psych block is massive on Step 1. Memorize antidepressant side effect profiles — TCA overdose, SSRI serotonin syndrome, and bupropion seizures appear constantly. Antipsychotic EPS and NMS are classic vignettes. Lithium toxicity has a narrow therapeutic window.</div>
       </div>
     </div>
     <div id="neuro-content"></div>
   </div>
 
-  <div id="tab-micro" class="tab-panel">
+  <div id="tab-micro" class="tab-panel active">
     <div class="sys-intro bg-micro" style="border-color:rgba(66,110,90,0.2)">
       <div class="sys-intro-icon">🦠</div>
       <div>
@@ -507,7 +509,7 @@ body::before {
     <div class="sys-intro bg-pulm" style="border-color:rgba(58,120,120,0.2)">
       <div class="sys-intro-icon">🫁</div>
       <div>
-        <div class="sys-intro-title c-pulm">Pulmonary, Vascular &amp; Smooth Muscle</div>
+        <div class="sys-intro-title c-pulm">Smooth Muscle</div>
         <div class="sys-intro-text">Asthma step therapy is heavily tested — know which drugs are for acute relief vs. maintenance. Nitrate tolerance (Monday disease) is a classic Step 1 vignette. Antihistamine receptor subtypes (H1 vs H2) determine organ effects and drug indication.</div>
       </div>
     </div>
@@ -518,7 +520,7 @@ body::before {
     <div class="sys-intro bg-onco" style="border-color:rgba(58,96,96,0.2)">
       <div class="sys-intro-icon">⚗</div>
       <div>
-        <div class="sys-intro-title c-onco">Antineoplastic Pharmacology</div>
+        <div class="sys-intro-title c-onco">Antineoplastics</div>
         <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong style="color:var(--onco)">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
       </div>
     </div>
@@ -534,7 +536,7 @@ const DRUGS = {
 
 autonomic: [
   {
-    group: "Parasympathomimetics",
+    group: "Parasympathetics",
     color: "auto",
     drugs: [
       {
@@ -579,7 +581,7 @@ autonomic: [
     ]
   },
   {
-    group: "Sympathomimetics & Adrenergic Drugs",
+    group: "Sympathetics",
     color: "auto",
     drugs: [
       {
@@ -653,7 +655,7 @@ autonomic: [
 
 cv: [
   {
-    group: "ACE Inhibitors & ARBs",
+    group: "Heart Failure & Renin-Angiotensin",
     color: "cv",
     drugs: [
       {
@@ -743,7 +745,7 @@ cv: [
     ]
   },
   {
-    group: "Antihypertensives",
+    group: "Anti-Hypertensives",
     color: "cv",
     drugs: [
       {
@@ -862,7 +864,7 @@ cv: [
 
 blood: [
   {
-    group: "Anticoagulants",
+    group: "Anticoagulants & Thrombolytics",
     color: "blood",
     drugs: [
       {
@@ -946,7 +948,7 @@ blood: [
     ]
   },
   {
-    group: "Lipid-Lowering Drugs",
+    group: "Dyslipidemia",
     color: "blood",
     drugs: [
       {
@@ -1032,38 +1034,6 @@ blood: [
         ci: "G6PD deficiency (hemolysis). Pre-existing retinal disease",
         pk: "Annual ophthalmology screening mandatory. Cumulative dose and daily dose/weight both matter for retinal toxicity. Long t½ (weeks)",
         pearl: "<strong>Hydroxychloroquine is disease-modifying in SLE</strong> — it reduces flares, hospitalizations, and mortality. Unlike most immunosuppressants, it's actually safe in pregnancy (used to prevent neonatal lupus). Retinal toxicity is the feared complication — baseline eye exam before starting, then annually."
-      },
-    ]
-  },
-  {
-    group: "Immunosuppressants",
-    color: "blood",
-    drugs: [
-      {
-        name: "Azathioprine",
-        summary: "Purine antimetabolite prodrug → 6-MP → inhibits de novo purine synthesis → ↓ lymphocyte proliferation. Used in transplant, autoimmune disease. DANGEROUS with allopurinol",
-        tier: 1,
-        aka: "Imuran · Prodrug of 6-mercaptopurine (6-MP)",
-        tags: ["Transplant", "Autoimmune", "IBD", "RA"],
-        moa: "<strong>Prodrug</strong> converted to <strong>6-mercaptopurine (6-MP)</strong> → further converted to 6-thioguanine nucleotides → inhibit de novo purine synthesis → suppress proliferation of <strong>T and B lymphocytes</strong> (lymphocytes rely on de novo synthesis, unlike most cells)",
-        use: "Organ transplant rejection prophylaxis (with other agents), Crohn's disease, ulcerative colitis (steroid-sparing), rheumatoid arthritis, SLE, myasthenia gravis, autoimmune hepatitis",
-        se: "<strong>Myelosuppression</strong> (leukopenia, thrombocytopenia, anemia — dose-limiting). <strong>Hepatotoxicity</strong> (↑ LFTs). Increased infection risk. GI upset. <strong>Malignancy risk</strong> (lymphoma, skin cancer with long-term use). Teratogenic",
-        ci: "<strong>Allopurinol / febuxostat co-administration</strong> (xanthine oxidase inhibitors block 6-MP metabolism → massive 6-MP accumulation → severe myelosuppression — FATAL if missed). Pregnancy. Severe myelosuppression",
-        pk: "<strong>TPMT (thiopurine methyltransferase) genotype testing</strong> before starting — TPMT deficiency → cannot metabolize 6-MP → severe myelosuppression. Metabolized by xanthine oxidase and TPMT. If allopurinol must be used, reduce azathioprine dose by 75%. Monitor CBC regularly",
-        pearl: "<strong>The azathioprine + allopurinol interaction is a classic Step 1 kill question.</strong> Allopurinol inhibits xanthine oxidase → 6-MP cannot be cleared → toxic accumulation → fatal myelosuppression. TPMT testing is standard of care before initiation. Lymphocytes are uniquely dependent on de novo purine synthesis (no salvage pathway backup), which is why this drug selectively immunosuppresses."
-      },
-      {
-        name: "Mycophenolate Mofetil",
-        summary: "Prodrug → mycophenolic acid → inhibits IMPDH → blocks de novo guanosine synthesis → selective suppression of T and B lymphocytes. Mainstay of solid organ transplant. Major teratogen",
-        tier: 1,
-        aka: "CellCept · Myfortic (enteric-coated) · MMF",
-        tags: ["Transplant", "Lupus Nephritis", "Autoimmune"],
-        moa: "<strong>Prodrug</strong> hydrolyzed to <strong>mycophenolic acid (MPA)</strong> → selectively inhibits <strong>inosine monophosphate dehydrogenase (IMPDH)</strong> → blocks de novo guanosine nucleotide synthesis → cytostatic effect on <strong>T and B lymphocytes</strong> (which lack a guanosine salvage pathway)",
-        use: "Solid organ transplant rejection prophylaxis (kidney, heart, liver — used with calcineurin inhibitor + corticosteroid). Lupus nephritis (first-line induction and maintenance). Myasthenia gravis. Steroid-sparing agent in various autoimmune conditions",
-        se: "<strong>GI toxicity</strong> (diarrhea, nausea, cramping — most common; enteric-coated formulation reduces GI burden). <strong>Myelosuppression</strong> (leukopenia, anemia, thrombocytopenia). Increased infection risk (CMV, PCP). <strong>Teratogenic</strong> (cleft lip/palate, limb abnormalities, miscarriage — two forms of contraception mandatory)",
-        ci: "<strong>Pregnancy</strong> (major teratogen — category D). Hypersensitivity to MMF. Caution with antacids/PPIs (↓ absorption via chelation)",
-        pk: "Rapidly hydrolyzed to MPA after oral absorption. Enterohepatic recirculation prolongs effect. Renal excretion. Antacids and cholestyramine reduce absorption. <strong>No dangerous allopurinol interaction</strong> (unlike azathioprine). Monitor CBC and renal function",
-        pearl: "<strong>MMF vs Azathioprine:</strong> Both target lymphocyte purine synthesis but via different enzymes — MMF inhibits IMPDH (guanosine pathway); azathioprine inhibits via 6-MP (overall purine synthesis). MMF has largely replaced azathioprine in transplant due to better efficacy and <strong>no allopurinol interaction</strong>. GI toxicity is MMF's main limitation — enteric-coated form helps. <strong>Teratogenicity is a major Step 1 theme</strong> — always flag in women of childbearing age and counsel on contraception."
       },
     ]
   },
@@ -1304,25 +1274,6 @@ neuro: [
         ci: "Levodopa: narrow-angle glaucoma, MAOIs (hypertensive crisis). Dopamine agonists + dopamine-blocking antipsychotics (antagonize each other)",
         pk: "Carbidopa inhibits peripheral (not central) DOPA decarboxylase — cannot cross BBB. This is why it's combined with levodopa. Without carbidopa, ≤1% of levodopa reaches the brain",
         pearl: "<strong>Parkinson's drug hierarchy for Step 1:</strong> Levodopa/carbidopa = gold standard. Young patient → consider dopamine agonist first (delay dyskinesias). Anticholinergics (benztropine) → tremor-predominant PD. Drug-induced Parkinsonism (antipsychotics) → benztropine or reduce antipsychotic dose. <strong>Never use dopamine-blocking drugs</strong> (haloperidol, metoclopramide) in PD — will worsen symptoms dramatically."
-      },
-    ]
-  },
-  {
-    group: "Migraine Pharmacology",
-    color: "neuro",
-    drugs: [
-      {
-        name: "Sumatriptan (Triptans)",
-        summary: "5-HT1B/1D agonists → cranial vasoconstriction + ↓ CGRP — acute migraine. CI: CAD/stroke (vasoconstrictors, NOT dilators)",
-        tier: 1,
-        aka: "Sumatriptan · Rizatriptan, Zolmitriptan, Eletriptan (-triptan suffix)",
-        tags: ["Migraine", "Cluster Headache", "Acute Treatment"],
-        moa: "Selective <strong>5-HT1B/1D receptor agonists</strong> → (1) vasoconstriction of cranial blood vessels — ↓ meningeal vasodilation. (2) Inhibit release of CGRP and substance P from trigeminal nerve terminals → ↓ neurogenic inflammation. (3) Presynaptic inhibition of pain transmission",
-        use: "Acute migraine (first-line for moderate-severe). Cluster headache (subcutaneous sumatriptan only). NOT for migraine prevention (no prophylactic role). Most effective when taken at headache onset",
-        se: "<strong>Coronary vasospasm/chest tightness</strong> (serious — 5-HT1B on coronary arteries). Paresthesias, flushing, dizziness, neck tightness, triptan sensations (pressure/tightening in chest/throat — usually benign but must exclude cardiac). Serotonin syndrome if combined with MAOIs",
-        ci: "<strong>CAD, uncontrolled hypertension, history of stroke/TIA, Prinzmetal angina</strong>, hemiplegic or basilar migraine, pregnancy (relative), within 24 hours of ergotamine use, concurrent MAOIs (serotonin syndrome)",
-        pk: "Sumatriptan: subcutaneous (fastest — 10 min onset), intranasal, or oral. Most triptans: 2-hour time to peak effect. Avoid within 24 hours of ergotamines (additive vasospasm)",
-        pearl: "<strong>Triptan MOA pearl:</strong> They are NOT vasodilators — they are vasoCONSTRICTORS of cerebral vessels. This is why they're contraindicated in CAD/stroke. Serotonin syndrome risk: triptans + MAOIs or linezolid. Don't confuse with ergotamines — both constrict cranial vessels but different receptor mechanisms."
       },
     ]
   },
@@ -1611,7 +1562,7 @@ micro: [
 
 gi: [
   {
-    group: "GI Pharmacology",
+    group: "Gastrointestinal",
     color: "gi",
     drugs: [
       {
@@ -1656,7 +1607,7 @@ gi: [
     ]
   },
   {
-    group: "Diabetes Pharmacology",
+    group: "Diabetes",
     color: "gi",
     drugs: [
       {
@@ -1727,7 +1678,7 @@ gi: [
     ]
   },
   {
-    group: "Thyroid Pharmacology",
+    group: "Thyroid, Pituitary & Adrenal",
     color: "gi",
     drugs: [
       {
@@ -1778,7 +1729,7 @@ gi: [
     ]
   },
   {
-    group: "Bone & Endocrine",
+    group: "Bone & Calcium",
     color: "gi",
     drugs: [
       {
@@ -1800,7 +1751,7 @@ gi: [
 
 pulm: [
   {
-    group: "Asthma & Respiratory",
+    group: "Allergy & Pulmonary",
     color: "pulm",
     drugs: [
       {
@@ -1884,7 +1835,7 @@ pulm: [
     ]
   },
   {
-    group: "Nitrates & Vasodilators",
+    group: "Vasoactive",
     color: "pulm",
     drugs: [
       {
@@ -1900,13 +1851,46 @@ pulm: [
         pk: "Sublingual: onset 1–2 min, duration 30 min. IV: titratable. Patch: 12–14 hrs on, then off to prevent tolerance",
         pearl: "<strong>Nitrate tolerance:</strong> The mechanism is depletion of sulfhydryl groups needed for NO generation. Monday disease: industrial workers exposed to nitrates all week → vasodilation tolerance. Weekend off → sulfhydryl groups replenish. Monday back to work → reflex vasoconstriction on withdrawal → angina/MI."
       },
+      {
+        name: "Prostaglandins, Prostacyclin, Bosentan & PDE5 Inhibitors",
+        summary: "PAH drug classes: PGI2 analogs (prostacyclins) → vasodilation + ↓ platelet aggregation; endothelin antagonists (bosentan) → block ET-1 vasoconstriction; PDE5 inhibitors (sildenafil) → ↑ cGMP → pulmonary vasodilation. Also: PGE1/PGE2 for ductus arteriosus, ulcers, and labor induction",
+        tier: 2,
+        aka: "Prostacyclins: Epoprostenol (IV), Iloprost (inhaled), Treprostinil · Endothelin antagonist: Bosentan, Ambrisentan · PDE5 inhibitors: Sildenafil (Viagra/Revatio), Tadalafil (Cialis/Adcirca) · PGE1: Alprostadil, Misoprostol · PGE2: Dinoprostone",
+        tags: ["Pulmonary HTN", "PAH", "Erectile Dysfunction", "Prostaglandins"],
+        moa: "<strong>Prostacyclins (PGI2 analogs):</strong> Bind IP receptors → ↑ cAMP → pulmonary smooth muscle relaxation + inhibit platelet aggregation. <strong>Bosentan:</strong> Competitive antagonist of endothelin-1 (ET-1) receptors → blocks ET-1–mediated vasoconstriction and smooth muscle proliferation. <strong>PDE5 inhibitors:</strong> Inhibit PDE5 → prevent cGMP breakdown → ↑ cGMP → smooth muscle relaxation → pulmonary and penile vasodilation. <strong>PGE1 (alprostadil/misoprostol):</strong> Vasodilation, maintain ductus arteriosus, ↓ gastric acid. <strong>PGE2 (dinoprostone):</strong> Cervical ripening and uterine contraction",
+        use: "<strong>PDE5 inhibitors:</strong> PAH, erectile dysfunction. <strong>Prostacyclins:</strong> PAH (epoprostenol IV most potent). <strong>Bosentan:</strong> PAH. <strong>Alprostadil (PGE1):</strong> Keep ductus arteriosus open in cyanotic CHD, erectile dysfunction. <strong>Misoprostol:</strong> NSAID-induced ulcer prevention, cervical ripening, postpartum hemorrhage. <strong>Dinoprostone (PGE2):</strong> Labor induction, cervical ripening",
+        se: "<strong>PDE5 inhibitors:</strong> Hypotension (especially with nitrates — DANGEROUS), flushing, headache, visual disturbances (sildenafil — transient blue-tinge). <strong>Bosentan:</strong> <strong>Hepatotoxicity</strong> (monitor LFTs), teratogenic (contraception mandatory), anemia. <strong>Prostacyclins:</strong> Flushing, jaw pain, diarrhea, hypotension. <strong>Misoprostol:</strong> Diarrhea, uterine cramping (avoid in pregnancy except for intended induction)",
+        ci: "<strong>PDE5 inhibitors + nitrates = ABSOLUTE CI</strong> (synergistic cGMP ↑ → severe/fatal hypotension). Bosentan: pregnancy (teratogen), severe hepatic impairment. Misoprostol: unintended pregnancy. Alprostadil: respiratory distress syndrome",
+        pk: "Sildenafil: CYP3A4 substrate. Bosentan: CYP3A4/2C9 inducer — reduces OCP levels (add barrier method). Epoprostenol: t½ ~6 min — requires continuous IV infusion; abrupt discontinuation causes rebound PAH crisis",
+        pearl: "<strong>PAH three-pathway approach:</strong> (1) NO pathway → PDE5 inhibitors ↑ cGMP; (2) Prostacyclin pathway → epoprostenol ↑ cAMP; (3) Endothelin pathway → bosentan blocks ET-1. The classic kill question: <strong>sildenafil + nitrates = fatal hypotension</strong> (both ↑ cGMP). Also: alprostadil keeps the ductus arteriosus open in cyanotic neonates — life-saving bridge to surgery."
+      },
     ]
   },
+  {
+    group: "Triptans & Migraine",
+    color: "pulm",
+    drugs: [
+      {
+        name: "Sumatriptan (Triptans)",
+        summary: "5-HT1B/1D agonists → cranial vasoconstriction + ↓ CGRP — acute migraine. CI: CAD/stroke (vasoconstrictors, NOT dilators)",
+        tier: 1,
+        aka: "Sumatriptan · Rizatriptan, Zolmitriptan, Eletriptan (-triptan suffix)",
+        tags: ["Migraine", "Cluster Headache", "Acute Treatment"],
+        moa: "Selective <strong>5-HT1B/1D receptor agonists</strong> → (1) vasoconstriction of cranial blood vessels — ↓ meningeal vasodilation. (2) Inhibit release of CGRP and substance P from trigeminal nerve terminals → ↓ neurogenic inflammation. (3) Presynaptic inhibition of pain transmission",
+        use: "Acute migraine (first-line for moderate-severe). Cluster headache (subcutaneous sumatriptan only). NOT for migraine prevention (no prophylactic role). Most effective when taken at headache onset",
+        se: "<strong>Coronary vasospasm/chest tightness</strong> (serious — 5-HT1B on coronary arteries). Paresthesias, flushing, dizziness, neck tightness, triptan sensations (pressure/tightening in chest/throat — usually benign but must exclude cardiac). Serotonin syndrome if combined with MAOIs",
+        ci: "<strong>CAD, uncontrolled hypertension, history of stroke/TIA, Prinzmetal angina</strong>, hemiplegic or basilar migraine, pregnancy (relative), within 24 hours of ergotamine use, concurrent MAOIs (serotonin syndrome)",
+        pk: "Sumatriptan: subcutaneous (fastest — 10 min onset), intranasal, or oral. Most triptans: 2-hour time to peak effect. Avoid within 24 hours of ergotamines (additive vasospasm)",
+        pearl: "<strong>Triptan MOA pearl:</strong> They are NOT vasodilators — they are vasoCONSTRICTORS of cerebral vessels. This is why they're contraindicated in CAD/stroke. Serotonin syndrome risk: triptans + MAOIs or linezolid. Don't confuse with ergotamines — both constrict cranial vessels but different receptor mechanisms."
+      },
+    ]
+  },,
+
 ],
 
 onco: [
   {
-    group: "Chemotherapy by Mechanism",
+    group: "Antimetabolites & Cell Cycle Drugs",
     color: "onco",
     drugs: [
       {
@@ -2002,6 +1986,39 @@ onco: [
       },
     ]
   },
+  {
+    group: "Immunosuppressants",
+    color: "onco",
+    drugs: [
+      {
+        name: "Azathioprine",
+        summary: "Purine antimetabolite prodrug → 6-MP → inhibits de novo purine synthesis → ↓ lymphocyte proliferation. Used in transplant, autoimmune disease. DANGEROUS with allopurinol",
+        tier: 1,
+        aka: "Imuran · Prodrug of 6-mercaptopurine (6-MP)",
+        tags: ["Transplant", "Autoimmune", "IBD", "RA"],
+        moa: "<strong>Prodrug</strong> converted to <strong>6-mercaptopurine (6-MP)</strong> → further converted to 6-thioguanine nucleotides → inhibit de novo purine synthesis → suppress proliferation of <strong>T and B lymphocytes</strong> (lymphocytes rely on de novo synthesis, unlike most cells)",
+        use: "Organ transplant rejection prophylaxis (with other agents), Crohn's disease, ulcerative colitis (steroid-sparing), rheumatoid arthritis, SLE, myasthenia gravis, autoimmune hepatitis",
+        se: "<strong>Myelosuppression</strong> (leukopenia, thrombocytopenia, anemia — dose-limiting). <strong>Hepatotoxicity</strong> (↑ LFTs). Increased infection risk. GI upset. <strong>Malignancy risk</strong> (lymphoma, skin cancer with long-term use). Teratogenic",
+        ci: "<strong>Allopurinol / febuxostat co-administration</strong> (xanthine oxidase inhibitors block 6-MP metabolism → massive 6-MP accumulation → severe myelosuppression — FATAL if missed). Pregnancy. Severe myelosuppression",
+        pk: "<strong>TPMT (thiopurine methyltransferase) genotype testing</strong> before starting — TPMT deficiency → cannot metabolize 6-MP → severe myelosuppression. Metabolized by xanthine oxidase and TPMT. If allopurinol must be used, reduce azathioprine dose by 75%. Monitor CBC regularly",
+        pearl: "<strong>The azathioprine + allopurinol interaction is a classic Step 1 kill question.</strong> Allopurinol inhibits xanthine oxidase → 6-MP cannot be cleared → toxic accumulation → fatal myelosuppression. TPMT testing is standard of care before initiation. Lymphocytes are uniquely dependent on de novo purine synthesis (no salvage pathway backup), which is why this drug selectively immunosuppresses."
+      },
+      {
+        name: "Mycophenolate Mofetil",
+        summary: "Prodrug → mycophenolic acid → inhibits IMPDH → blocks de novo guanosine synthesis → selective suppression of T and B lymphocytes. Mainstay of solid organ transplant. Major teratogen",
+        tier: 1,
+        aka: "CellCept · Myfortic (enteric-coated) · MMF",
+        tags: ["Transplant", "Lupus Nephritis", "Autoimmune"],
+        moa: "<strong>Prodrug</strong> hydrolyzed to <strong>mycophenolic acid (MPA)</strong> → selectively inhibits <strong>inosine monophosphate dehydrogenase (IMPDH)</strong> → blocks de novo guanosine nucleotide synthesis → cytostatic effect on <strong>T and B lymphocytes</strong> (which lack a guanosine salvage pathway)",
+        use: "Solid organ transplant rejection prophylaxis (kidney, heart, liver — used with calcineurin inhibitor + corticosteroid). Lupus nephritis (first-line induction and maintenance). Myasthenia gravis. Steroid-sparing agent in various autoimmune conditions",
+        se: "<strong>GI toxicity</strong> (diarrhea, nausea, cramping — most common; enteric-coated formulation reduces GI burden). <strong>Myelosuppression</strong> (leukopenia, anemia, thrombocytopenia). Increased infection risk (CMV, PCP). <strong>Teratogenic</strong> (cleft lip/palate, limb abnormalities, miscarriage — two forms of contraception mandatory)",
+        ci: "<strong>Pregnancy</strong> (major teratogen — category D). Hypersensitivity to MMF. Caution with antacids/PPIs (↓ absorption via chelation)",
+        pk: "Rapidly hydrolyzed to MPA after oral absorption. Enterohepatic recirculation prolongs effect. Renal excretion. Antacids and cholestyramine reduce absorption. <strong>No dangerous allopurinol interaction</strong> (unlike azathioprine). Monitor CBC and renal function",
+        pearl: "<strong>MMF vs Azathioprine:</strong> Both target lymphocyte purine synthesis but via different enzymes — MMF inhibits IMPDH (guanosine pathway); azathioprine inhibits via 6-MP (overall purine synthesis). MMF has largely replaced azathioprine in transplant due to better efficacy and <strong>no allopurinol interaction</strong>. GI toxicity is MMF's main limitation — enteric-coated form helps. <strong>Teratogenicity is a major Step 1 theme</strong> — always flag in women of childbearing age and counsel on contraception."
+      },
+    ]
+  },,
+
 ],
 
 };
@@ -2025,25 +2042,63 @@ function drugCardHTML(drug, colorClass, idx) {
     </div>
     ${drug.summary ? `<div class="drug-summary">${drug.summary}</div>` : ''}
     <div class="drug-body">
-      ${drug.moa ? `<div class="info-row"><span class="info-label moa">Mechanism</span><div class="info-text">${drug.moa}</div></div>` : ''}
+      ${drug.moa ? `<div class="info-row"><span class="info-label moa">Mechanism</span><div class="info-text">${formatLines(drug.moa)}</div></div>` : ''}
       ${drug.use ? `<div class="info-row"><span class="info-label use">Uses</span><div class="info-text">${formatLines(drug.use)}</div></div>` : ''}
       ${drug.se ? `<div class="info-row"><span class="info-label se">Side Effects</span><div class="info-text">${formatLines(drug.se)}</div></div>` : ''}
-      ${drug.ci ? `<div class="info-row"><span class="info-label ci">Contraindications</span><span class="info-text">${drug.ci}</span></div>` : ''}
-      ${drug.pk ? `<div class="info-row"><span class="info-label pk">Pharmacokinetics</span><span class="info-text">${drug.pk}</span></div>` : ''}
+      ${drug.ci ? `<div class="info-row"><span class="info-label ci">Contraindications</span><div class="info-text">${formatLines(drug.ci)}</div></div>` : ''}
+      ${drug.pk ? `<div class="info-row"><span class="info-label pk">Pharmacokinetics</span><div class="info-text">${formatLines(drug.pk)}</div></div>` : ''}
       ${drug.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${drug.pearl}</div></div>` : ''}
     </div>
   </div>`;
 }
 
-// Split text on ". Capital" boundaries into visual line entries
+// Format text into visual lines for readability
 function formatLines(text) {
-  // Split on ". " followed by uppercase letter or common drug-name patterns
-  const parts = text.split(/\.\s+(?=[A-Z0-9(↑↓])/);
+  if (!text) return text;
+
+  // Step 1: Normalise HTML — temporarily replace <strong>...</strong> so we don't
+  // accidentally split inside a bold tag.  We'll put them back after.
+  // (Simple approach: just split on structural boundaries, not inside tags)
+
+  // Split boundaries:
+  // A) ". " followed by uppercase letter, digit, (, ↑, ↓, or arrow —
+  //    the classic "new sentence starting with a drug name or capital"
+  // B) ". Also: " / ". Note:" transitions
+  // C) Drug-name prefixes mid-sentence: after a comma+space when followed by
+  //    a known pattern like "Word: " or "Word/Word: "
+  //    e.g. "...hyperglycemia. Clopidogrel: TTP" → split before "Clopidogrel:"
+
+  let parts = [];
+
+  // First split on sentence boundaries before capitals/numbers
+  const sentenceSplit = text.split(/\.\s+(?=[A-Z↑↓(0-9])/);
+
+  sentenceSplit.forEach(segment => {
+    // Within each sentence, further split on "DrugName: " mid-sentence patterns
+    // i.e. a word (possibly with / or -) followed by colon+space NOT at start
+    // Only split if there's already content before it (not at the very beginning)
+    const midSplit = segment.split(/(?<=\w)\. (?=[A-Z][a-zA-Z/\-]+:)/);
+    if (midSplit.length > 1) {
+      midSplit.forEach((p, i) => {
+        if (i < midSplit.length - 1) parts.push(p + '.');
+        else parts.push(p);
+      });
+    } else {
+      parts.push(segment);
+    }
+  });
+
+  // Clean up: restore periods on non-terminal parts that lost them
+  parts = parts.map((p, i) => {
+    p = p.trim();
+    if (i < parts.length - 1 && !p.endsWith('.') && !p.endsWith('>') && !p.endsWith(')')) {
+      return p + '.';
+    }
+    return p;
+  }).filter(p => p.length > 0);
+
   if (parts.length <= 1) return text;
-  return parts.map((p, i) => {
-    const line = (i < parts.length - 1 && !p.endsWith('.')) ? p + '.' : p;
-    return `<div class="info-line">${line}</div>`;
-  }).join('');
+  return parts.map(p => `<div class="info-line">${p}</div>`).join('');
 }
 
 function renderSection(sectionId, sysKey) {
