@@ -394,12 +394,27 @@ body::before {
   .brand-title { font-size: 34px; }
   .tabs { flex-wrap: wrap; }
 }
+.back-link {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  margin-bottom: 14px;
+  transition: opacity 0.15s;
+}
+.back-link:hover {
+  opacity: 0.7;
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-inner">
+    <a href="index.html" class="back-link">← Back to Hub</a>
     <div class="header-top">
       <div>
         <p class="brand-super">Step 1 · Pharmacology Reference</p>
