@@ -106,7 +106,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px;}
 
 /* Tool card */
-.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;border-top:3px solid;text-decoration:none;color:inherit;transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .18s;box-shadow:0 1px 8px rgba(26,20,40,0.05);display:block;position:relative;}
+.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;border-top:3px solid;text-decoration:none;color:inherit;transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .18s;box-shadow:0 1px 8px rgba(26,20,40,0.05);display:block;position:relative;}
 .tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(26,20,40,0.1);}
 .tool-card:hover .card-arrow{transform:translate(3px,-3px);}
 .card-inner{padding:22px 22px 20px;}
@@ -144,28 +144,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .card-add-inner{display:flex;flex-direction:column;align-items:center;gap:8px;}
 .card-add-text{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;}
 
-/* QOTD Banner */
-.qotd-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;background:var(--fuji);background-image:linear-gradient(120deg,#1a1428 0%,#3d2e6e 45%,#2a1e50 100%);border-radius:18px;padding:22px 28px;text-decoration:none;border:1px solid rgba(232,132,154,.15);box-shadow:0 2px 16px rgba(26,20,40,.12);transition:transform .18s,box-shadow .18s;}
-.qotd-banner:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(26,20,40,.2);}
+/* QOTD Banner (Soft Surface Theme) */
+.qotd-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;background:var(--surface);border-radius:14px;padding:22px 28px;text-decoration:none;border:1px solid var(--border);box-shadow:0 2px 16px rgba(26,20,40,.04);transition:transform .18s,box-shadow .18s;}
+.qotd-banner:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(26,20,40,.08);}
 .qotd-left{display:flex;align-items:center;gap:18px;}
-.qotd-icon{font-size:22px;width:52px;height:52px;border-radius:14px;background:rgba(232,132,154,.12);border:1px solid rgba(232,132,154,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.qotd-label{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--sakura);margin-bottom:3px;}
-.qotd-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#fdf5f7;line-height:1.2;margin-bottom:3px;}
-.qotd-sub{font-size:11.5px;color:rgba(255,220,230,.4);}
-.qotd-cta{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sakura);border:1px solid rgba(232,132,154,.3);background:rgba(232,132,154,.1);border-radius:10px;padding:10px 18px;white-space:nowrap;flex-shrink:0;transition:background .15s,border-color .15s;}
-.qotd-banner:hover .qotd-cta{background:rgba(232,132,154,.2);border-color:rgba(232,132,154,.5);}
+.qotd-icon{font-size:22px;width:52px;height:52px;border-radius:14px;background:rgba(232,132,154,.08);border:1px solid rgba(232,132,154,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--sakura2);}
+.qotd-label{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--sakura2);margin-bottom:3px;}
+.qotd-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--ink);line-height:1.2;margin-bottom:3px;}
+.qotd-sub{font-size:11.5px;color:var(--muted);}
+.qotd-cta{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink2);border:1px solid var(--border);background:var(--bg2);border-radius:10px;padding:10px 18px;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.qotd-banner:hover .qotd-cta{background:var(--sakura-light);border-color:rgba(232,132,154,.3);color:var(--sakura2);}
 
-/* Quote strip */
-.quote-strip{margin-top:13px;padding:26px 34px;background:var(--surface2);border:1px solid var(--border);border-radius:18px;position:relative;overflow:hidden;}
-.quote-strip::before{content:'桜';position:absolute;right:18px;bottom:-18px;font-size:110px;color:rgba(232,132,154,.07);line-height:1;pointer-events:none;font-family:'Cormorant Garamond',serif;}
+/* Banners & Strips (Sketchy Alert Theme) */
+.quote-strip{margin-top:13px;margin-bottom:22px;padding:26px 34px;background:rgba(61,46,110,0.06);border:1px solid rgba(90,68,144,0.2);border-left:3px solid var(--fuji2);border-radius:12px;position:relative;overflow:hidden;}
+.quote-strip::before{content:'桜';position:absolute;right:18px;bottom:-18px;font-size:110px;color:rgba(90,68,144,.04);line-height:1;pointer-events:none;font-family:'Cormorant Garamond',serif;}
 .q-text{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.5vw,21px);font-style:italic;font-weight:300;color:var(--ink2);line-height:1.55;position:relative;z-index:1;}
-.q-text strong{font-style:normal;font-weight:600;color:var(--sakura2);}
+.q-text strong{font-style:normal;font-weight:600;color:var(--fuji2);}
 .q-attr{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-top:10px;display:block;}
 
-/* Japan callout */
-.japan-callout{margin-top:13px;padding:16px 22px;background:linear-gradient(110deg,rgba(232,132,154,.07) 0%,rgba(61,46,110,.06) 100%);border:1px solid var(--border);border-left:3px solid var(--sakura);border-radius:12px;display:flex;align-items:center;gap:14px;}
-.jc-text{font-size:12px;color:var(--muted);line-height:1.6;}
-.jc-text strong{color:var(--ink2);}
+.japan-callout{margin-top:13px;margin-bottom:22px;padding:16px 20px;background:rgba(61,46,110,0.06);border:1px solid rgba(90,68,144,0.2);border-left:3px solid var(--fuji2);border-radius:12px;display:flex;align-items:center;gap:14px;}
+.jc-text{font-size:13px;color:var(--muted);line-height:1.7;}
+.jc-text strong{color:var(--fuji2);}
 
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(26,20,40,.45);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
@@ -264,11 +263,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   <header class="hero">
     <div class="hero-eyebrow">Step 1 Study Hub</div>
     <h1 class="hero-name">Your <em>Study Resources,</em><br/>All in One Place</h1>
-    <p class="hero-sub">A personal library for the road ahead</p>
-    <p class="hero-jp">桜 &nbsp;·&nbsp; 富士山 &nbsp;·&nbsp; 医学</p>
     <div class="blossom-div">
       <div class="bdl l"></div>
-      <span style="font-size:16px;letter-spacing:5px;">🌸🌸🌸</span>
+      <span style="font-size:16px;letter-spacing:5px;">🌸Just a Little Longer🌸</span>
       <div class="bdl r"></div>
     </div>
     <div class="countdown-wrap">
@@ -288,7 +285,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
   <div class="sec-label">🌸 &nbsp;My Study Tools</div>
   <div class="tool-grid">
-    <a class="tool-card card-pharm" href="drug_facts.html">
+    <a class="tool-card card-pharm" href="drugfacts.html">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">💊</div>
