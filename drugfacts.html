@@ -92,7 +92,7 @@ body::before {
 .header {
   background: #c4b4d6;
   background-image: linear-gradient(120deg, #c0b0d2 0%, #cabdd8 55%, #bcb0d0 100%);
-  border-bottom: 1px solid rgba(90,56,120,0.18);
+  /* Remove the border-bottom line here */
   padding: 24px 44px 0;
   position: sticky; 
   top: 0; 
@@ -149,7 +149,13 @@ body::before {
 .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(40,20,70,0.38); font-size: 14px; pointer-events: none; }
 
 /* ── TABS ── */
-.tabs { display: flex; gap: 0; overflow-x: auto; padding-bottom: 0; }
+.tabs { 
+  display: flex; 
+  gap: 0; 
+  overflow-x: auto; 
+  padding-bottom: 0; 
+  flex-wrap: nowrap; /* Forces one single line on desktop */
+}
 .tabs::-webkit-scrollbar { height: 0; }
 .tab-btn {
   padding: 11px 18px; white-space: nowrap;
@@ -402,36 +408,28 @@ body::before {
 @media(max-width: 768px) {
   .header { 
     padding: 12px 14px 0; 
-    transition: transform 0.3s ease-in-out; /* Only slides on mobile */
+    transition: transform 0.3s ease-in-out;
   }
   
-  /* This movement class now only exists for small screens */
   .header--hidden {
     transform: translateY(-100%);
+  }
+
+  /* These styles ONLY apply on mobile */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 201;
+    background: #bcb0d0; /* Solid background for mobile legibility */
+    padding: 8px 4px;
+    margin-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.2); /* The line only appears on mobile */
   }
 
   .content { padding: 12px 12px 60px; }
   .drug-grid { grid-template-columns: 1fr; }
   .header-top { flex-direction: column; gap: 12px; }
   .search-wrap { max-width: 100%; }
-
-  /* Touch Target & Legibility Fixes */
-  .tab-btn { 
-    padding: 12px 14px; 
-    font-size: 10px; 
-  }
-  .drug-name { font-size: 20px; }
-  
-  /* Sticky Tabs: Keeps tabs pinned and looking solid on mobile */
-  .tabs {
-    position: sticky;
-    top: 0;
-    z-index: 201;
-    background: #bcb0d0; /* Matches the bottom of your header gradient */
-    padding: 8px 0;
-    margin-top: 5px;
-    border-top: 1px solid rgba(255,255,255,0.2);
-  }
 }
 /* ── TIER BADGE ── */
 .tier-badge {
@@ -449,7 +447,6 @@ body::before {
 /* Full-window improvements */
 @media(min-width: 1400px) {
   .brand-title { font-size: 34px; }
-  .tabs { flex-wrap: wrap; }
 }
 .back-link {
   display: inline-block;
