@@ -2218,15 +2218,14 @@ function drugCardHTML(drug, colorClass, idx) {
 // Format text into visual lines for readability
 function formatLines(text) {
   if (!text) return text;
+  
+  // Convert Markdown **bold** to HTML <strong>
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
   let parts = [];
-
-  // Split on ". " followed by an optional HTML tag, then a capital letter or number
   const sentenceSplit = text.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
 
   sentenceSplit.forEach(segment => {
-    // Within each sentence, further split on "DrugName:" mid-sentence patterns
-    // Now updated to look past <strong> tags
     const midSplit = segment.split(/(?<=\w)\.\s+(?=(?:<[^>]+>)*[A-Z][a-zA-Z/\-]+(?:<\/[^>]+>)?:)/);
     if (midSplit.length > 1) {
       midSplit.forEach((p, i) => {
@@ -2238,7 +2237,6 @@ function formatLines(text) {
     }
   });
 
-  // Clean up: restore periods on non-terminal parts that lost them
   parts = parts.map((p, i) => {
     p = p.trim();
     if (i < parts.length - 1 && !p.endsWith('.') && !p.endsWith('>') && !p.endsWith(')')) {
