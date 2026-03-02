@@ -547,7 +547,7 @@ function updateTracker(){
     const el=document.getElementById("chip-t"+t);
     if(el) el.textContent=av.filter(v=>v.tier===t).length;
   });
-
+  if(document.getElementById("tier1-count")) document.getElementById("tier1-count").textContent = av.filter(v=>v.tier===1).length;
   const el=document.getElementById("tracker-pct"),bar=document.getElementById("tracker-bar"),
         note=document.getElementById("tracker-note"),chip=document.getElementById("header-completed"),
         hrem=document.getElementById("header-remaining"),htot=document.getElementById("header-total");
