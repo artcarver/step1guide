@@ -2171,31 +2171,19 @@ function drugCardHTML(drug, colorClass, idx) {
 }
 
 // Format text into visual lines for readability
+// Format text into visual lines for readability
 function formatLines(text) {
   if (!text) return text;
 
-  // Step 1: Normalise HTML — temporarily replace <strong>...</strong> so we don't
-  // accidentally split inside a bold tag.  We'll put them back after.
-  // (Simple approach: just split on structural boundaries, not inside tags)
-
-  // Split boundaries:
-  // A) ". " followed by uppercase letter, digit, (, ↑, ↓, or arrow —
-  //    the classic "new sentence starting with a drug name or capital"
-  // B) ". Also: " / ". Note:" transitions
-  // C) Drug-name prefixes mid-sentence: after a comma+space when followed by
-  //    a known pattern like "Word: " or "Word/Word: "
-  //    e.g. "...hyperglycemia. Clopidogrel: TTP" → split before "Clopidogrel:"
-
   let parts = [];
 
-  // First split on sentence boundaries before capitals/numbers
-  const sentenceSplit = text.split(/\.\s+(?=[A-Z↑↓(0-9])/);
+  // Split on ". " followed by an optional HTML tag, then a capital letter or number
+  const sentenceSplit = text.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
 
   sentenceSplit.forEach(segment => {
-    // Within each sentence, further split on "DrugName: " mid-sentence patterns
-    // i.e. a word (possibly with / or -) followed by colon+space NOT at start
-    // Only split if there's already content before it (not at the very beginning)
-    const midSplit = segment.split(/(?<=\w)\. (?=[A-Z][a-zA-Z/\-]+:)/);
+    // Within each sentence, further split on "DrugName:" mid-sentence patterns
+    // Now updated to look past <strong> tags
+    const midSplit = segment.split(/(?<=\w)\.\s+(?=(?:<[^>]+>)*[A-Z][a-zA-Z/\-]+(?:<\/[^>]+>)?:)/);
     if (midSplit.length > 1) {
       midSplit.forEach((p, i) => {
         if (i < midSplit.length - 1) parts.push(p + '.');
