@@ -94,13 +94,10 @@ body::before {
   background-image: linear-gradient(120deg, #c0b0d2 0%, #cabdd8 55%, #bcb0d0 100%);
   border-bottom: 1px solid rgba(90,56,120,0.18);
   padding: 24px 44px 0;
-  position: sticky; top: 0; z-index: 200;
+  position: sticky; 
+  top: 0; 
+  z-index: 200;
   box-shadow: 0 1px 0 rgba(90,56,120,0.12), 0 6px 24px rgba(90,68,140,0.1);
-  transition: transform 0.3s ease-in-out;
-  will-change: transform;
-}
-.header--hidden {
-  transform: translateY(-100%);
 }
 .header-inner { max-width: 1340px; margin: 0 auto; }
 .header-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -403,7 +400,16 @@ body::before {
 }
 
 @media(max-width: 768px) {
-  .header { padding: 12px 14px 0; } 
+  .header { 
+    padding: 12px 14px 0; 
+    transition: transform 0.3s ease-in-out; /* Only slides on mobile */
+  }
+  
+  /* This movement class now only exists for small screens */
+  .header--hidden {
+    transform: translateY(-100%);
+  }
+
   .content { padding: 12px 12px 60px; }
   .drug-grid { grid-template-columns: 1fr; }
   .header-top { flex-direction: column; gap: 12px; }
@@ -416,14 +422,15 @@ body::before {
   }
   .drug-name { font-size: 20px; }
   
-  /* Sticky Tabs: Keeps tabs at top while header hides */
+  /* Sticky Tabs: Keeps tabs pinned and looking solid on mobile */
   .tabs {
     position: sticky;
     top: 0;
     z-index: 201;
-    background: var(--bg);
-    padding-top: 10px;
-    border-bottom: 1px solid var(--border);
+    background: #bcb0d0; /* Matches the bottom of your header gradient */
+    padding: 8px 0;
+    margin-top: 5px;
+    border-top: 1px solid rgba(255,255,255,0.2);
   }
 }
 /* ── TIER BADGE ── */
@@ -3037,17 +3044,16 @@ let lastScrollY = window.scrollY;
 const header = document.querySelector('.header');
 
 window.addEventListener('scroll', () => {
-  // Check if screen is mobile-sized (< 768px)
-  if (window.innerWidth <= 768) {
-    if (window.scrollY > lastScrollY && window.scrollY > 100) {
-      // Scrolling down on mobile - hide header
-      header.classList.add('header--hidden');
-    } else {
-      // Scrolling up on mobile - show header
-      header.classList.remove('header--hidden');
-    }
+  // HARD GUARD: If screen is wider than mobile (laptop/desktop), STOP here.
+  if (window.innerWidth > 768) {
+    header.classList.remove('header--hidden');
+    return; 
+  }
+
+  // Mobile-only logic
+  if (window.scrollY > lastScrollY && window.scrollY > 100) {
+    header.classList.add('header--hidden');
   } else {
-    // On laptop/desktop - force header to stay visible
     header.classList.remove('header--hidden');
   }
   lastScrollY = window.scrollY;
