@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sketchy Micro Tracker - Step 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fdf5f7;--bg2:#f7eaee;--surface:#fffafc;--surface2:#fdf0f4;
+  --border:#ecd8de;--border2:#dfc4cc;
+  --ink:#1a1428;--ink2:#2e2040;--muted:#7a6070;--dim:#c0a8b4;
+  --sakura:#d4607a;--sakura2:#b84060;
+  --fuji:#3d2e6e;--fuji2:#5a4490;
+  --t1:#c03050;--t2:#b85820;--t3:#8a6e10;--t4:#5a7060;
+  --green:#2a8a6a;
+  --radius:12px;--radius-lg:14px;
+  --card-shadow:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.02);
+}
+
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Jost',sans-serif;min-height:100vh;padding-bottom:80px;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* ========== HEADER ========== */
+.header{
+  background:#c4b4d6;
+  background-image:linear-gradient(120deg,#c0b0d2 0%,#cabdd8 55%,#bcb0d0 100%);
+  border-bottom:1px solid rgba(90,56,120,0.18);
+  padding:16px 44px 0;position:sticky;top:0;z-index:200;
+  box-shadow:0 1px 0 rgba(90,56,120,0.12),0 6px 24px rgba(90,68,140,0.1);
+}
+.header-inner{max-width:1200px;margin:0 auto;}
+.back-link{
+  display:inline-block;font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;color:#ffffff;
+  text-decoration:none;margin-bottom:8px;transition:opacity 0.15s;
+}
+.back-link:hover{opacity:0.7;}
+.brand-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;letter-spacing:-0.5px;color:#1a1028;line-height:1;}
+.brand-sub{font-size:12px;color:rgba(26,16,40,0.5);margin-top:4px;}
+
+/* ========== STATS ROW ========== */
+.stats-row{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap;}
+.stat-chip{
+  background:rgba(255,255,255,0.32);border:1px solid rgba(255,255,255,0.5);
+  border-radius:var(--radius);padding:10px 16px;min-width:90px;
+  transition:background 0.15s;
+}
+.stat-chip:hover{background:rgba(255,255,255,0.48);}
+.stat-chip .num{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;line-height:1;}
+.stat-chip .lbl{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(26,16,40,0.45);margin-top:2px;}
+
+/* ========== TABS ========== */
+.tabs{display:flex;gap:2px;padding-top:6px;}
+.tab-btn{
+  padding:10px 18px;white-space:nowrap;background:transparent;border:none;
+  cursor:pointer;font-family:'DM Mono',monospace;font-size:9.5px;
+  letter-spacing:1.5px;text-transform:uppercase;color:rgba(26,16,40,0.35);
+  border-bottom:2px solid transparent;transition:all 0.18s;
+}
+.tab-btn:hover{color:rgba(26,16,40,0.65);}
+.tab-btn.active{color:#1a1028;border-bottom-color:#5a3878;}
+
+/* ========== CONTENT ========== */
+.content{max-width:1200px;margin:0 auto;padding:24px 44px 0;position:relative;z-index:1;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;animation:fu 0.22s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+.alert{
+  border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px;
+  font-size:13px;line-height:1.65;border:1px solid rgba(90,68,144,0.2);
+  border-left:3px solid var(--fuji2);
+  background:rgba(61,46,110,0.05);color:var(--muted);
+}
+.alert strong{color:var(--fuji2);}
+
+/* ========== SECTION HEADERS (uniform) ========== */
+.section-hdr{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 20px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  border-left:4px solid;margin-top:24px;
+}
+.section-hdr:first-child{margin-top:0;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:-0.2px;}
+.section-why{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.section-meta{margin-left:auto;text-align:right;flex-shrink:0;}
+.section-meta-text{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.section-meta-bar{height:4px;width:90px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;border:1px solid var(--border);}
+.section-meta-bar-fill{height:100%;border-radius:2px;transition:width 0.3s;}
+
+/* ========== VIDEO LIST (uniform card) ========== */
+.video-list{
+  border:1px solid var(--border);border-top:none;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  margin-bottom:4px;background:var(--surface);
+}
+
+/* Sub-section header within tier view */
+.sub-section-hdr{
+  padding:8px 20px;background:var(--surface2);
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.sub-section-name{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+.sub-section-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);}
+
+/* ========== GRID LAYOUT ========== */
+.col-hdr{
+  display:grid;grid-template-columns:40px 40px 1fr 70px 110px 110px;
+  align-items:center;gap:8px;padding:8px 20px;
+  border-bottom:1px solid var(--border);background:var(--surface2);
+}
+.col-hdr span{font-family:'DM Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;}
+
+.video-row{
+  display:grid;grid-template-columns:40px 40px 1fr 70px 110px 110px;
+  align-items:center;gap:8px;padding:10px 20px;
+  border-bottom:1px solid rgba(236,216,222,0.4);
+  transition:background 0.12s;overflow:visible;
+}
+.video-row:last-child{border-bottom:none;}
+.video-row:hover{background:var(--surface2);}
+.video-row.fully-done{opacity:0.55;}
+.video-row.fully-done .video-name{text-decoration:line-through;opacity:0.7;}
+
+.video-name{font-size:13px;color:var(--ink2);line-height:1.35;}
+.video-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:right;}
+
+.yield-bar-wrap{display:flex;align-items:center;gap:6px;}
+.yield-bar-bg{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.yield-bar-fill{height:100%;border-radius:3px;transition:width 0.3s;}
+.yield-label{font-family:'DM Mono',monospace;font-size:10px;width:28px;text-align:right;}
+
+/* ========== UPDATED CHECKBOXES WITH DELAY ========== */
+.check-box{
+  width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:transparent;transition:all 0.18s;flex-shrink:0;cursor:pointer;
+  position:relative; /* For tooltip positioning */
+}
+.check-box:hover{border-color:var(--muted);}
+.check-box.checked{background:var(--green);border-color:var(--green);color:#fff;}
+.check-box.reviewed{background:var(--fuji2);border-color:var(--fuji2);color:#fff;}
+
+/* Tooltip implementation */
+.check-box[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Arrow for tooltip */
+.check-box[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 100;
+}
+
+/* The Delay Magic: Only show after 0.8s hover */
+.check-box[data-tooltip]:hover::after,
+.check-box[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0.8s;
+}
+
+.reason-tag{
+  font-size:8.5px;padding:2px 7px;border-radius:5px;display:inline-block;
+  font-family:'DM Mono',monospace;letter-spacing:0.5px;white-space:nowrap;border:1px solid;
+}
+/* ========== OVERALL PROGRESS ========== */
+.overall-progress{
+  margin-bottom:22px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:22px 26px;box-shadow:var(--card-shadow);
+}
+.op-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.op-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;}
+.op-pct{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--sakura);line-height:1;}
+.op-bar{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden;border:1px solid var(--border);}
+.op-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--sakura),var(--fuji2));transition:width 0.3s;}
+.op-note{margin-top:8px;font-size:12px;color:var(--muted);}
+
+/* ========== TRACKER TABLE ========== */
+.cat-table{width:100%;border-collapse:collapse;}
+.cat-table th{
+  font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;color:var(--dim);
+  text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);
+}
+.cat-table td{padding:12px 14px;border-bottom:1px solid rgba(236,216,222,0.5);font-size:13px;}
+.cat-table tr:hover td{background:var(--surface2);}
+.tier-pill{
+  display:inline-block;padding:3px 10px;border-radius:10px;
+  font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1px;
+  text-transform:uppercase;border:1px solid;
+}
+.mini-bar-wrap{width:100%;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;border:1px solid var(--border);margin-bottom:4px;}
+.mini-bar-fill{height:100%;border-radius:3px;transition:width 0.3s;}
+
+/* ========== TRACKER CARDS ========== */
+.tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.tracker-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:20px;box-shadow:var(--card-shadow);
+}
+.tracker-card-title{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:14px;
+}
+.tracker-card-item{
+  font-size:12.5px;padding:7px 0;border-bottom:1px solid rgba(236,216,222,0.5);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.tracker-card-item:last-child{border-bottom:none;}
+
+/* ========== EMPTY STATE ========== */
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--dim);
+}
+.empty-state-icon{font-size:32px;margin-bottom:12px;opacity:0.5;}
+.empty-state-text{font-size:13px;font-style:italic;}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:768px){
+  .header{position:relative;padding:12px 16px 0;}
+  .content{padding:16px 16px 0;}
+  .brand-title{font-size:22px;}
+  .stats-row{gap:6px;margin-top:8px;}
+  .stat-chip{padding:8px 12px;min-width:auto;}
+  .stat-chip .num{font-size:18px;}
+  .stat-chip .lbl{font-size:7px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tab-btn{padding:8px 12px;font-size:9px;}
+  .video-row,.col-hdr{grid-template-columns:36px 36px 1fr 60px;}
+  .video-row .yield-bar-wrap,.video-row .reason-tag,.col-hdr .hide-mobile{display:none;}
+  .tracker-grid{grid-template-columns:1fr;}
+  .section-meta-bar{width:60px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <a href="index.html" class="back-link">&#8592; Back to Hub</a>
+    <h1 class="brand-title">Sketchy Micro Tracker</h1>
+    <p class="brand-sub"><span id="header-remaining">0</span> remaining &nbsp;·&nbsp; <span id="header-total">0</span> hrs total</p>
+
+    <div class="stats-row">
+      <div class="stat-chip"><div class="num" style="color:var(--t1)" id="chip-t1">0</div><div class="lbl">Tier 1 · High Yield</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t2)" id="chip-t2">0</div><div class="lbl">Tier 2 · Important</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t3)" id="chip-t3">0</div><div class="lbl">Tier 3 · Review</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t4)" id="chip-t4">0</div><div class="lbl">Tier 4 · Low Yield</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--green)" id="header-completed">0 / 0</div><div class="lbl">Fully Complete</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('bytier',this)">By Priority Tier</button>
+      <button class="tab-btn" onclick="switchTab('bycat',this)">By Category</button>
+      <button class="tab-btn" onclick="switchTab('tracker',this)">Progress Tracker</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="tab-bycat" class="tab-panel"><div id="bycat-content"></div></div>
+  
+  <div id="tab-bytier" class="tab-panel active">
+    <div class="alert">
+      <strong>Start with Tier 1.</strong> These <span id="tier1-count">0</span> videos cover the organisms that appear on almost every Step 1 exam. Complete all of Tier 1 before moving to Tier 2.
+    </div>
+    <div id="bytier-content"></div>
+  </div>
+
+  <div id="tab-tracker" class="tab-panel">
+    <div class="overall-progress">
+      <div class="op-top"><span class="op-label">Overall Completion</span><span class="op-pct" id="tracker-pct">0%</span></div>
+      <div class="op-bar"><div class="op-bar-fill" id="tracker-bar" style="width:0%"></div></div>
+      <div class="op-note" id="tracker-note">0 of 0 videos completed (Watch + Review)</div>
+    </div>
+    <div id="tracker-content"></div>
+  </div>
+</div>
+
+<script>
+// Firebase Config - graceful fallback if SDK not loaded
+let auth = null;
+let db = null;
+let currentUser = null;
+let watchedState = {};
+let reviewedState = {};
+
+try {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
+    authDomain: "sketchy-tracker.firebaseapp.com",
+    projectId: "sketchy-tracker",
+    storageBucket: "sketchy-tracker.firebasestorage.app",
+    messagingSenderId: "970470066509",
+    appId: "1:970470066509:web:14c7300fb1dd882a038f04",
+    measurementId: "G-2KVBCP4THR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+} catch(e) {
+  console.log("Firebase not available, using local storage");
+}
+
+const categories = [
+  {
+    id:"gpc", name:"Gram Positive Cocci", totalTime:"51 min",
+    why:"S. aureus and Streptococci are among the most tested organisms on Step 1",
+    videos:[
+      {id:"b1",num:"1.1",name:"Staph aureus",time:"11min",tier:1,yield:10,reason:"MRSA, toxins (TSST-1, enterotoxin), skin/bone/heart infections - every exam"},
+      {id:"b2",num:"1.2",name:"Staph epidermidis & Staph saprophyticus",time:"7min",tier:1,yield:8,reason:"Biofilm on prosthetics (epidermidis), UTIs in young women (saprophyticus)"},
+      {id:"b3",num:"1.3",name:"Strep pyogenes",time:"14.5min",tier:1,yield:9,reason:"Pharyngitis, rheumatic fever, PSGN, necrotizing fasciitis - extremely tested"},
+      {id:"b4",num:"1.4",name:"Strep agalactiae",time:"5.5min",tier:1,yield:8,reason:"Group B Strep - neonatal meningitis/sepsis, screen at 35-37 weeks"},
+      {id:"b5",num:"1.5",name:"Strep pneumoniae & Strep viridans",time:"9min",tier:1,yield:10,reason:"#1 cause pneumonia/meningitis/otitis; viridans = subacute endocarditis"},
+      {id:"b6",num:"1.6",name:"Enterococcus",time:"4min",tier:2,yield:7,reason:"VRE, UTIs, biliary infections - know vancomycin resistance"},
+    ]
+  },
+  {
+    id:"gpb", name:"Gram Positive Bacilli", totalTime:"49 min",
+    why:"Clostridium toxins and Listeria are classic vignette organisms",
+    videos:[
+      {id:"b7",num:"2.1",name:"Bacillus anthracis and cereus",time:"10min",tier:2,yield:7,reason:"Anthrax (woolsorter's disease), cereus food poisoning - reheated rice"},
+      {id:"b8",num:"2.2",name:"Clostridium tetani",time:"7min",tier:2,yield:8,reason:"Tetanospasmin blocks Renshaw cells; lockjaw - classic toxin question"},
+      {id:"b9",num:"2.3",name:"Clostridium botulinum",time:"7.5min",tier:2,yield:8,reason:"Blocks ACh release; floppy baby, canned food - SNARE protein questions"},
+      {id:"b10",num:"2.4",name:"Clostridium difficile",time:"8min",tier:1,yield:9,reason:"Antibiotic-associated pseudomembranous colitis - extremely high yield"},
+      {id:"b11",num:"2.5",name:"Clostridium perfringens",time:"5.5min",tier:2,yield:7,reason:"Gas gangrene, alpha toxin (lecithinase) - double zone hemolysis"},
+      {id:"b12",num:"2.6",name:"Corynebacterium diphtheriae",time:"7min",tier:2,yield:8,reason:"Pseudomembrane, exotoxin (ADP-ribosylation of EF-2), bull neck"},
+      {id:"b13",num:"2.7",name:"Listeria monocytogenes",time:"4min",tier:1,yield:9,reason:"Meningitis in neonates/elderly/immunocompromised; tumbling motility"},
+    ]
+  },
+  {
+    id:"gpfr", name:"GP Branching Filamentous Rods", totalTime:"10 min",
+    why:"Actinomyces vs Nocardia distinction is a classic board comparison",
+    videos:[
+      {id:"b14",num:"3.1",name:"Actinomyces",time:"3min",tier:3,yield:6,reason:"Sulfur granules, draining sinus tracts, cervicofacial - anaerobe"},
+      {id:"b15",num:"3.2",name:"Nocardia",time:"7min",tier:3,yield:6,reason:"Partially acid-fast, aerobe, immunocompromised lung/brain abscesses"},
+    ]
+  },
+  {
+    id:"gnc", name:"Gram Negative Cocci", totalTime:"22 min",
+    why:"Neisseria species cause meningitis and STIs - always tested",
+    videos:[
+      {id:"b16",num:"4.1",name:"Neisseria species overview",time:"5min",tier:1,yield:8,reason:"Gram-negative diplococci, oxidase+, IgA protease, complement deficiency"},
+      {id:"b17",num:"4.2",name:"Neisseria meningitidis",time:"9min",tier:1,yield:9,reason:"Meningococcemia, Waterhouse-Friderichsen, complement C5-C9 deficiency"},
+      {id:"b18",num:"4.3",name:"Neisseria gonorrhoeae",time:"7.5min",tier:1,yield:9,reason:"STI, septic arthritis in young adults, ophthalmia neonatorum"},
+    ]
+  },
+  {
+    id:"gne", name:"GN Bacilli - Enteric", totalTime:"70 min",
+    why:"Enteric bacteria cause the majority of GI and UTI vignettes on Step 1",
+    videos:[
+      {id:"b19",num:"5.1",name:"Klebsiella, Enterobacter, Serratia",time:"8.5min",tier:2,yield:7,reason:"Klebsiella = currant jelly sputum in alcoholics; nosocomial UTIs"},
+      {id:"b20",num:"5.2",name:"Salmonella",time:"8min",tier:1,yield:8,reason:"Bloody diarrhea, typhoid fever, osteomyelitis in sickle cell - classic"},
+      {id:"b21",num:"5.3",name:"Shigella",time:"6.5min",tier:1,yield:8,reason:"Bloody diarrhea, Shiga toxin, HUS connection - tested with E. coli"},
+      {id:"b22",num:"5.4",name:"Escherichia coli",time:"9min",tier:1,yield:10,reason:"ETEC vs EHEC, #1 UTI cause, neonatal meningitis (K1) - every exam"},
+      {id:"b23",num:"5.5",name:"Yersinia enterocolitica",time:"8min",tier:3,yield:5,reason:"Mimics appendicitis in children, blood transfusion contamination"},
+      {id:"b24",num:"5.6",name:"Campylobacter",time:"5.5min",tier:2,yield:7,reason:"#1 cause bacterial diarrhea worldwide; Guillain-Barré association"},
+      {id:"b25",num:"5.7",name:"Vibrio",time:"6min",tier:3,yield:6,reason:"Cholera rice-water diarrhea; vulnificus from raw oysters/seawater"},
+      {id:"b26",num:"5.8",name:"Helicobacter pylori",time:"5.5min",tier:1,yield:9,reason:"Peptic ulcers, gastric cancer/MALT lymphoma, urease+ - extremely tested"},
+      {id:"b27",num:"5.9",name:"Pseudomonas",time:"10min",tier:1,yield:9,reason:"Burns, CF lung infections, hot tub folliculitis, blue-green pigment"},
+      {id:"b28",num:"5.10",name:"Proteus mirabilis",time:"3.5min",tier:2,yield:6,reason:"Staghorn calculi, urease+, swarming motility on agar"},
+    ]
+  },
+  {
+    id:"gnr", name:"GN Bacilli - Respiratory", totalTime:"24 min",
+    why:"Pertussis, H. flu, and Legionella are frequently tested respiratory pathogens",
+    videos:[
+      {id:"b29",num:"6.1",name:"Bordetella pertussis",time:"7.5min",tier:2,yield:8,reason:"Whooping cough, pertussis toxin, lymphocytosis - DTaP vaccine"},
+      {id:"b30",num:"6.2",name:"Haemophilus influenzae",time:"9min",tier:2,yield:8,reason:"Epiglottitis, meningitis (type b), COPD exacerbations - Hib vaccine"},
+      {id:"b31",num:"6.3",name:"Legionella",time:"7.5min",tier:2,yield:7,reason:"Legionnaires' disease, AC/water towers, hyponatremia, urine antigen"},
+    ]
+  },
+  {
+    id:"gnz", name:"GN Bacilli - Zoonotics", totalTime:"18 min",
+    why:"Lower yield but Francisella and Brucella appear as classic vignettes",
+    videos:[
+      {id:"b32",num:"7.1",name:"Bartonella henselae",time:"4min",tier:3,yield:5,reason:"Cat scratch disease, bacillary angiomatosis in HIV"},
+      {id:"b33",num:"7.2",name:"Brucella",time:"5min",tier:3,yield:5,reason:"Unpasteurized dairy, undulant fever - intracellular organism"},
+      {id:"b34",num:"7.3",name:"Francisella tularensis",time:"4min",tier:3,yield:5,reason:"Tularemia - rabbit/tick exposure, ulceroglandular form"},
+      {id:"b35",num:"7.4",name:"Pasteurella multocida",time:"5min",tier:4,yield:4,reason:"Cat/dog bite infections - quick wound cellulitis"},
+    ]
+  },
+  {
+    id:"myco", name:"Mycobacteria", totalTime:"26 min",
+    why:"TB is one of the most tested organisms across all of Step 1",
+    videos:[
+      {id:"b36",num:"8.1",name:"Mycobacterium tuberculosis",time:"16.5min",tier:1,yield:10,reason:"Caseating granulomas, Ghon complex, PPD, RIPE therapy - guaranteed questions"},
+      {id:"b37",num:"8.2",name:"Mycobacterium leprae",time:"9min",tier:2,yield:6,reason:"Lepromatous vs tuberculoid, armadillo reservoir, cool body temperatures"},
+    ]
+  },
+  {
+    id:"spiro", name:"Spirochetes", totalTime:"26 min",
+    why:"Syphilis and Lyme disease are classic clinical vignettes tested repeatedly",
+    videos:[
+      {id:"b38",num:"9.1",name:"Borrelia burgdorferi",time:"8min",tier:2,yield:8,reason:"Lyme disease stages, erythema migrans, Bell palsy, Ixodes tick"},
+      {id:"b39",num:"9.2",name:"Leptospirosis",time:"5min",tier:3,yield:5,reason:"Flood/sewage exposure, icterohemorrhagic form, Weil disease"},
+      {id:"b40",num:"9.3",name:"Treponema pallidum",time:"13min",tier:1,yield:10,reason:"Syphilis stages, VDRL/FTA-ABS, Jarisch-Herxheimer, congenital - every exam"},
+    ]
+  },
+  {
+    id:"gi_bact", name:"Gram-Indeterminate Bacteria", totalTime:"43 min",
+    why:"Chlamydia, Mycoplasma, and Rickettsia are high-yield atypicals",
+    videos:[
+      {id:"b41",num:"10.1",name:"Chlamydia",time:"15min",tier:1,yield:9,reason:"#1 reportable STI, trachoma, neonatal pneumonia, elementary/reticulate bodies"},
+      {id:"b42",num:"10.2",name:"Coxiella burnetii",time:"5min",tier:3,yield:5,reason:"Q fever, no arthropod vector needed, culture-negative endocarditis"},
+      {id:"b43",num:"10.3",name:"Gardnerella vaginalis",time:"5.5min",tier:2,yield:7,reason:"Bacterial vaginosis, fishy smell, clue cells, whiff test - OB/GYN"},
+      {id:"b44",num:"10.4",name:"Mycoplasma pneumoniae",time:"6min",tier:2,yield:8,reason:"Walking pneumonia, no cell wall, cold agglutinins (IgM) - very tested"},
+      {id:"b45",num:"10.5",name:"Rickettsia species overview",time:"3.5min",tier:2,yield:7,reason:"Obligate intracellular, arthropod vectors, endothelial tropism"},
+      {id:"b46",num:"10.6",name:"Rickettsia prowazekii",time:"4min",tier:3,yield:5,reason:"Epidemic typhus, body lice, centripetal rash (trunk → extremities)"},
+      {id:"b47",num:"10.7",name:"Rickettsia rickettsii",time:"4min",tier:2,yield:8,reason:"RMSF, tick bite, rash starts palms/soles, can be fatal - classic"},
+    ]
+  },
+  {
+    id:"rna_pos", name:"RNA Viruses: Positive Sense", totalTime:"101 min",
+    why:"HIV and Hepatitis viruses are among the most tested topics on all of Step 1",
+    videos:[
+      {id:"v1",num:"1.1",name:"Picornavirus overview",time:"11min",tier:2,yield:7,reason:"Naked RNA virus family framework for poliovirus, coxsackie, rhino, HAV"},
+      {id:"v2",num:"1.2",name:"Poliovirus",time:"7min",tier:2,yield:7,reason:"Anterior horn cell destruction, Sabin vs Salk vaccine - classic"},
+      {id:"v3",num:"1.3",name:"Coxsackievirus",time:"5min",tier:2,yield:7,reason:"Hand-foot-mouth, myocarditis (B), herpangina (A) - pediatric vignettes"},
+      {id:"v4",num:"1.4",name:"Rhinovirus",time:"5min",tier:3,yield:5,reason:"Common cold, >100 serotypes, acid-labile - low yield"},
+      {id:"v5",num:"1.5",name:"Hepatitis A",time:"7min",tier:2,yield:8,reason:"Fecal-oral, no chronic state, travel-associated - compared with Hep E"},
+      {id:"v6",num:"1.6",name:"Calicivirus (Norovirus)",time:"5.5min",tier:2,yield:6,reason:"Cruise ship outbreaks, winter vomiting disease"},
+      {id:"v7",num:"1.7",name:"Flavivirus (Dengue, WNV, Yellow Fever)",time:"8min",tier:2,yield:7,reason:"Dengue hemorrhagic fever, WNV meningitis, yellow fever Councilman bodies"},
+      {id:"v8",num:"1.8",name:"Hepatitis C",time:"10.5min",tier:1,yield:9,reason:"Chronic hepatitis → cirrhosis → HCC; IV drug use; direct-acting antivirals"},
+      {id:"v9",num:"1.9",name:"Togavirus (Rubella)",time:"11.5min",tier:2,yield:8,reason:"Congenital rubella syndrome (PDA, cataracts, deafness) - TORCH"},
+      {id:"v10",num:"1.10",name:"Coronavirus",time:"14min",tier:3,yield:6,reason:"SARS/MERS/COVID, spike protein, respiratory illness"},
+      {id:"v11",num:"1.11",name:"HIV",time:"16.5min",tier:1,yield:10,reason:"CD4 depletion, opportunistic infections, HAART, AIDS-defining illnesses"},
+    ]
+  },
+  {
+    id:"rna_neg", name:"RNA Viruses: Negative Sense", totalTime:"67 min",
+    why:"Influenza and paramyxoviruses are classic respiratory pathogen questions",
+    videos:[
+      {id:"v12",num:"2.1",name:"Orthomyxovirus (Influenza)",time:"18.5min",tier:1,yield:9,reason:"Antigenic drift vs shift, segmented genome, neuraminidase inhibitors"},
+      {id:"v13",num:"2.2",name:"Paramyxovirus (Measles, Mumps)",time:"16min",tier:2,yield:8,reason:"Measles (Koplik spots, 3 Cs), mumps (orchitis, parotitis) - TORCH/vaccines"},
+      {id:"v14",num:"2.3",name:"Rhabdovirus",time:"9min",tier:3,yield:6,reason:"Rabies, Negri bodies, bullet-shaped, animal bite - post-exposure prophylaxis"},
+      {id:"v15",num:"2.4",name:"Filovirus (Ebola)",time:"5min",tier:3,yield:5,reason:"Hemorrhagic fever, high mortality, bat reservoir"},
+      {id:"v16",num:"2.5",name:"Bunyavirus (California Encephalitis)",time:"6min",tier:3,yield:5,reason:"Hantavirus pulmonary syndrome, rodent exposure"},
+      {id:"v17",num:"2.6",name:"Arenavirus",time:"5min",tier:3,yield:4,reason:"LCMV, Lassa fever - rodent exposure, rare on Step 1"},
+      {id:"v18",num:"2.7",name:"Reovirus (Rotavirus)",time:"7min",tier:2,yield:8,reason:"#1 cause pediatric diarrhea worldwide, segmented dsRNA, vaccine"},
+    ]
+  },
+  {
+    id:"dna_virus", name:"DNA Viruses", totalTime:"120 min",
+    why:"Herpesviruses and Hepatitis B are some of the most heavily tested topics",
+    videos:[
+      {id:"v19",num:"3.1",name:"HSV-1 and HSV-2",time:"11min",tier:1,yield:9,reason:"Oral/genital herpes, encephalitis (temporal lobe), Tzanck smear, acyclovir"},
+      {id:"v20",num:"3.2",name:"HHV-4 (Epstein-Barr Virus)",time:"13.5min",tier:1,yield:9,reason:"Mono, Burkitt lymphoma, nasopharyngeal carcinoma, heterophile antibodies"},
+      {id:"v21",num:"3.3",name:"HHV-5 (Cytomegalovirus)",time:"12min",tier:1,yield:9,reason:"Owl-eye inclusions, transplant/HIV retinitis, congenital - TORCH"},
+      {id:"v22",num:"3.4",name:"HHV-3 (Varicella Zoster Virus)",time:"12min",tier:2,yield:8,reason:"Chickenpox → shingles, dermatome distribution, Ramsay Hunt"},
+      {id:"v23",num:"3.5",name:"HHV-6 (Roseola)",time:"5min",tier:2,yield:7,reason:"Roseola infantum - high fever then rash (exanthem subitum)"},
+      {id:"v24",num:"3.6",name:"HHV-8 (Kaposi's Sarcoma)",time:"7min",tier:2,yield:7,reason:"Kaposi sarcoma in AIDS, vascular tumor, violaceous lesions"},
+      {id:"v25",num:"3.7",name:"Polyomavirus (JC virus)",time:"6.5min",tier:2,yield:7,reason:"PML in immunocompromised, demyelination, JC targets oligodendrocytes"},
+      {id:"v26",num:"3.8",name:"Papillomavirus",time:"14min",tier:1,yield:9,reason:"HPV 16/18 cervical cancer, 6/11 condylomata, E6/E7 oncoproteins"},
+      {id:"v27",num:"3.9",name:"Parvovirus",time:"7min",tier:2,yield:8,reason:"Erythema infectiosum (5th disease), aplastic crisis in sickle cell, B19"},
+      {id:"v28",num:"3.10",name:"Adenovirus",time:"5min",tier:3,yield:5,reason:"Pharyngoconjunctival fever, swimming pool conjunctivitis"},
+      {id:"v29",num:"3.11",name:"Poxvirus",time:"8.5min",tier:3,yield:5,reason:"Molluscum contagiosum, smallpox (historical) - largest DNA virus"},
+      {id:"v30",num:"3.12",name:"Hepatitis B (DNA) & Hep D",time:"18.5min",tier:1,yield:10,reason:"Serology (HBsAg, anti-HBc, etc.), ground glass hepatocytes, HCC risk"},
+    ]
+  },
+  {
+    id:"proto_int", name:"Protozoa - Intestinal", totalTime:"18 min",
+    why:"Giardia and Cryptosporidium are classic diarrhea vignettes in immunocompromised",
+    videos:[
+      {id:"p1",num:"1.1",name:"Giardia lamblia",time:"5.5min",tier:2,yield:8,reason:"Campers, foul-smelling fatty diarrhea, trophozoites on microscopy"},
+      {id:"p2",num:"1.2",name:"Entamoeba histolytica",time:"8min",tier:2,yield:7,reason:"Bloody diarrhea, flask-shaped ulcers, liver abscess - anchovy paste"},
+      {id:"p3",num:"1.3",name:"Cryptosporidium",time:"4.5min",tier:2,yield:7,reason:"Watery diarrhea in AIDS (CD4 <100), acid-fast oocysts"},
+    ]
+  },
+  {
+    id:"proto_cns", name:"Protozoa - CNS", totalTime:"22 min",
+    why:"Toxoplasma is extremely high-yield in HIV and pregnancy contexts",
+    videos:[
+      {id:"p4",num:"2.1",name:"Toxoplasma gondii",time:"10.5min",tier:1,yield:9,reason:"Ring-enhancing lesions in AIDS, congenital TORCH, cat feces - every exam"},
+      {id:"p5",num:"2.2",name:"Trypanosoma brucei",time:"5min",tier:3,yield:5,reason:"African sleeping sickness, tsetse fly, antigenic variation"},
+      {id:"p6",num:"2.3",name:"Naegleria fowleri",time:"6min",tier:3,yield:6,reason:"PAM from freshwater, rapidly fatal meningoencephalitis - dramatic vignette"},
+    ]
+  },
+  {
+    id:"proto_blood", name:"Protozoa - Blood", totalTime:"33 min",
+    why:"Plasmodium (malaria) is the most tested parasite on Step 1",
+    videos:[
+      {id:"p7",num:"3.1",name:"Trypanosoma cruzi (Chagas Disease)",time:"6min",tier:2,yield:7,reason:"Reduviid bug, dilated cardiomyopathy, megacolon - Central/South America"},
+      {id:"p8",num:"3.2",name:"Babesia",time:"7min",tier:3,yield:5,reason:"Ixodes tick (same as Lyme), maltese cross on smear, asplenic patients"},
+      {id:"p9",num:"3.3",name:"Plasmodium species",time:"14min",tier:1,yield:9,reason:"P. falciparum most deadly, cyclic fevers, sickle cell protection - always tested"},
+      {id:"p10",num:"3.4",name:"Leishmaniasis",time:"6min",tier:3,yield:5,reason:"Sandfly vector, visceral (kala-azar) vs cutaneous, macrophage parasite"},
+    ]
+  },
+  {
+    id:"proto_other", name:"Protozoa - Other", totalTime:"6 min",
+    why:"Trichomonas is a high-yield STI comparison question",
+    videos:[
+      {id:"p11",num:"4.1",name:"Trichomonas vaginalis",time:"6min",tier:2,yield:7,reason:"Frothy green discharge, strawberry cervix, treat both partners with metronidazole"},
+    ]
+  },
+  {
+    id:"helm_nem", name:"Helminths - Nematodes", totalTime:"25 min",
+    why:"Intestinal and tissue nematode vignettes appear occasionally on Step 1",
+    videos:[
+      {id:"p12",num:"5.1",name:"Intestinal nematodes",time:"13min",tier:2,yield:7,reason:"Ascaris, hookworm (iron deficiency), Enterobius (perianal itch), Strongyloides"},
+      {id:"p13",num:"5.2",name:"Tissue nematodes",time:"11.5min",tier:3,yield:5,reason:"Onchocerca (river blindness), Wuchereria (elephantiasis), Toxocara"},
+    ]
+  },
+  {
+    id:"helm_tc", name:"Helminths - Trematodes & Cestodes", totalTime:"22 min",
+    why:"Schistosoma and tapeworm lifecycle questions appear periodically",
+    videos:[
+      {id:"p14",num:"6.1",name:"Cestodes",time:"10.5min",tier:3,yield:5,reason:"Taenia solium (neurocysticercosis), Echinococcus (hydatid cyst), Diphyllobothrium (B12)"},
+      {id:"p15",num:"6.2",name:"Trematodes",time:"11min",tier:3,yield:5,reason:"Schistosoma (portal HTN, bladder cancer), Clonorchis (cholangiocarcinoma)"},
+    ]
+  },
+  {
+    id:"fungi_sys", name:"Systemic Mycoses", totalTime:"28 min",
+    why:"Geographic fungi are classic board vignettes based on travel history",
+    videos:[
+      {id:"f1",num:"1.1",name:"Histoplasmosis",time:"9.5min",tier:2,yield:8,reason:"Ohio/Mississippi River, bird/bat droppings, mimics TB, macrophage yeast"},
+      {id:"f2",num:"1.2",name:"Blastomycosis",time:"6min",tier:2,yield:7,reason:"Great Lakes, broad-based budding yeast, skin and lung granulomas"},
+      {id:"f3",num:"1.3",name:"Coccidioidomycosis",time:"7.5min",tier:2,yield:7,reason:"Southwest desert, spherules with endospores, Valley fever, erythema nodosum"},
+      {id:"f4",num:"1.4",name:"Paracoccidioidomycosis",time:"5min",tier:4,yield:3,reason:"Latin America, captain's wheel yeast - rare on Step 1"},
+    ]
+  },
+  {
+    id:"fungi_cut", name:"Cutaneous Mycoses", totalTime:"16 min",
+    why:"Dermatophyte and Sporothrix vignettes test morphology and exposure history",
+    videos:[
+      {id:"f5",num:"2.1",name:"Malassezia furfur",time:"5min",tier:3,yield:5,reason:"Tinea versicolor, spaghetti-and-meatballs appearance, hypo/hyperpigmented"},
+      {id:"f6",num:"2.2",name:"Dermatophytes",time:"6min",tier:3,yield:5,reason:"Tinea corporis/pedis/capitis, KOH prep branching hyphae"},
+      {id:"f7",num:"2.3",name:"Sporothrix schenckii",time:"4.5min",tier:3,yield:6,reason:"Rose gardener's disease, ascending lymphocutaneous nodules, dimorphic"},
+    ]
+  },
+  {
+    id:"fungi_opp", name:"Opportunistic Fungal Infections", totalTime:"44 min",
+    why:"Candida, Aspergillus, Cryptococcus, and PCP are extremely tested in HIV/immunocompromised",
+    videos:[
+      {id:"f8",num:"3.1",name:"Candida albicans",time:"13min",tier:1,yield:9,reason:"Thrush, vulvovaginitis, germ tube+, pseudohyphae - immunocompromised"},
+      {id:"f9",num:"3.2",name:"Aspergillus fumigatus",time:"11min",tier:1,yield:9,reason:"Invasive aspergillosis, ABPA, aspergilloma; 45° branching hyphae"},
+      {id:"f10",num:"3.3",name:"Cryptococcus neoformans",time:"9min",tier:1,yield:9,reason:"Meningitis in AIDS, India ink, latex agglutination, pigeon droppings"},
+      {id:"f11",num:"3.4",name:"Mucormycosis",time:"6min",tier:1,yield:8,reason:"Diabetic ketoacidosis, rhinocerebral, wide-angle non-septate hyphae"},
+      {id:"f12",num:"3.5",name:"Pneumocystis pneumonia",time:"5min",tier:1,yield:9,reason:"PJP in AIDS (CD4 <200), ground-glass CXR, TMP-SMX prophylaxis"},
+    ]
+  },
+];
+
+const TIER_COLORS = {1:"#c03050",2:"#b85820",3:"#8a6e10",4:"#5a7060"};
+const TIER_BG     = {1:"rgba(192,48,80,0.08)",2:"rgba(184,88,32,0.08)",3:"rgba(138,110,16,0.07)",4:"rgba(90,112,96,0.07)"};
+const TIER_NAMES  = {1:"HIGH YIELD",2:"IMPORTANT",3:"REVIEW",4:"LOW YIELD"};
+
+const TIER_DATA = {
+  1:{label:"Tier 1 — High Yield",sub:"Highest-frequency Step 1 topics. Each video covers multiple guaranteed questions.",color:"var(--t1)"},
+  2:{label:"Tier 2 — Important",sub:"High-yield content that consolidates your foundation and covers common vignettes.",color:"var(--t2)"},
+  3:{label:"Tier 3 — Review",sub:"Medium-yield topics. Worth watching but only after Tiers 1 & 2 are complete.",color:"var(--t3)"},
+  4:{label:"Tier 4 — Low Yield",sub:"Lower-yield. Skim First Aid instead if time is short.",color:"var(--t4)"},
+};
+
+// ========== AUTH (inherited from index page) ==========
+if (auth) {
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUser = user;
+      await fetchStateFromFirebase();
+    } else {
+      currentUser = null;
+      loadStateFromLocal();
+    }
+    updateAll();
+  });
+} else {
+  loadStateFromLocal();
+  updateAll();
+}
+
+async function fetchStateFromFirebase() {
+  if (!currentUser) return;
+  try {
+    const doc = await db.collection('users').doc(currentUser.uid).collection('trackers').doc('micro').get();
+    if (doc.exists) {
+      watchedState = doc.data().watched || {};
+      reviewedState = doc.data().reviewed || {};
+    } else {
+      watchedState = {};
+      reviewedState = {};
+    }
+  } catch (err) { console.error("Error fetching state:", err); }
+}
+
+function loadStateFromLocal() {
+  try { watchedState = JSON.parse(localStorage.getItem('sketchy_micro_progress') || '{}'); } catch(e) { watchedState = {}; }
+  try { reviewedState = JSON.parse(localStorage.getItem('sketchy_micro_reviewed') || '{}'); } catch(e) { reviewedState = {}; }
+}
+
+function saveState() {
+  if (currentUser) {
+    db.collection('users').doc(currentUser.uid).collection('trackers').doc('micro').set({ watched: watchedState, reviewed: reviewedState }, { merge: true }).catch(console.error);
+  } else {
+    localStorage.setItem('sketchy_micro_progress', JSON.stringify(watchedState));
+    localStorage.setItem('sketchy_micro_reviewed', JSON.stringify(reviewedState));
+  }
+}
+
+function isWatched(id) { return !!watchedState[id]; }
+function isReviewed(id) { return !!reviewedState[id]; }
+function isComplete(id) { return isWatched(id) && isReviewed(id); }
+
+function toggleWatch(id, event) {
+  event.stopPropagation();
+  watchedState[id] = !watchedState[id];
+  saveState();
+  updateAll();
+}
+function toggleReview(id, event) {
+  event.stopPropagation();
+  reviewedState[id] = !reviewedState[id];
+  saveState();
+  updateAll();
+}
+
+// ========== RENDERING ==========
+function allVideos() { return categories.flatMap(c => c.videos); }
+function updateAll() { updateTracker(); renderByCat(); renderByTier(); renderTracker(); }
+
+function colHeaderHTML() {
+  return `<div class="col-hdr">
+    <span>Watched</span><span>Reviewed</span><span></span>
+    <span style="text-align:right">Time</span>
+    <span class="hide-mobile"></span>
+    <span class="hide-mobile"></span>
+  </div>`;
+}
+
+function videoRowHTML(v, showCat) {
+  const w = isWatched(v.id);
+  const r = isReviewed(v.id);
+  const complete = w && r;
+  const tc = TIER_COLORS[v.tier];
+  const yp = (v.yield / 10) * 100;
+  const yc = v.yield >= 9 ? "var(--t1)" : v.yield >= 7 ? "var(--t2)" : v.yield >= 5 ? "var(--t3)" : "var(--t4)";
+  const catName = showCat ? categories.find(c => c.videos.some(vv => vv.id === v.id))?.name : null;
+  
+  return `<div class="video-row ${complete ? 'fully-done' : ''}" id="row-${v.id}">
+    <div class="check-box ${w ? 'checked' : ''}" data-tooltip="Watched" onclick="toggleWatch('${v.id}',event)">${w ? '✓' : ''}</div>
+    <div class="check-box ${r ? 'reviewed' : ''}" data-tooltip="Reviewed" onclick="toggleReview('${v.id}',event)">${r ? '✓' : ''}</div>
+    <div class="video-name">${v.name}${catName ? ` <span style="font-size:10px;color:var(--dim)">[${catName}]</span>` : ''}</div>
+    <div class="video-time">${v.time}</div>
+    <div class="yield-bar-wrap">
+      <div class="yield-bar-bg"><div class="yield-bar-fill" style="width:${yp}%;background:${yc}"></div></div>
+      <span class="yield-label" style="color:${yc}">${v.yield}/10</span>
+    </div>
+    <div><span class="reason-tag" style="background:${TIER_BG[v.tier]};color:${tc};border-color:${tc}40">${TIER_NAMES[v.tier]}</span></div>
+  </div>`;
+}
+
+function renderByCat() {
+  const c = document.getElementById("bycat-content");
+  let html = "";
+  
+  categories.forEach(cat => {
+    const done = cat.videos.filter(v => isComplete(v.id)).length;
+    const total = cat.videos.length;
+    const pct = Math.round((done / total) * 100);
+    const minTier = Math.min(...cat.videos.map(v => v.tier));
+    const hc = TIER_COLORS[minTier];
+    
+    html += `<div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}">
+      <div>
+        <div class="section-title" style="color:${hc}">${cat.name}</div>
+        <div class="section-why">${cat.why}</div>
+      </div>
+      <div class="section-meta">
+        <span class="section-meta-text" style="color:${pct === 100 ? 'var(--green)' : 'var(--muted)'}">${done}/${total} &nbsp;·&nbsp; ${cat.totalTime}</span>
+        <div class="section-meta-bar">
+          <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : hc}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="video-list">
+      ${cat.videos.map(v => videoRowHTML(v, false)).join("")}
+    </div>`;
+  });
+  
+  c.innerHTML = html;
+}
+
+function renderByTier() {
+  const c = document.getElementById("bytier-content");
+  let html = "";
+  
+  for (let t = 1; t <= 4; t++) {
+    const d = TIER_DATA[t];
+    const all = allVideos().filter(v => v.tier === t);
+    const done = all.filter(v => isComplete(v.id)).length;
+    const totalMins = all.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
+    const pct = all.length ? Math.round((done / all.length) * 100) : 0;
+    
+    html += `<div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}">
+      <div>
+        <div class="section-title" style="color:${d.color}">${d.label}</div>
+        <div class="section-why">${d.sub}</div>
+      </div>
+      <div class="section-meta">
+        <span class="section-meta-text">${done}/${all.length} &nbsp;·&nbsp; ~${Math.round(totalMins / 60 * 10) / 10} hrs</span>
+        <div class="section-meta-bar">
+          <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : d.color}"></div>
+        </div>
+      </div>
+    </div>`;
+    
+    categories.forEach(cat => {
+      const cv = cat.videos.filter(v => v.tier === t).sort((a, b) => b.yield - a.yield);
+      if (!cv.length) return;
+      const cd = cv.filter(v => isComplete(v.id)).length;
+      
+      html += `<div class="video-list" style="border-radius:0;margin-bottom:0;border-top:none">
+        <div class="sub-section-hdr">
+          <span class="sub-section-name" style="color:${d.color}">${cat.name}</span>
+          <span class="sub-section-count">${cd}/${cv.length}</span>
+        </div>
+        ${cv.map(v => videoRowHTML(v, false)).join("")}
+      </div>`;
+    });
+    
+    html += `<div style="margin-bottom:24px"></div>`;
+  }
+  c.innerHTML = html;
+}
+
+function updateTracker() {
+  const av = allVideos();
+  const total = av.length;
+  const done = av.filter(v => isComplete(v.id)).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const rem = total - done;
+  const totalMins = av.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
+
+  [1, 2, 3, 4].forEach(t => {
+    const el = document.getElementById("chip-t" + t);
+    if (el) el.textContent = av.filter(v => v.tier === t).length;
+  });
+  const t1el = document.getElementById("tier1-count");
+  if (t1el) t1el.textContent = av.filter(v => v.tier === 1).length;
+  
+  const el = document.getElementById("tracker-pct");
+  const bar = document.getElementById("tracker-bar");
+  const note = document.getElementById("tracker-note");
+  const chip = document.getElementById("header-completed");
+  const hrem = document.getElementById("header-remaining");
+  const htot = document.getElementById("header-total");
+  
+  if (el) el.textContent = pct + "%";
+  if (bar) bar.style.width = pct + "%";
+  if (note) note.textContent = `${done} of ${total} videos completed (Watch + Review)`;
+  if (chip) chip.textContent = `${done} / ${total}`;
+  if (hrem) hrem.textContent = rem;
+  if (htot) htot.textContent = `~${Math.round(totalMins / 60 * 10) / 10}`;
+}
+
+function renderTracker() {
+  const c = document.getElementById("tracker-content");
+  const av = allVideos();
+
+  let html = `<table class="cat-table" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:22px;box-shadow:var(--card-shadow)">
+    <thead><tr>
+      <th>Category</th><th>Progress (W+R)</th><th>Done / Total</th><th>Time Left</th><th>Top Tier</th>
+    </tr></thead><tbody>`;
+  
+  categories.forEach(cat => {
+    const done = cat.videos.filter(v => isComplete(v.id)).length;
+    const total = cat.videos.length;
+    const pct = Math.round((done / total) * 100);
+    const ml = cat.videos.filter(v => !isComplete(v.id)).reduce((s, v) => s + (parseInt(v.time) || 0), 0);
+    const mt = Math.min(...cat.videos.map(v => v.tier));
+    const tc = TIER_COLORS[mt];
+    
+    html += `<tr>
+      <td style="font-weight:500;color:var(--ink2)">${cat.name}</td>
+      <td style="min-width:120px">
+        <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : tc}"></div></div>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${pct}%</span>
+      </td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${done} / ${total}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${ml ? `~${Math.round(ml / 60 * 10) / 10} hrs` : '✓ Done'}</td>
+      <td><span class="tier-pill" style="background:${TIER_BG[mt]};color:${tc};border-color:${tc}50">${TIER_NAMES[mt]}</span></td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+
+  const completed = av.filter(v => isComplete(v.id));
+  const upcoming = av.filter(v => !isComplete(v.id)).sort((a, b) => a.tier - b.tier || b.yield - a.yield).slice(0, 10);
+
+  html += `<div class="tracker-grid">
+    <div class="tracker-card">
+      <p class="tracker-card-title" style="color:var(--green)">✓ Fully Completed (${completed.length})</p>
+      ${completed.length
+        ? completed.map(v => `<div class="tracker-card-item"><span style="color:var(--muted)">${v.name}</span><span style="color:var(--green);font-size:11px">✓✓</span></div>`).join("")
+        : '<div class="empty-state" style="padding:24px 0"><div class="empty-state-text">None yet. Watch & Review to complete.</div></div>'}
+    </div>
+    <div class="tracker-card">
+      <p class="tracker-card-title" style="color:var(--t1)">▶ Up Next (Top Priority)</p>
+      ${upcoming.map(v => {
+        const tc = TIER_COLORS[v.tier];
+        return `<div class="tracker-card-item">
+          <span style="color:var(--ink2)">${v.name}</span>
+          <span class="tier-pill" style="background:${TIER_BG[v.tier]};color:${tc};border-color:${tc}40;font-size:8px">${TIER_NAMES[v.tier]}</span>
+        </div>`;
+      }).join("")}
+    </div>
+  </div>`;
+  
+  c.innerHTML = html;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  if (btn) btn.classList.add("active");
+}
+
+updateAll();
+</script>
+</body>
+</html>
