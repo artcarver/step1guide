@@ -155,7 +155,8 @@ body::before {
   gap: 0; 
   overflow-x: auto; 
   padding-bottom: 0; 
-  flex-wrap: nowrap; /* Forces one single line on desktop */
+  flex-wrap: nowrap !important; /* Prevents stacking on desktop */
+  background: transparent; /* Forces one single line on desktop */
 }
 .tabs::-webkit-scrollbar { height: 0; }
 .tab-btn {
