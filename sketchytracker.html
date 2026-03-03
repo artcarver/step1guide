@@ -18,163 +18,230 @@
   --ink:#1a1428;--ink2:#2e2040;--muted:#7a6070;--dim:#c0a8b4;
   --sakura:#d4607a;--sakura2:#b84060;
   --fuji:#3d2e6e;--fuji2:#5a4490;
-  --t1:#c03050;
-  --t2:#b85820;
-  --t3:#8a6e10;
-  --t4:#5a7060;
+  --t1:#c03050;--t2:#b85820;--t3:#8a6e10;--t4:#5a7060;
   --green:#2a8a6a;
+  --radius:12px;--radius-lg:14px;
+  --card-shadow:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.02);
 }
 
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--ink);font-family:'Jost',sans-serif;min-height:100vh;padding-bottom:80px;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-/* Header */
+/* ========== HEADER ========== */
 .header{
   background:#c4b4d6;
   background-image:linear-gradient(120deg,#c0b0d2 0%,#cabdd8 55%,#bcb0d0 100%);
   border-bottom:1px solid rgba(90,56,120,0.18);
-  padding:24px 44px 0;position:sticky;top:0;z-index:200;
+  padding:16px 44px 0;position:sticky;top:0;z-index:200;
   box-shadow:0 1px 0 rgba(90,56,120,0.12),0 6px 24px rgba(90,68,140,0.1);
 }
-.header-inner{max-width:1200px;margin:0 auto;position:relative;}
-.auth-btn{
-  position:absolute;top:0;right:0;
-  background:var(--fuji);color:#fff;border:none;padding:6px 12px;
-  border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;
-  cursor:pointer;letter-spacing:1px;text-transform:uppercase;
+.header-inner{max-width:1200px;margin:0 auto;}
+.back-link{
+  display:inline-block;font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:1.5px;text-transform:uppercase;color:#ffffff;
+  text-decoration:none;margin-bottom:8px;transition:opacity 0.15s;
 }
-.eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:4px;color:#5a3878;text-transform:uppercase;margin-bottom:5px;}
-.brand-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;letter-spacing:-0.5px;color:#1a1028;line-height:1;}
-.brand-flourish{display:flex;align-items:center;gap:8px;margin:6px 0;}
-.fl{height:1px;width:32px;}.fl.l{background:linear-gradient(90deg,transparent,rgba(90,56,120,0.4));}.fl.r{background:linear-gradient(90deg,rgba(90,56,120,0.4),transparent);}
-.fd{width:3px;height:3px;border-radius:50%;background:#5a3878;}
-.brand-sub{font-size:12px;color:rgba(26,16,40,0.5);margin-top:2px;}
+.back-link:hover{opacity:0.7;}
+.brand-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;letter-spacing:-0.5px;color:#1a1028;line-height:1;}
+.brand-sub{font-size:12px;color:rgba(26,16,40,0.5);margin-top:4px;}
 
-/* Stats row */
-.stats-row{display:flex;gap:10px;margin:14px 0 0;flex-wrap:wrap;}
+/* ========== STATS ROW ========== */
+.stats-row{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap;}
 .stat-chip{
-  background:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.45);
-  border-radius:12px;padding:10px 16px;
+  background:rgba(255,255,255,0.32);border:1px solid rgba(255,255,255,0.5);
+  border-radius:var(--radius);padding:10px 16px;min-width:90px;
+  transition:background 0.15s;
 }
-.stat-chip .num{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;line-height:1;}
-.stat-chip .lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(26,16,40,0.5);margin-top:2px;}
+.stat-chip:hover{background:rgba(255,255,255,0.48);}
+.stat-chip .num{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;line-height:1;}
+.stat-chip .lbl{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(26,16,40,0.45);margin-top:2px;}
 
-/* Tabs */
-.tabs{display:flex;gap:2px;padding-top:8px;}
-.tab-btn{padding:10px 18px;white-space:nowrap;background:transparent;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(26,16,40,0.4);border-bottom:2px solid transparent;transition:all 0.18s;}
-.tab-btn:hover{color:rgba(26,16,40,0.72);}
+/* ========== TABS ========== */
+.tabs{display:flex;gap:2px;padding-top:6px;}
+.tab-btn{
+  padding:10px 18px;white-space:nowrap;background:transparent;border:none;
+  cursor:pointer;font-family:'DM Mono',monospace;font-size:9.5px;
+  letter-spacing:1.5px;text-transform:uppercase;color:rgba(26,16,40,0.35);
+  border-bottom:2px solid transparent;transition:all 0.18s;
+}
+.tab-btn:hover{color:rgba(26,16,40,0.65);}
 .tab-btn.active{color:#1a1028;border-bottom-color:#5a3878;}
 
-/* Content */
-.content{max-width:1200px;margin:0 auto;padding:28px 44px 0;position:relative;z-index:1;}
+/* ========== CONTENT ========== */
+.content{max-width:1200px;margin:0 auto;padding:24px 44px 0;position:relative;z-index:1;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;animation:fu 0.22s ease;}
 @keyframes fu{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
 
-.alert{border-radius:12px;padding:16px 20px;margin-bottom:22px;font-size:13px;line-height:1.7;border:1px solid;border-left:3px solid;}
-.alert.info{background:var(--fuji-light,rgba(61,46,110,0.06));border-color:rgba(90,68,144,0.2);border-left-color:var(--fuji2);color:var(--muted);}
-.alert.info strong{color:var(--fuji2);}
+.alert{
+  border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px;
+  font-size:13px;line-height:1.65;border:1px solid rgba(90,68,144,0.2);
+  border-left:3px solid var(--fuji2);
+  background:rgba(61,46,110,0.05);color:var(--muted);
+}
+.alert strong{color:var(--fuji2);}
 
+/* ========== SECTION HEADERS (uniform) ========== */
 .section-hdr{
   display:flex;align-items:center;gap:14px;
-  padding:16px 20px;border-radius:14px 14px 0 0;
-  border-left:4px solid;margin-top:28px;
+  padding:14px 20px;border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  border-left:4px solid;margin-top:24px;
 }
-.section-hdr:first-of-type{margin-top:0;}
-.section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;letter-spacing:-0.2px;}
-.section-meta{margin-left:auto;text-align:right;}
+.section-hdr:first-child{margin-top:0;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:-0.2px;}
+.section-why{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.section-meta{margin-left:auto;text-align:right;flex-shrink:0;}
+.section-meta-text{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.section-meta-bar{height:4px;width:90px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;border:1px solid var(--border);}
+.section-meta-bar-fill{height:100%;border-radius:2px;transition:width 0.3s;}
 
-.video-list{border:1px solid var(--border);border-top:none;border-radius:0 0 14px 14px;overflow:hidden;margin-bottom:4px;}
-
-/* Grid Layout */
-.video-row, .col-hdr {
-  display:grid;grid-template-columns:32px 32px 1fr 80px 110px 120px;
-  align-items:center;gap:10px;padding:11px 20px;
-  border-bottom:1px solid rgba(236,216,222,0.5);
+/* ========== VIDEO LIST (uniform card) ========== */
+.video-list{
+  border:1px solid var(--border);border-top:none;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  margin-bottom:4px;background:var(--surface);
 }
 
-.video-row{transition:background 0.15s;cursor:pointer;}
+/* Sub-section header within tier view */
+.sub-section-hdr{
+  padding:8px 20px;background:var(--surface2);
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.sub-section-name{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;}
+.sub-section-count{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);}
+
+/* ========== GRID LAYOUT ========== */
+.col-hdr{
+  display:grid;grid-template-columns:40px 40px 1fr 70px 110px 110px;
+  align-items:center;gap:8px;padding:8px 20px;
+  border-bottom:1px solid var(--border);background:var(--surface2);
+}
+.col-hdr span{font-family:'DM Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;}
+
+.video-row{
+  display:grid;grid-template-columns:40px 40px 1fr 70px 110px 110px;
+  align-items:center;gap:8px;padding:10px 20px;
+  border-bottom:1px solid rgba(236,216,222,0.4);
+  transition:background 0.12s;overflow:visible;
+}
 .video-row:last-child{border-bottom:none;}
 .video-row:hover{background:var(--surface2);}
-
-.video-row.fully-done{opacity:0.6;}
+.video-row.fully-done{opacity:0.55;}
 .video-row.fully-done .video-name{text-decoration:line-through;opacity:0.7;}
 
-.video-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);}
 .video-name{font-size:13px;color:var(--ink2);line-height:1.35;}
 .video-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:right;}
 
-.yield-bar-wrap{display:flex;align-items:center;gap:8px;}
+.yield-bar-wrap{display:flex;align-items:center;gap:6px;}
 .yield-bar-bg{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
-.yield-bar-fill{height:100%;border-radius:3px;}
+.yield-bar-fill{height:100%;border-radius:3px;transition:width 0.3s;}
 .yield-label{font-family:'DM Mono',monospace;font-size:10px;width:28px;text-align:right;}
 
-/* Checkboxes */
+/* ========== CHECKBOXES (improved) ========== */
+.check-cell{display:flex;flex-direction:column;align-items:center;gap:1px;}
 .check-box{
-  width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);
+  width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;color:transparent;transition:all 0.18s;flex-shrink:0;
+  font-size:10px;color:transparent;transition:all 0.15s;flex-shrink:0;
+  cursor:pointer;position:relative;
 }
+.check-box:hover{border-color:var(--muted);transform:scale(1.06);}
 .check-box.checked{background:var(--green);border-color:var(--green);color:#fff;}
 .check-box.reviewed{background:var(--fuji2);border-color:var(--fuji2);color:#fff;}
 
-.reason-tag{font-size:8.5px;padding:2px 7px;border-radius:5px;display:inline-block;font-family:'DM Mono',monospace;letter-spacing:0.5px;white-space:nowrap;border:1px solid;}
+/* Tooltip */
+.check-box[data-tooltip]{position:relative;}
+.check-box[data-tooltip]:hover::after{
+  content:attr(data-tooltip);
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;font-family:'DM Mono',monospace;font-size:8px;
+  padding:3px 7px;border-radius:4px;white-space:nowrap;z-index:10;
+  pointer-events:none;letter-spacing:0.8px;
+}
+.check-box[data-tooltip]:hover::before{
+  content:'';position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);
+  border:3px solid transparent;border-bottom-color:var(--ink);z-index:10;
+}
 
-/* Column Headers */
-.col-hdr{padding:7px 20px;border-bottom:1px solid var(--border);}
-.col-hdr span{font-family:'DM Mono',monospace;font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;}
+.reason-tag{
+  font-size:8.5px;padding:3px 8px;border-radius:6px;display:inline-block;
+  font-family:'DM Mono',monospace;letter-spacing:0.5px;white-space:nowrap;border:1px solid;
+}
 
-.overall-progress{margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;}
+/* ========== OVERALL PROGRESS ========== */
+.overall-progress{
+  margin-bottom:22px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:22px 26px;box-shadow:var(--card-shadow);
+}
 .op-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .op-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;}
-.op-pct{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--sakura);line-height:1;}
+.op-pct{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--sakura);line-height:1;}
 .op-bar{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden;border:1px solid var(--border);}
 .op-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--sakura),var(--fuji2));transition:width 0.3s;}
 .op-note{margin-top:8px;font-size:12px;color:var(--muted);}
 
+/* ========== TRACKER TABLE ========== */
 .cat-table{width:100%;border-collapse:collapse;}
-.cat-table th{font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+.cat-table th{
+  font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:2px;color:var(--dim);
+  text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);
+}
 .cat-table td{padding:12px 14px;border-bottom:1px solid rgba(236,216,222,0.5);font-size:13px;}
 .cat-table tr:hover td{background:var(--surface2);}
-.tier-pill{display:inline-block;padding:2px 9px;border-radius:10px;font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid;}
-.mini-bar-wrap{width:100%;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
-.mini-bar-fill{height:100%;border-radius:3px;}
+.tier-pill{
+  display:inline-block;padding:3px 10px;border-radius:10px;
+  font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1px;
+  text-transform:uppercase;border:1px solid;
+}
+.mini-bar-wrap{width:100%;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;border:1px solid var(--border);margin-bottom:4px;}
+.mini-bar-fill{height:100%;border-radius:3px;transition:width 0.3s;}
 
+/* ========== TRACKER CARDS ========== */
+.tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.tracker-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:20px;box-shadow:var(--card-shadow);
+}
+.tracker-card-title{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;margin-bottom:14px;
+}
+.tracker-card-item{
+  font-size:12.5px;padding:7px 0;border-bottom:1px solid rgba(236,216,222,0.5);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.tracker-card-item:last-child{border-bottom:none;}
+
+/* ========== EMPTY STATE ========== */
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--dim);
+}
+.empty-state-icon{font-size:32px;margin-bottom:12px;opacity:0.5;}
+.empty-state-text{font-size:13px;font-style:italic;}
+
+/* ========== RESPONSIVE ========== */
 @media(max-width:768px){
-  .header { position: relative; padding: 16px 16px 0; }
-  .content { padding: 16px 16px 0; }
-  .brand-title { font-size: 22px; }
-  .brand-flourish { display: none; }
-  .eyebrow, .brand-super { margin-bottom: 2px; }
-  .back-link { margin-bottom: 8px; }
-
-  .stats-row, .scores-widget { gap: 6px; margin-top: 8px; }
-  .stat-chip { padding: 8px 12px; }
-  .stat-chip .num { font-size: 20px; }
-  .stat-chip .lbl { font-size: 7.5px; }
-
-  .tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
-  .tab-btn { padding: 8px 12px; }
-
-  .video-row, .col-hdr { grid-template-columns: 28px 28px 1fr 60px; }
-  .video-row .yield-bar-wrap, .video-row .reason-tag { display: none; }
+  .header{position:relative;padding:12px 16px 0;}
+  .content{padding:16px 16px 0;}
+  .brand-title{font-size:22px;}
+  .stats-row{gap:6px;margin-top:8px;}
+  .stat-chip{padding:8px 12px;min-width:auto;}
+  .stat-chip .num{font-size:18px;}
+  .stat-chip .lbl{font-size:7px;}
+  .tabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .tab-btn{padding:8px 12px;font-size:9px;}
+  .video-row,.col-hdr{grid-template-columns:36px 36px 1fr 60px;}
+  .video-row .yield-bar-wrap,.video-row .reason-tag,.col-hdr .hide-mobile{display:none;}
+  .tracker-grid{grid-template-columns:1fr;}
+  .section-meta-bar{width:60px;}
 }
-.back-link {
-  display: inline-block;
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #ffffff;
-  text-decoration: none;
-  margin-bottom: 14px;
-  transition: opacity 0.15s;
-}
-.back-link:hover { opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -182,16 +249,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <div class="header">
   <div class="header-inner">
     <a href="index.html" class="back-link">&#8592; Back to Hub</a>
-    <p class="eyebrow">Sketchy Pharm · Step 1 Priority Planner</p>
-    <h1 class="brand-title">What to Watch First</h1>
-    <div class="brand-flourish"><div class="fl l"></div><div class="fd"></div><div class="fl r"></div></div>
-    <p class="brand-sub">Ranked by Step 1 testing frequency &nbsp;·&nbsp; <span id="header-remaining">0</span> videos remaining &nbsp;·&nbsp; <span id="header-total">0</span> hrs total</p>
+    <h1 class="brand-title">Sketchy Pharm Tracker</h1>
+    <p class="brand-sub"><span id="header-remaining">0</span> remaining &nbsp;·&nbsp; <span id="header-total">0</span> hrs total</p>
 
     <div class="stats-row">
-      <div class="stat-chip"><div class="num" style="color:var(--t1)" id="chip-t1">0</div><div class="lbl">Tier 1 - High Yield</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--t2)" id="chip-t2">0</div><div class="lbl">Tier 2 - Important</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--t3)" id="chip-t3">0</div><div class="lbl">Tier 3 - Review</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--t4)" id="chip-t4">0</div><div class="lbl">Tier 4 - Low Yield</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t1)" id="chip-t1">0</div><div class="lbl">Tier 1 · High Yield</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t2)" id="chip-t2">0</div><div class="lbl">Tier 2 · Important</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t3)" id="chip-t3">0</div><div class="lbl">Tier 3 · Review</div></div>
+      <div class="stat-chip"><div class="num" style="color:var(--t4)" id="chip-t4">0</div><div class="lbl">Tier 4 · Low Yield</div></div>
       <div class="stat-chip"><div class="num" style="color:var(--green)" id="header-completed">0 / 0</div><div class="lbl">Fully Complete</div></div>
     </div>
 
@@ -207,7 +272,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   <div id="tab-bycat" class="tab-panel"><div id="bycat-content"></div></div>
   
   <div id="tab-bytier" class="tab-panel active">
-    <div class="alert info">
+    <div class="alert">
       <strong>Start with Tier 1.</strong> These <span id="tier1-count">0</span> videos cover topics that appear on almost every Step 1 exam. Complete all of Tier 1 before moving to Tier 2.
     </div>
     <div id="bytier-content"></div>
@@ -224,25 +289,29 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 </div>
 
 <script>
-// Paste your Firebase Config Object here
-const firebaseConfig = {
-  apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
-  authDomain: "sketchy-tracker.firebaseapp.com",
-  projectId: "sketchy-tracker",
-  storageBucket: "sketchy-tracker.firebasestorage.app",
-  messagingSenderId: "970470066509",
-  appId: "1:970470066509:web:14c7300fb1dd882a038f04",
-  measurementId: "G-2KVBCP4THR"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// Application State
+// Firebase Config - graceful fallback if SDK not loaded
+let auth = null;
+let db = null;
+let currentUser = null;
 let watchedState = {};
 let reviewedState = {};
-let currentUser = null;
+
+try {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
+    authDomain: "sketchy-tracker.firebaseapp.com",
+    projectId: "sketchy-tracker",
+    storageBucket: "sketchy-tracker.firebasestorage.app",
+    messagingSenderId: "970470066509",
+    appId: "1:970470066509:web:14c7300fb1dd882a038f04",
+    measurementId: "G-2KVBCP4THR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+} catch(e) {
+  console.log("Firebase not available, using local storage");
+}
 
 const categories = [
   {
@@ -396,32 +465,33 @@ const categories = [
   },
 ];
 
-const TIER_COLORS = {1:"var(--t1)",2:"var(--t2)",3:"var(--t3)",4:"var(--t4)"};
+const TIER_COLORS = {1:"#c03050",2:"#b85820",3:"#8a6e10",4:"#5a7060"};
 const TIER_BG     = {1:"rgba(192,48,80,0.08)",2:"rgba(184,88,32,0.08)",3:"rgba(138,110,16,0.07)",4:"rgba(90,112,96,0.07)"};
 const TIER_NAMES  = {1:"HIGH YIELD",2:"IMPORTANT",3:"REVIEW",4:"LOW YIELD"};
 
-// Authentication and Database Sync
-const authBtn = document.getElementById('auth-btn');
+const TIER_DATA = {
+  1:{label:"Tier 1 — High Yield",sub:"Highest-frequency Step 1 topics. Each video covers multiple guaranteed questions.",color:"var(--t1)"},
+  2:{label:"Tier 2 — Important",sub:"High-yield content that consolidates your foundation and covers common vignettes.",color:"var(--t2)"},
+  3:{label:"Tier 3 — Review",sub:"Medium-yield topics. Worth watching but only after Tiers 1 & 2 are complete.",color:"var(--t3)"},
+  4:{label:"Tier 4 — Low Yield",sub:"Lower-yield. Skim First Aid instead if time is short.",color:"var(--t4)"},
+};
 
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    currentUser = user;
-    await fetchStateFromFirebase(); 
-  } else {
-    currentUser = null;
-    loadStateFromLocal(); 
-  }
-  updateAll(); 
-});
-
-authBtn.addEventListener('click', () => {
-  if (currentUser) {
-    auth.signOut();
-  } else {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(console.error);
-  }
-});
+// ========== AUTH (inherited from index page) ==========
+if (auth) {
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUser = user;
+      await fetchStateFromFirebase();
+    } else {
+      currentUser = null;
+      loadStateFromLocal();
+    }
+    updateAll();
+  });
+} else {
+  loadStateFromLocal();
+  updateAll();
+}
 
 async function fetchStateFromFirebase() {
   if (!currentUser) return;
@@ -434,69 +504,66 @@ async function fetchStateFromFirebase() {
       watchedState = {};
       reviewedState = {};
     }
-  } catch (err) {
-    console.error("Error fetching state:", err);
-  }
+  } catch (err) { console.error("Error fetching state:", err); }
 }
 
 function loadStateFromLocal() {
-  const saved = localStorage.getItem('sketchy_local_progress');
-  const savedReviewed = localStorage.getItem('sketchy_local_reviewed');
-  if (saved) {
-    try { watchedState = JSON.parse(saved); } catch(e) { watchedState = {}; }
-  } else { watchedState = {}; }
-  
-  if (savedReviewed) {
-    try { reviewedState = JSON.parse(savedReviewed); } catch(e) { reviewedState = {}; }
-  } else { reviewedState = {}; }
+  try { watchedState = JSON.parse(localStorage.getItem('sketchy_local_progress') || '{}'); } catch(e) { watchedState = {}; }
+  try { reviewedState = JSON.parse(localStorage.getItem('sketchy_local_reviewed') || '{}'); } catch(e) { reviewedState = {}; }
 }
 
 function saveState() {
   if (currentUser) {
-    db.collection('users').doc(currentUser.uid).set({
-      watched: watchedState,
-      reviewed: reviewedState
-    }, { merge: true }).catch(console.error);
+    db.collection('users').doc(currentUser.uid).set({ watched: watchedState, reviewed: reviewedState }, { merge: true }).catch(console.error);
   } else {
     localStorage.setItem('sketchy_local_progress', JSON.stringify(watchedState));
     localStorage.setItem('sketchy_local_reviewed', JSON.stringify(reviewedState));
   }
 }
+
 function isWatched(id) { return !!watchedState[id]; }
 function isReviewed(id) { return !!reviewedState[id]; }
 function isComplete(id) { return isWatched(id) && isReviewed(id); }
 
-function toggleWatch(id) {
+function toggleWatch(id, event) {
+  event.stopPropagation();
   watchedState[id] = !watchedState[id];
   saveState();
   updateAll();
 }
-
 function toggleReview(id, event) {
-  event.stopPropagation(); // Prevent toggling 'watch' when clicking 'review'
+  event.stopPropagation();
   reviewedState[id] = !reviewedState[id];
   saveState();
   updateAll();
 }
 
-// Rendering Logic
-function allVideos(){return categories.flatMap(c=>c.videos);}
-function updateAll(){updateTracker();renderByCat();renderByTier();renderTracker();}
+// ========== RENDERING ==========
+function allVideos() { return categories.flatMap(c => c.videos); }
+function updateAll() { updateTracker(); renderByCat(); renderByTier(); renderTracker(); }
 
-function videoRowHTML(v, showCat){
-  const w=isWatched(v.id);
-  const r=isReviewed(v.id);
-  const complete = w && r; // Logic for visual dimming
+function colHeaderHTML() {
+  return `<div class="col-hdr">
+    <span>Watched</span><span>Reviewed</span><span></span>
+    <span style="text-align:right">Time</span>
+    <span class="hide-mobile"></span>
+    <span class="hide-mobile"></span>
+  </div>`;
+}
+
+function videoRowHTML(v, showCat) {
+  const w = isWatched(v.id);
+  const r = isReviewed(v.id);
+  const complete = w && r;
+  const tc = TIER_COLORS[v.tier];
+  const yp = (v.yield / 10) * 100;
+  const yc = v.yield >= 9 ? "var(--t1)" : v.yield >= 7 ? "var(--t2)" : v.yield >= 5 ? "var(--t3)" : "var(--t4)";
+  const catName = showCat ? categories.find(c => c.videos.some(vv => vv.id === v.id))?.name : null;
   
-  const tc=TIER_COLORS[v.tier];
-  const yp=(v.yield/10)*100;
-  const yc=v.yield>=9?"var(--t1)":v.yield>=7?"var(--t2)":v.yield>=5?"var(--t3)":"var(--t4)";
-  const catName = showCat ? categories.find(c=>c.videos.some(vv=>vv.id===v.id))?.name : null;
-  return `
-  <div class="video-row ${complete?'fully-done':''}" onclick="toggleWatch('${v.id}')" id="row-${v.id}">
-    <div class="check-box ${w?'checked':''}">${w?'✓':''}</div>
-    <div class="check-box ${r?'reviewed':''}" onclick="toggleReview('${v.id}', event)">${r?'✓':''}</div>
-    <div class="video-name ${complete?'done-name':''}">${v.name}${catName?` <span style="font-size:10px;color:var(--dim)">[${catName}]</span>`:''}</div>
+  return `<div class="video-row ${complete ? 'fully-done' : ''}" id="row-${v.id}">
+    <div class="check-box ${w ? 'checked' : ''}" data-tooltip="Watched" onclick="toggleWatch('${v.id}',event)">${w ? '✓' : ''}</div>
+    <div class="check-box ${r ? 'reviewed' : ''}" data-tooltip="Reviewed" onclick="toggleReview('${v.id}',event)">${r ? '✓' : ''}</div>
+    <div class="video-name">${v.name}${catName ? ` <span style="font-size:10px;color:var(--dim)">[${catName}]</span>` : ''}</div>
     <div class="video-time">${v.time}</div>
     <div class="yield-bar-wrap">
       <div class="yield-bar-bg"><div class="yield-bar-fill" style="width:${yp}%;background:${yc}"></div></div>
@@ -506,167 +573,171 @@ function videoRowHTML(v, showCat){
   </div>`;
 }
 
-function renderByCat(){
-  const c=document.getElementById("bycat-content");
-  c.innerHTML=categories.map(cat=>{
-    // Count ONLY if both watched and reviewed
-    const done=cat.videos.filter(v=>isComplete(v.id)).length;
-    const total=cat.videos.length;
-    const pct=Math.round((done/total)*100);
-    const minTier=Math.min(...cat.videos.map(v=>v.tier));
-    const hc=TIER_COLORS[minTier];
-    return `
-    <div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}">
+function renderByCat() {
+  const c = document.getElementById("bycat-content");
+  let html = "";
+  
+  categories.forEach(cat => {
+    const done = cat.videos.filter(v => isComplete(v.id)).length;
+    const total = cat.videos.length;
+    const pct = Math.round((done / total) * 100);
+    const minTier = Math.min(...cat.videos.map(v => v.tier));
+    const hc = TIER_COLORS[minTier];
+    
+    html += `<div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}">
       <div>
         <div class="section-title" style="color:${hc}">${cat.name}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px">${cat.why}</div>
+        <div class="section-why">${cat.why}</div>
       </div>
       <div class="section-meta">
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:${pct===100?'var(--green)':'var(--muted)'}">${done}/${total} &nbsp;·&nbsp; ${cat.totalTime}</span>
-        <div style="height:4px;width:90px;background:var(--bg2);border-radius:2px;margin-top:7px;overflow:hidden;border:1px solid var(--border)">
-          <div style="width:${pct}%;height:100%;background:${pct===100?'var(--green)':hc};border-radius:2px"></div>
+        <span class="section-meta-text" style="color:${pct === 100 ? 'var(--green)' : 'var(--muted)'}">${done}/${total} &nbsp;·&nbsp; ${cat.totalTime}</span>
+        <div class="section-meta-bar">
+          <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : hc}"></div>
         </div>
       </div>
     </div>
     <div class="video-list">
-      <div class="col-hdr">
-        <span>WATCH</span><span>REV</span><span>Video</span><span style="text-align:right">Time</span>
-        <span>Yield</span><span>Priority</span>
-      </div>
-      ${cat.videos.map(v=>videoRowHTML(v,false)).join("")}
+      ${cat.videos.map(v => videoRowHTML(v, false)).join("")}
     </div>`;
-  }).join("");
+  });
+  
+  c.innerHTML = html;
 }
 
-function renderByTier(){
-  const c=document.getElementById("bytier-content");
-  const td={
-    1:{label:"Tier 1 - High Yield",sub:"Highest-frequency Step 1 topics. Each video covers multiple guaranteed questions.",color:"var(--t1)"},
-    2:{label:"Tier 2 - Important",sub:"High-yield content that consolidates your foundation and covers common vignettes.",color:"var(--t2)"},
-    3:{label:"Tier 3 - Review",sub:"Medium-yield topics. Worth watching but only after Tiers 1 & 2 are complete.",color:"var(--t3)"},
-    4:{label:"Tier 4 - Low Yield",sub:"Lower-yield. Skim First Aid instead if time is short.",color:"var(--t4)"},
-  };
-  let html="";
-  for(let t=1;t<=4;t++){
-    const d=td[t];
-    const all=allVideos().filter(v=>v.tier===t);
-    // Logic: Only count as done if isComplete (watch+review)
-    const done=all.filter(v=>isComplete(v.id)).length;
-    const totalMins=all.reduce((s,v)=>s+(parseInt(v.time)||0),0);
-    html+=`<div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}">
+function renderByTier() {
+  const c = document.getElementById("bytier-content");
+  let html = "";
+  
+  for (let t = 1; t <= 4; t++) {
+    const d = TIER_DATA[t];
+    const all = allVideos().filter(v => v.tier === t);
+    const done = all.filter(v => isComplete(v.id)).length;
+    const totalMins = all.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
+    const pct = all.length ? Math.round((done / all.length) * 100) : 0;
+    
+    html += `<div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}">
       <div>
         <div class="section-title" style="color:${d.color}">${d.label}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px">${d.sub}</div>
+        <div class="section-why">${d.sub}</div>
       </div>
       <div class="section-meta">
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${done}/${all.length} &nbsp;·&nbsp; ~${Math.round(totalMins/60*10)/10} hrs</span>
+        <span class="section-meta-text">${done}/${all.length} &nbsp;·&nbsp; ~${Math.round(totalMins / 60 * 10) / 10} hrs</span>
+        <div class="section-meta-bar">
+          <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : d.color}"></div>
+        </div>
       </div>
     </div>`;
-    categories.forEach(cat=>{
-      const cv=cat.videos.filter(v=>v.tier===t).sort((a,b)=>b.yield-a.yield);
-      if(!cv.length)return;
-      const cd=cv.filter(v=>isComplete(v.id)).length;
-      html+=`<div style="border:1px solid var(--border);border-top:none;overflow:hidden">
-        <div style="padding:8px 20px;background:var(--surface2);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)">
-          <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:${d.color};text-transform:uppercase">${cat.name}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)">${cd}/${cv.length}</span>
+    
+    categories.forEach(cat => {
+      const cv = cat.videos.filter(v => v.tier === t).sort((a, b) => b.yield - a.yield);
+      if (!cv.length) return;
+      const cd = cv.filter(v => isComplete(v.id)).length;
+      
+      html += `<div class="video-list" style="border-radius:0;margin-bottom:0;border-top:none">
+        <div class="sub-section-hdr">
+          <span class="sub-section-name" style="color:${d.color}">${cat.name}</span>
+          <span class="sub-section-count">${cd}/${cv.length}</span>
         </div>
-        ${cv.map(v=>videoRowHTML(v,false)).join("")}
+        ${cv.map(v => videoRowHTML(v, false)).join("")}
       </div>`;
     });
-    html+=`<div style="margin-bottom:28px"></div>`;
+    
+    html += `<div style="margin-bottom:24px"></div>`;
   }
-  c.innerHTML=html;
+  c.innerHTML = html;
 }
 
-function updateTracker(){
-  const av=allVideos();
-  const total=av.length;
-  // Progress bar logic: requires BOTH checks
-  const done=av.filter(v=>isComplete(v.id)).length;
-  const pct=Math.round((done/total)*100);
-  const rem=total-done;
-  const totalMins=av.reduce((s,v)=>s+(parseInt(v.time)||0),0);
+function updateTracker() {
+  const av = allVideos();
+  const total = av.length;
+  const done = av.filter(v => isComplete(v.id)).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const rem = total - done;
+  const totalMins = av.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
 
-  [1,2,3,4].forEach(t=>{
-    const el=document.getElementById("chip-t"+t);
-    if(el) el.textContent=av.filter(v=>v.tier===t).length;
+  [1, 2, 3, 4].forEach(t => {
+    const el = document.getElementById("chip-t" + t);
+    if (el) el.textContent = av.filter(v => v.tier === t).length;
   });
-  if(document.getElementById("tier1-count")) document.getElementById("tier1-count").textContent = av.filter(v=>v.tier===1).length;
-  const el=document.getElementById("tracker-pct"),bar=document.getElementById("tracker-bar"),
-        note=document.getElementById("tracker-note"),chip=document.getElementById("header-completed"),
-        hrem=document.getElementById("header-remaining"),htot=document.getElementById("header-total");
-  if(el) el.textContent=(isNaN(pct)?0:pct)+"%";
-  if(bar) bar.style.width=(isNaN(pct)?0:pct)+"%";
-  if(note) note.textContent=`${done} of ${total} videos completed (Watch + Review)`;
-  if(chip) chip.textContent=`${done} / ${total}`;
-  if(hrem) hrem.textContent=rem;
-  if(htot) htot.textContent=`~${Math.round(totalMins/60*10)/10}`;
+  const t1el = document.getElementById("tier1-count");
+  if (t1el) t1el.textContent = av.filter(v => v.tier === 1).length;
+  
+  const el = document.getElementById("tracker-pct");
+  const bar = document.getElementById("tracker-bar");
+  const note = document.getElementById("tracker-note");
+  const chip = document.getElementById("header-completed");
+  const hrem = document.getElementById("header-remaining");
+  const htot = document.getElementById("header-total");
+  
+  if (el) el.textContent = pct + "%";
+  if (bar) bar.style.width = pct + "%";
+  if (note) note.textContent = `${done} of ${total} videos completed (Watch + Review)`;
+  if (chip) chip.textContent = `${done} / ${total}`;
+  if (hrem) hrem.textContent = rem;
+  if (htot) htot.textContent = `~${Math.round(totalMins / 60 * 10) / 10}`;
 }
 
-function renderTracker(){
-  updateTracker();
-  const c=document.getElementById("tracker-content");
-  const av=allVideos();
+function renderTracker() {
+  const c = document.getElementById("tracker-content");
+  const av = allVideos();
 
-  let html=`<table class="cat-table" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px">
+  let html = `<table class="cat-table" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:22px;box-shadow:var(--card-shadow)">
     <thead><tr>
       <th>Category</th><th>Progress (W+R)</th><th>Done / Total</th><th>Time Left</th><th>Top Tier</th>
     </tr></thead><tbody>`;
-  categories.forEach(cat=>{
-    // Logic: isComplete (Watch + Review)
-    const done=cat.videos.filter(v=>isComplete(v.id)).length;
-    const total=cat.videos.length;
-    const pct=Math.round((done/total)*100);
-    // Time left: sum of videos that are NOT complete
-    const ml=cat.videos.filter(v=>!isComplete(v.id)).reduce((s,v)=>s+(parseInt(v.time)||0),0);
-    const mt=Math.min(...cat.videos.map(v=>v.tier));
-    const tc=TIER_COLORS[mt];
-    html+=`<tr>
+  
+  categories.forEach(cat => {
+    const done = cat.videos.filter(v => isComplete(v.id)).length;
+    const total = cat.videos.length;
+    const pct = Math.round((done / total) * 100);
+    const ml = cat.videos.filter(v => !isComplete(v.id)).reduce((s, v) => s + (parseInt(v.time) || 0), 0);
+    const mt = Math.min(...cat.videos.map(v => v.tier));
+    const tc = TIER_COLORS[mt];
+    
+    html += `<tr>
       <td style="font-weight:500;color:var(--ink2)">${cat.name}</td>
       <td style="min-width:120px">
-        <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${isNaN(pct)?0:pct}%;background:${pct===100?'var(--green)':tc}"></div></div>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${isNaN(pct)?0:pct}%</span>
+        <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : tc}"></div></div>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${pct}%</span>
       </td>
       <td style="font-family:'DM Mono',monospace;font-size:12px">${done} / ${total}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${ml?`~${Math.round(ml/60*10)/10} hrs`:'✓ Done'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${ml ? `~${Math.round(ml / 60 * 10) / 10} hrs` : '✓ Done'}</td>
       <td><span class="tier-pill" style="background:${TIER_BG[mt]};color:${tc};border-color:${tc}50">${TIER_NAMES[mt]}</span></td>
     </tr>`;
   });
-  html+=`</tbody></table>`;
+  html += `</tbody></table>`;
 
-  // Lists: "Completed" means both checked. "Up Next" means not fully complete.
-  const completed=av.filter(v=>isComplete(v.id));
-  const upcoming=av.filter(v=>!isComplete(v.id)).sort((a,b)=>a.tier-b.tier||b.yield-a.yield).slice(0,8);
+  const completed = av.filter(v => isComplete(v.id));
+  const upcoming = av.filter(v => !isComplete(v.id)).sort((a, b) => a.tier - b.tier || b.yield - a.yield).slice(0, 10);
 
-  html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
-      <p style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:14px">✓ Fully Completed (${completed.length})</p>
-      ${completed.length?completed.map(v=>`<div style="font-size:12.5px;padding:7px 0;border-bottom:1px solid rgba(236,216,222,0.5);color:var(--muted);display:flex;justify-content:space-between"><span>${v.name}</span><span style="color:var(--green)">✓✓</span></div>`).join(""):'<p style="font-size:13px;color:var(--dim);font-style:italic">None yet. Watch & Review to complete.</p>'}
+  html += `<div class="tracker-grid">
+    <div class="tracker-card">
+      <p class="tracker-card-title" style="color:var(--green)">✓ Fully Completed (${completed.length})</p>
+      ${completed.length
+        ? completed.map(v => `<div class="tracker-card-item"><span style="color:var(--muted)">${v.name}</span><span style="color:var(--green);font-size:11px">✓✓</span></div>`).join("")
+        : '<div class="empty-state" style="padding:24px 0"><div class="empty-state-text">None yet. Watch & Review to complete.</div></div>'}
     </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
-      <p style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--t1);text-transform:uppercase;margin-bottom:14px">▶ Up Next (Top Priority)</p>
-      ${upcoming.map(v=>{
-        const tc=TIER_COLORS[v.tier];
-        return `<div style="font-size:12.5px;padding:7px 0;border-bottom:1px solid rgba(236,216,222,0.5);display:flex;justify-content:space-between;align-items:center">
+    <div class="tracker-card">
+      <p class="tracker-card-title" style="color:var(--t1)">▶ Up Next (Top Priority)</p>
+      ${upcoming.map(v => {
+        const tc = TIER_COLORS[v.tier];
+        return `<div class="tracker-card-item">
           <span style="color:var(--ink2)">${v.name}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:8.5px;padding:2px 7px;border-radius:4px;background:${TIER_BG[v.tier]};color:${tc};border:1px solid ${tc}40">${TIER_NAMES[v.tier]}</span>
+          <span class="tier-pill" style="background:${TIER_BG[v.tier]};color:${tc};border-color:${tc}40;font-size:8px">${TIER_NAMES[v.tier]}</span>
         </div>`;
       }).join("")}
     </div>
   </div>`;
-  c.innerHTML=html;
+  
+  c.innerHTML = html;
 }
 
-function switchTab(name,btn){
-  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("tab-"+name).classList.add("active");
-  if(btn)btn.classList.add("active");
+function switchTab(name, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  if (btn) btn.classList.add("active");
 }
-
-const t1el = document.getElementById("tier1-count");
-if(t1el) t1el.textContent = allVideos().filter(v=>v.tier===1).length;
 
 updateAll();
 </script>
