@@ -397,34 +397,35 @@ body::before {
   margin-left: 6px;
 }
 
-@media (max-width: 768px) {
-  /* 1. Simplify Header & Content Spacing */
+@media (max-width: 600px) {
+  /* 1. Header scrolls naturally; no animation */
   .header { 
-    padding: 12px 14px 0; 
-    transition: transform 0.3s ease-in-out; /* Slide only on mobile */
+    position: relative;
+    padding: 16px 16px 0;
+    transition: none;
+    transform: none;
   }
   .content { padding: 12px 12px 60px; }
 
-  /* 2. Disappearing Class */
-  .header--hidden { transform: translateY(-100%); }
-
-  /* 3. Drug Grid & Titles */
+  /* 2. Drug Grid & Typography */
   .drug-grid { grid-template-columns: 1fr; }
   .drug-name { font-size: 21px; }
   .header-top { flex-direction: column; gap: 10px; align-items: flex-start; }
   .search-wrap { max-width: 100%; }
 
-  /* 4. Thumb-Friendly Tabs */
+  /* 3. Sticky Navigation: Tabs stay pinned to the top */
   .tabs {
     position: sticky;
     top: 0;
     z-index: 201;
-    background: #bcb0d0; /* Match header for seamless look */
+    background: #bcb0d0; /* Solid background for legibility */
     padding: 8px 4px;
     margin-top: 10px;
     border-top: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
     overflow-x: auto;
     flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
   }
   .tab-btn { 
     padding: 10px 14px; 
@@ -3037,24 +3038,7 @@ function handleSearch(q) {
   count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + q + '"';
   grid.innerHTML = matches.map((d, i) => drugCardHTML(d, d.colorClass, 'search-' + i)).join('');
 }
-let lastScrollY = window.scrollY;
-const header = document.querySelector('.header');
 
-window.addEventListener('scroll', () => {
-  // HARD GUARD: If screen is wider than 768px (laptop), do nothing.
-  if (window.innerWidth > 600) {
-    header.classList.remove('header--hidden');
-    return; 
-  }
-
-  // Mobile-only logic: Hide on down-scroll, show on up-scroll
-  if (window.scrollY > lastScrollY && window.scrollY > 100) {
-    header.classList.add('header--hidden');
-  } else {
-    header.classList.remove('header--hidden');
-  }
-  lastScrollY = window.scrollY;
-});
 </script>
 </body>
 </html>
