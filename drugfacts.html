@@ -397,37 +397,38 @@ body::before {
   margin-left: 6px;
 }
 
-@media(max-width: 600px) {
+@media (max-width: 768px) {
+  /* 1. Simplify Header & Content Spacing */
   .header { 
     padding: 12px 14px 0; 
-    transition: transform 0.3s ease-in-out; /* Slide ONLY on mobile */
+    transition: transform 0.3s ease-in-out; /* Slide only on mobile */
   }
-  
-  /* Movement class used by JavaScript */
-  .header--hidden {
-    transform: translateY(-100%);
-  }
-
   .content { padding: 12px 12px 60px; }
+
+  /* 2. Disappearing Class */
+  .header--hidden { transform: translateY(-100%); }
+
+  /* 3. Drug Grid & Titles */
   .drug-grid { grid-template-columns: 1fr; }
-  .header-top { flex-direction: column; gap: 12px; }
+  .drug-name { font-size: 21px; }
+  .header-top { flex-direction: column; gap: 10px; align-items: flex-start; }
   .search-wrap { max-width: 100%; }
 
-  .tab-btn { 
-    padding: 12px 14px; 
-    font-size: 10px; 
-  }
-  
-  /* Fixed Tabs Styling: Prevents background bleed-through */
+  /* 4. Thumb-Friendly Tabs */
   .tabs {
     position: sticky;
     top: 0;
     z-index: 201;
-    background: #bcb0d0; /* Solid match for header bottom */
+    background: #bcb0d0; /* Match header for seamless look */
     padding: 8px 4px;
     margin-top: 10px;
     border-top: 1px solid rgba(255,255,255,0.2);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .tab-btn { 
+    padding: 10px 14px; 
+    font-size: 10.5px; 
   }
 }
 /* ── TIER BADGE ── */
