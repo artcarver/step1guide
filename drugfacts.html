@@ -129,7 +129,34 @@ body::before {
   background: #5a3878;
 }
 
-.search-wrap { flex: 1; max-width: 400px; position: relative; }
+.search-wrap { 
+  flex: 1; 
+  max-width: 400px; 
+  position: relative; 
+  display: flex;
+  align-items: center;
+}
+
+#search-clear {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  display: none; /* Hidden by default */
+  line-height: 1;
+  z-index: 5; /* Ensures it stays above the input background */
+}
+
+#search-clear:hover {
+  color: var(--ink);
+}
+
+#search-clear:hover {
+  color: var(--ink);
+}
 .search-input {
   width: 100%; padding: 10px 16px 10px 40px;
   background: rgba(255,255,255,0.3);
@@ -485,6 +512,7 @@ body::before {
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
         <input class="search-input" type="text" id="search-input" placeholder="Search drug, class, mechanism, side effect..." oninput="handleSearch(this.value)"/>
+        <button id="search-clear" onclick="clearSearch()">×</button>
       </div>
     </div>
   <nav class="tabs" id="tabs">
@@ -3002,6 +3030,8 @@ function handleSearch(q) {
   const grid = document.getElementById('search-grid');
   const empty = document.getElementById('search-empty');
   const count = document.getElementById('search-count');
+  const clearBtn = document.getElementById('search-clear');
+  clearBtn.style.display = q.length > 0 ? 'block' : 'none';
 
   if(!q || q.length < 2) {
     sr.classList.remove('active');
@@ -3038,7 +3068,11 @@ function handleSearch(q) {
   count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + q + '"';
   grid.innerHTML = matches.map((d, i) => drugCardHTML(d, d.colorClass, 'search-' + i)).join('');
 }
-
+function clearSearch() {
+  const input = document.getElementById('search-input');
+  input.value = '';
+  handleSearch(''); // Resets the UI
+}
 </script>
 </body>
 </html>
