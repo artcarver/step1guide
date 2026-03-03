@@ -1261,19 +1261,6 @@ blood: [
     color: "blood",
     drugs: [
       {
-        name: "NSAIDs",
-        summary: "Reversibly inhibit COX-1/2 → ↓ prostaglandins. GI ulcers (↓ PGE2), renal failure, inhibit platelet aggregation. Ketorolac: IV/IM",
-        tier: 1,
-        aka: "Ibuprofen, Naproxen, Celecoxib",
-        tags: ["Pain", "Fever", "Gout"],
-        moa: "Inhibit **COX-1 and COX-2** → ↓ PGE2, PGI2, TXA2",
-        use: "Pain, inflammation, fever. Indomethacin: gout, closes **PDA**",
-        se: "**GI ulcers** (↓ PGE2), **renal toxicity** (afferent vasoconstriction → ↓ GFR)",
-        ci: "Renal failure, peptic ulcer, 3rd trimester of pregnancy",
-        pk: "Celecoxib: COX-2 selective (↓ GI risk, ↑ CV risk)",
-        pearl: "**Renal Physiology:** NSAIDs block PGE2, which normally keeps the afferent arteriole dilated. This can cause **AKI** in dehydrated patients."
-      },
-      {
         name: "Allopurinol & Febuxostat",
         summary: "Inhibit xanthine oxidase → ↓ uric acid synthesis. For chronic gout prevention. Allopurinol + azathioprine/6-MP = fatal toxicity",
         tier: 1,
@@ -1346,6 +1333,19 @@ neuro: [
         ci: "Head injury (CO2 retention → cerebral vasodilation → ↑ ICP). **MAOIs + meperidine** (serotonin syndrome — meperidine is serotonergic). Use caution in obstructive sleep apnea",
         pk: "Fentanyl: 100× more potent than morphine. Codeine: prodrug → CYP2D6 activation (ultrarapid metabolizers → toxicity; poor metabolizers → no effect). Tramadol: weak μ agonist + inhibits NE/serotonin reuptake",
         pearl: "**Constipation is the one opioid SE with no tolerance.** All other SEs (sedation, nausea, respiratory depression) diminish with continued use — constipation persists indefinitely. Always prescribe a stimulant laxative (senna, bisacodyl) with opioids. Meperidine + MAOIs = serotonin syndrome (unique to meperidine — other opioids are safe with MAOIs)."
+      },
+      {
+        name: "NSAIDs (Non-Opioid Analgesics)",
+        summary: "Reversibly inhibit COX-1/2 → ↓ prostaglandins. GI ulcers (↓ PGE2), renal failure, inhibit platelet aggregation. Ketorolac: IV/IM",
+        tier: 1,
+        aka: "Ibuprofen, Naproxen, Ketorolac, Indomethacin (non-selective) · Celecoxib (COX-2 selective)",
+        tags: ["Pain", "Fever", "Inflammation", "Gout"],
+        moa: "Inhibit **COX-1 and COX-2** → ↓ PGE2, PGI2, TXA2. COX-1: constitutive (GI protection). COX-2: inducible (inflammation/pain)",
+        use: "Pain, inflammation, fever, dysmenorrhea. Indomethacin: gout, closes **PDA**. Ketorolac: IV/IM analgesic",
+        se: "**GI ulcers/bleeding** (↓ PGE2), **renal toxicity** (afferent vasoconstriction → ↓ GFR), **platelet dysfunction**. Aspirin-exacerbated respiratory disease",
+        ci: "Renal failure, peptic ulcer, 3rd trimester of pregnancy (closes PDA)",
+        pk: "COX-2 selective (celecoxib): ↓ GI risk but ↑ CV risk (↑ MI/stroke)",
+        pearl: "**Renal Physiology:** In dehydration/CHF, PGE2 maintains GFR by dilating the afferent arteriole. NSAIDs block this → afferent constriction → **Acute Kidney Injury**."
       },
       {
         name: "Naloxone, Naltrexone & Buprenorphine",
