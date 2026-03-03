@@ -1111,26 +1111,58 @@ cv: [
         pearl: "**Mag toxicity reversal = calcium gluconate.** Classic board scenario: pre-eclamptic patient on MgSO4 infusion → respiratory depression + absent deep tendon reflexes. Give IV calcium gluconate immediately. Monitor patellar reflexes (first to disappear) and urine output during infusion."
       },
     ]
-  }
+  },
+{
+  group: "Dyslipidemia",
+  color: "cv",
+  drugs: [
+    {
+      name: "Statins (HMG-CoA Reductase Inhibitors)",
+      summary: "Inhibit cholesterol synthesis — first-line for LDL lowering. Key SE: myopathy/rhabdomyolysis (↑ with CYP3A4 inhibitors + fibrates)",
+      tier: 1,
+      aka: "Atorvastatin, Rosuvastatin",
+      tags: ["Hypercholesterolemia", "CV Risk Reduction"],
+      moa: "Inhibit **HMG-CoA reductase** → ↓ LDL, ↓ VLDL, mild ↑ HDL",
+      use: "First-line for LDL reduction and CV event prevention",
+      se: "**Myopathy/Rhabdomyolysis** (risk ↑ with fibrates), hepatotoxicity",
+      ci: "Pregnancy (teratogenic), active liver disease",
+      pk: "Lovastatin/simvastatin: CYP3A4 substrates",
+      pearl: "**Statin + fibrate = rhabdomyolysis risk**. Statins also have **pleiotropic effects** (anti-inflammatory)."
+    },
+    {
+      name: "Fibrates & Niacin",
+      summary: "Fibrates: ↓ TGs via PPARα. Niacin: ↑ HDL most, ↓ TGs, causes flushing (use aspirin). Both increase statin myopathy risk",
+      tier: 1,
+      aka: "Gemfibrozil, Fenofibrate · Niacin",
+      tags: ["Hypertriglyceridemia", "HDL"],
+      moa: "**Fibrates:** activate **PPARα** → ↑ LPL → ↑ TG clearance. **Niacin:** inhibits hormone-sensitive lipase → ↓ hepatic VLDL synthesis → **↑↑ HDL**",
+      use: "Fibrates: **hypertriglyceridemia** (TGs > 500). Niacin: raising HDL",
+      se: "**Fibrates:** myopathy, gallstones. **Niacin:** **flushing** (prostaglandin-mediated), hyperglycemia, hyperuricemia",
+      ci: "Gemfibrozil + statin (high rhabdo risk)",
+      pk: "Aspirin blocks niacin-induced flushing by inhibiting COX",
+      pearl: "Niacin is the **only drug that significantly raises HDL**."
+    }
+  ]
+}
 ],
 
 blood: [
-{
-    group: "Anticoagulants & Thrombolytics",
+  {
+    group: "Anticoagulants (Coagulation Factors)",
     color: "blood",
     drugs: [
       {
         name: "Heparin (UFH & LMWH)",
         summary: "UFH: activates antithrombin → inhibits IIa + Xa, monitor aPTT, reversed by protamine. LMWH: Xa only, preferred in pregnancy",
         tier: 1,
-        aka: "Unfractionated Heparin (UFH) · Enoxaparin, Dalteparin (LMWH) · Fondaparinux (synthetic pentasaccharide)",
+        aka: "Unfractionated Heparin (UFH) · Enoxaparin, Dalteparin (LMWH) · Fondaparinux",
         tags: ["DVT/PE", "ACS", "Pregnancy-safe"],
         moa: "**UFH:** activates antithrombin III → inhibits **IIa (thrombin) and Xa**. **LMWH:** preferentially inhibits **Xa** (less anti-IIa). Fondaparinux: Xa only",
         use: "DVT, PE, ACS, bridging therapy. LMWH/heparin: safe in pregnancy (don't cross placenta)",
-        se: "**HIT (Heparin-Induced Thrombocytopenia):** Type I = non-immune, mild, transient. Type II = immune-mediated (IgG vs PF4-heparin complex) → paradoxical THROMBOSIS (not just bleeding). ALSO: bleeding, osteoporosis with long-term use",
+        se: "**HIT (Heparin-Induced Thrombocytopenia):** Type I = non-immune, mild. Type II = immune-mediated (IgG vs PF4-heparin) → paradoxical **THROMBOSIS**. Osteoporosis with long-term use",
         ci: "Active bleeding, HIT history",
-        pk: "UFH: IV/SubQ, monitored by **aPTT**. LMWH: monitored by anti-Xa levels. Reversal: **Protamine sulfate** (reverses UFH completely, partially reverses LMWH, does NOT reverse fondaparinux)",
-        pearl: "**HIT type II:** platelets fall 5–10 days after starting heparin + paradoxical CLOTTING (not just thrombocytopenia). Stop all heparin IMMEDIATELY, switch to **argatroban or bivalirudin** (direct thrombin inhibitors). NEVER give warfarin alone initially in HIT."
+        pk: "UFH: monitor **aPTT**. LMWH: monitor anti-Xa levels. Reversal: **Protamine sulfate** (reverses UFH completely; only partial for LMWH)",
+        pearl: "**HIT type II:** platelets fall 5–10 days after starting heparin. Stop all heparin IMMEDIATELY; switch to **argatroban or bivalirudin** (direct thrombin inhibitors). NEVER give warfarin alone initially in HIT."
       },
       {
         name: "Warfarin",
@@ -1138,12 +1170,12 @@ blood: [
         tier: 1,
         aka: "Coumadin",
         tags: ["AF", "DVT/PE", "Prosthetic Valves"],
-        moa: "Inhibits **vitamin K epoxide reductase** → ↓ γ-carboxylation of factors II, VII, IX, X (and proteins C and S)",
-        use: "AF (stroke prevention), DVT/PE treatment, mechanical heart valves (prosthetic), hypercoagulable states",
-        se: "**Bleeding** (most common). **Warfarin skin necrosis:** protein C/S deficiency patients → paradoxical clotting in first days (proteins C and S have shortest half-lives → depleted first). **Teratogenic (embryopathy, fetal bleeding)**",
-        ci: "Pregnancy (fetal warfarin syndrome), active bleeding, inability to monitor INR",
-        pk: "Monitored by **INR** (target 2–3 for AF/DVT; 2.5–3.5 for mechanical valves). Multiple drug interactions — CYP2C9 substrate",
-        pearl: "**Warfarin reversal:** Minor bleeding → hold + vitamin K PO. Serious bleeding → IV vitamin K + **4-factor PCC** or FFP for immediate reversal. DOAC reversal: dabigatran → idarucizumab; Xa inhibitors → andexanet alfa."
+        moa: "Inhibits **vitamin K epoxide reductase** → ↓ γ-carboxylation of factors II, VII, IX, X, and proteins C and S",
+        use: "AF (stroke prevention), DVT/PE treatment, mechanical heart valves, hypercoagulable states",
+        se: "**Bleeding** (most common). **Warfarin skin necrosis:** protein C/S deficiency patients → paradoxical clotting in first days. **Teratogenic (embryopathy)**",
+        ci: "Pregnancy (fetal warfarin syndrome), active bleeding",
+        pk: "Monitored by **INR** (target 2–3 for AF/DVT). Multiple drug interactions via **CYP2C9**",
+        pearl: "**Warfarin reversal:** Minor bleeding → hold + vitamin K PO. Serious bleeding → IV vitamin K + **4-factor PCC** or FFP."
       },
       {
         name: "Direct Oral Anticoagulants (DOACs)",
@@ -1152,128 +1184,120 @@ blood: [
         aka: "Dabigatran (IIa inhibitor) · Rivaroxaban, Apixaban, Edoxaban (Xa inhibitors)",
         tags: ["AF", "DVT/PE", "No Monitoring"],
         moa: "**Dabigatran:** direct thrombin (IIa) inhibitor. **Rivaroxaban/Apixaban:** direct factor Xa inhibitors",
-        use: "Non-valvular AF, DVT/PE treatment/prevention. Advantages: no INR monitoring, fewer drug interactions, fixed dosing",
-        se: "Bleeding. Dabigatran: GI side effects (most), ↑ GI bleed risk vs warfarin",
-        ci: "Mechanical heart valves (DOACs inferior), severe renal failure (dabigatran), pregnancy",
-        pk: "Dabigatran: renal clearance. Rivaroxaban/apixaban: hepatic. No routine monitoring needed",
-        pearl: "**Reversal agents:** Dabigatran → **Idarucizumab** (specific antibody fragment). Factor Xa inhibitors → **Andexanet alfa**. If unavailable: 4-factor PCC. This is increasingly tested — know which reversal agent goes with which drug."
-      },
+        use: "Non-valvular AF, DVT/PE. Advantages: no INR monitoring, fewer drug interactions",
+        se: "Bleeding. Dabigatran: GI side effects (most common)",
+        ci: "Mechanical heart valves (DOACs inferior), severe renal failure (dabigatran)",
+        pk: "Dabigatran: renal clearance. Rivaroxaban/apixaban: hepatic clearance",
+        pearl: "**Reversal agents:** Dabigatran → **Idarucizumab**. Factor Xa inhibitors → **Andexanet alfa**."
+      }
+    ]
+  },
+  {
+    group: "Antiplatelets (Platelet Aggregation)",
+    color: "blood",
+    drugs: [
       {
         name: "Aspirin (Antiplatelet)",
         summary: "Irreversibly inhibits COX → ↓ TXA2 for 7–10 days. Reye syndrome in kids + viral illness. Overdose: mixed resp alkalosis + met acidosis",
         tier: 1,
-        aka: "Acetylsalicylic acid (ASA) — low dose 81–325 mg",
+        aka: "Acetylsalicylic acid (ASA)",
         tags: ["ACS", "Stroke Prevention", "Post-Stent"],
-        moa: "Irreversibly inhibits **COX-1 and COX-2** → ↓ thromboxane A2 (TXA2) synthesis in platelets → ↓ platelet aggregation. Effect lasts platelet lifespan (7–10 days) because platelets cannot synthesize new COX",
-        use: "ACS (immediate 325 mg chewed), secondary prevention of MI/stroke, post-coronary stent (dual antiplatelet with P2Y12), TIA/stroke prevention, primary prevention (controversial — only selected high-risk patients)",
-        se: "**GI bleeding/ulcers** (↓ PGE2 → ↓ mucosal protection — take with food or PPI). **Reye syndrome** (children + viral illness → hepatic encephalopathy — avoid <19 yrs with fever). Tinnitus/salicylism (overdose). Aspirin-exacerbated respiratory disease",
-        ci: "Children/adolescents with viral illness (Reye syndrome), active GI bleeding, severe aspirin allergy, peptic ulcer",
-        pk: "Antiplatelet dose: 81 mg (low-dose). Anti-inflammatory/analgesic: 325–650 mg. Effect irreversible — platelet function returns as new platelets produced over 7–10 days",
-        pearl: "**Aspirin overdose — classic mixed picture:** Early: salicylates directly stimulate respiratory center → hyperventilation → respiratory alkalosis. Late: uncouple oxidative phosphorylation → metabolic acidosis. Net result: mixed respiratory alkalosis + metabolic acidosis. Treat with sodium bicarb to alkalinize urine (trap ionized salicylate)."
+        moa: "Irreversibly inhibits **COX-1 and COX-2** → ↓ thromboxane A2 (TXA2) synthesis. Effect lasts platelet lifespan (7–10 days)",
+        use: "ACS (immediate 325 mg chewed), secondary stroke prevention, post-coronary stent",
+        se: "**GI bleeding/ulcers** (↓ PGE2). **Reye syndrome** (children + viral illness). Tinnitus (overdose)",
+        ci: "Children with viral illness, active GI bleeding",
+        pk: "Antiplatelet dose: 81 mg. Effect is irreversible",
+        pearl: "**Aspirin overdose:** Early respiratory alkalosis followed by late metabolic acidosis (uncoupling oxidative phosphorylation). Treat with sodium bicarb to alkalinize urine."
       },
       {
-        name: "P2Y12 Inhibitors & GP IIb/IIIa Blockers",
+        name: "P2Y12 & GP IIb/IIIa Blockers",
         summary: "Clopidogrel (prodrug, CYP2C19) + ticagrelor: DAPT post-stent/ACS. Clopidogrel + omeprazole interaction — use pantoprazole",
         tier: 1,
-        aka: "Clopidogrel (Plavix), Ticagrelor, Prasugrel · Abciximab, Eptifibatide, Tirofiban",
+        aka: "Clopidogrel (Plavix), Ticagrelor · Abciximab, Eptifibatide",
         tags: ["ACS", "Post-Stent", "PCI"],
-        moa: "P2Y12 inhibitors: block **ADP receptor (P2Y12)** on platelets → ↓ ADP-induced aggregation. Clopidogrel/prasugrel: irreversible. Ticagrelor: reversible. GP IIb/IIIa inhibitors: block final common pathway of platelet aggregation — **prevent fibrinogen binding**",
-        use: "Dual antiplatelet therapy (DAPT = aspirin + P2Y12): post-coronary stent (prevents in-stent thrombosis), ACS. Ticagrelor/prasugrel: preferred over clopidogrel in ACS (more potent, predictable). GP IIb/IIIa: during PCI procedure (acute setting only)",
-        se: "Bleeding (all). Clopidogrel: TTP (rare). **Ticagrelor: dyspnea** (adenosine-mediated, not bronchospasm — unique SE). Prasugrel: ↑ bleeding risk in elderly/low weight/prior stroke. GP IIb/IIIa: thrombocytopenia",
-        ci: "Clopidogrel + PPIs (omeprazole inhibits CYP2C19 activation — use pantoprazole instead). Prasugrel: prior stroke/TIA (↑ intracranial bleed), age >75 or <60 kg (relative). Active bleeding",
-        pk: "Clopidogrel: prodrug → CYP2C19 activation — poor metabolizers (CYP2C19 LOF) get no benefit. Ticagrelor/prasugrel: not prodrugs, more reliable. Reversal: platelet transfusion (clopidogrel/prasugrel); ticagrelor wears off faster",
-        pearl: "**Clopidogrel + omeprazole interaction:** Omeprazole inhibits CYP2C19 → ↓ clopidogrel activation → ↓ antiplatelet effect. Use pantoprazole or famotidine for GI protection instead. Also: clopidogrel non-responders (CYP2C19 poor metabolizers) should use ticagrelor."
+        moa: "P2Y12 inhibitors: block **ADP receptor (P2Y12)**. GP IIb/IIIa inhibitors: block final common pathway (prevents fibrinogen binding)",
+        use: "Dual antiplatelet therapy (DAPT): post-stent, ACS",
+        se: "Bleeding. **Ticagrelor: dyspnea** (unique side effect)",
+        ci: "Clopidogrel + PPIs (omeprazole inhibits CYP2C19 activation)",
+        pk: "Clopidogrel: prodrug → requires **CYP2C19** activation",
+        pearl: "**PPI Interaction:** Omeprazole inhibits CYP2C19 → ↓ clopidogrel activation. Use pantoprazole for GI protection instead."
       },
       {
-        name: "Thrombolytics",
-        summary: "tPA/alteplase: convert plasminogen → plasmin, lyse clots. Used in STEMI, ischemic stroke (≤4.5h), massive PE. CI: recent surgery/bleed",
-        tier: 1,
-        aka: "tPA (Alteplase, Tenecteplase) · Streptokinase",
-        tags: ["STEMI", "Ischemic Stroke", "Massive PE"],
-        moa: "Convert **plasminogen → plasmin** → dissolves fibrin clots systemically",
-        use: "Ischemic stroke (within **4.5 hours** of symptom onset), STEMI (if PCI unavailable), massive PE with hemodynamic instability",
-        se: "**Bleeding** (intracranial hemorrhage most feared). Streptokinase: antigenic reactions",
-        ci: "Recent surgery (<14 days), active bleeding, prior intracranial hemorrhage, BP >185/110, ischemic stroke >4.5 hrs or hemorrhagic stroke",
-        pk: "tPA: fibrin-specific (less systemic bleeding). Streptokinase: non-specific, antigenic",
-        pearl: "**Stroke tPA window = 4.5 hours.** First must get non-contrast CT head to rule out hemorrhage. Absolute contraindications include: any intracranial hemorrhage, major surgery within 14 days, BP >185/110."
-      },
+        name: "PDE3/PDE5 Inhibitors (Antiplatelet)",
+        summary: "Cilostazol/Dipyridamole: ↑ cAMP in platelets → inhibit aggregation + vasodilation. Cilostazol used for claudication; Dipyridamole for stroke prevention",
+        tier: 2,
+        aka: "Cilostazol (Pletal) · Dipyridamole (Persantine)",
+        tags: ["Claudication", "Stroke Prevention", "Vasodilation"],
+        moa: "Inhibit **phosphodiesterase (PDE3 in platelets/vessels)** → ↑ cAMP → (1) **Inhibit platelet aggregation**. (2) Direct **vasodilation**",
+        use: "Cilostazol: **intermittent claudication** (symptom relief in PAD). Dipyridamole: **secondary stroke prevention** (combined with aspirin), cardiac stress testing",
+        se: "Headache, palpitations, diarrhea, dizziness. **Coronary steal** (dipyridamole)",
+        ci: "**Heart Failure of any severity** (cilostazol — associated with reduced survival)",
+        pk: "Cilostazol: CYP3A4 substrate",
+        pearl: "**Cilostazol is the 'claudication drug'**—it improves walking distance in PAD. High-yield CI: **never use in HF**. Dipyridamole causes **coronary steal**—dilating normal vessels and shunting blood *away* from stenosed ones."
+      }
     ]
   },
-{
-    group: "Dyslipidemia",
+  {
+    group: "Thrombolytics (Clot Busters)",
     color: "blood",
     drugs: [
       {
-        name: "Statins (HMG-CoA Reductase Inhibitors)",
-        summary: "Inhibit cholesterol synthesis — first-line for LDL lowering. Key SE: myopathy/rhabdomyolysis (↑ with CYP3A4 inhibitors + fibrates)",
+        name: "tPA & Thrombolytics",
+        summary: "tPA/alteplase: convert plasminogen → plasmin, lyse clots. Used in STEMI, ischemic stroke (≤4.5h), massive PE. CI: recent surgery/bleed",
         tier: 1,
-        aka: "Atorvastatin, Rosuvastatin (high-intensity) · Simvastatin, Lovastatin (moderate) — all end in -statin",
-        tags: ["Hypercholesterolemia", "CV Risk Reduction"],
-        moa: "Inhibit **HMG-CoA reductase** (rate-limiting step in cholesterol synthesis in liver) → ↓ intracellular cholesterol → ↑ LDL receptors → ↓ LDL, ↓ VLDL, mild ↑ HDL",
-        use: "First-line for LDL reduction, primary and secondary CV event prevention. Most beneficial drug class for reducing cardiovascular mortality",
-        se: "**Myopathy/Rhabdomyolysis** (↑ with fibrates or niacin combination, CYP3A4 inhibitors). Hepatotoxicity (↑ LFTs). Teratogenic",
-        ci: "Pregnancy (teratogenic), active liver disease, concurrent fibrate use (rhabdo risk)",
-        pk: "Lovastatin/simvastatin: CYP3A4 substrates (grapefruit juice ↑ levels). Pravastatin/rosuvastatin: not CYP3A4 — safer with other meds",
-        pearl: "**Statin + fibrate = rhabdomyolysis risk.** If patient develops muscle pain on statin → check CK. Teratogenic — women of childbearing age must use contraception. Statins also have **pleiotropic effects** (anti-inflammatory, stabilize plaques) beyond just LDL lowering."
-      },
-    ,
-      {
-  name: "Fibrates & Niacin",
-  summary: "Fibrates (gemfibrozil, fenofibrate): ↓ TGs via PPARα, used when TGs > 500 mg/dL. Niacin: ↑ HDL most of any drug, ↓ TGs, flushing (use aspirin). Both increase statin myopathy risk",
-  tier: 1,
-  aka: "Fibrates: Gemfibrozil (Lopid), Fenofibrate (Tricor) · Niacin (Nicotinic acid, Niaspan)",
-  tags: ["Hypertriglyceridemia", "Dyslipidemia", "HDL"],
-  moa: "**Fibrates:** activate **PPARα** (peroxisome proliferator-activated receptor alpha) in hepatocytes → ↑ lipoprotein lipase (LPL) → ↑ TG clearance + ↓ VLDL synthesis → ↓↓ TGs, modest ↑ HDL, variable LDL effect. **Niacin (nicotinic acid):** inhibits **hormone-sensitive lipase** in adipose → ↓ free fatty acid release → ↓ hepatic VLDL synthesis → ↓ TGs, ↓ LDL, ↑↑ HDL (most potent HDL-raising agent available)",
-  use: "Fibrates: **hypertriglyceridemia** (especially TGs > 500 mg/dL to prevent pancreatitis), mixed dyslipidemia. Gemfibrozil: TG-lowering + modest HDL raising. Niacin: raising HDL, lowering TGs (increasingly replaced by newer agents, but still on Step 1)",
-  se: "**Fibrates:** myopathy (↑↑ risk when combined with statins — gemfibrozil >> fenofibrate for drug interaction), gallstones (↑ biliary cholesterol secretion → cholelithiasis), GI upset, hepatotoxicity. **Niacin:** **flushing** (prostaglandin-mediated — reduce with aspirin pretreatment or extended-release formulation), hyperglycemia (↑ insulin resistance), hyperuricemia (↑ gout), hepatotoxicity (extended-release > immediate-release)",
-  ci: "Fibrates: severe renal/hepatic disease, gallbladder disease. **Gemfibrozil + statin: high myopathy/rhabdomyolysis risk** (gemfibrozil inhibits statin glucuronidation → ↑ statin levels — prefer fenofibrate if combination needed). Niacin: active peptic ulcer, severe hepatic disease, poorly controlled diabetes",
-  pk: "Niacin: immediate-release (more flushing, less hepatotoxicity) vs extended-release (less flushing, more hepatotoxicity). Flushing due to PGD2 release from Langerhans cells — blocked by aspirin (325mg 30min before dose)",
-  pearl: "**Niacin flushing mechanism and treatment:** Niacin activates niacin receptor on skin Langerhans cells → PGD2 release → vasodilation/flushing. Aspirin blocks COX → ↓ PGD2 → reduces flushing. This is a classic Step 1 pharmacology mechanism. Also note: niacin is the **only drug that significantly raises HDL** — Step 1 loves asking 'which drug has the biggest effect on HDL?'"
-}
+        aka: "Alteplase, Tenecteplase · Streptokinase",
+        tags: ["STEMI", "Ischemic Stroke", "Massive PE"],
+        moa: "Convert **plasminogen → plasmin** → dissolves fibrin clots systemically",
+        use: "Ischemic stroke (within **4.5 hours**), STEMI (if PCI unavailable), massive PE",
+        se: "**Bleeding** (intracranial hemorrhage most feared)",
+        ci: "Recent surgery (<14 days), active bleeding, prior ICH, BP >185/110",
+        pk: "tPA: fibrin-specific",
+        pearl: "**Stroke window:** Must get non-contrast CT head first to rule out hemorrhage. Window is **4.5 hours** from symptom onset."
+      }
     ]
   },
-{
-    group: "Anti-Inflammatory",
+  {
+    group: "Gout & Rheumatology",
     color: "blood",
     drugs: [
       {
         name: "NSAIDs",
         summary: "Reversibly inhibit COX-1/2 → ↓ prostaglandins. GI ulcers (↓ PGE2), renal failure, inhibit platelet aggregation. Ketorolac: IV/IM",
         tier: 1,
-        aka: "Ibuprofen, Naproxen, Ketorolac, Indomethacin (non-selective) · Celecoxib (COX-2 selective)",
-        tags: ["Pain", "Fever", "Inflammation", "Gout"],
-        moa: "Inhibit **COX-1 and COX-2** → ↓ PGE2, PGI2, TXA2. COX-1: constitutive (GI protection, platelet aggregation). COX-2: inducible (inflammation, fever, pain)",
-        use: "Pain, inflammation, fever, dysmenorrhea. Indomethacin: gout, patent ductus arteriosus (closes PDA by ↓ PGE2), pericarditis. Ketorolac: IV/IM analgesic",
-        se: "**GI ulcers/bleeding** (↓ PGE2 → ↓ mucus/HCO3 production), **renal toxicity** (↓ PGE2 → afferent vasoconstriction → ↓ GFR), **platelet dysfunction**, aspirin-exacerbated respiratory disease, premature closure of PDA if used in 3rd trimester",
-        ci: "Renal failure, peptic ulcer, last trimester of pregnancy (closes PDA), aspirin-sensitive asthma",
-        pk: "COX-2 selective (celecoxib): ↓ GI risk but ↑ CV risk (↑ MI/stroke — TXA2 unopposed because PGI2 ↓).",
-        pearl: "**Classic renal physiology:** In dehydration/CHF/cirrhosis, PGE2 maintains GFR by dilating the afferent arteriole. Add NSAID → ↓ PGE2 → afferent constriction → AKI. High-yield vignette: elderly patient on NSAID develops AKI."
+        aka: "Ibuprofen, Naproxen, Celecoxib",
+        tags: ["Pain", "Fever", "Gout"],
+        moa: "Inhibit **COX-1 and COX-2** → ↓ PGE2, PGI2, TXA2",
+        use: "Pain, inflammation, fever. Indomethacin: gout, closes **PDA**",
+        se: "**GI ulcers** (↓ PGE2), **renal toxicity** (afferent vasoconstriction → ↓ GFR)",
+        ci: "Renal failure, peptic ulcer, 3rd trimester of pregnancy",
+        pk: "Celecoxib: COX-2 selective (↓ GI risk, ↑ CV risk)",
+        pearl: "**Renal Physiology:** NSAIDs block PGE2, which normally keeps the afferent arteriole dilated. This can cause **AKI** in dehydrated patients."
       },
       {
         name: "Allopurinol & Febuxostat",
         summary: "Inhibit xanthine oxidase → ↓ uric acid synthesis. For chronic gout prevention. Allopurinol + azathioprine/6-MP = fatal toxicity",
         tier: 1,
-        aka: "Allopurinol (xanthine oxidase inhibitor) · Febuxostat (XO inhibitor, non-purine)",
-        tags: ["Gout", "Hyperuricemia", "Tumor Lysis"],
-        moa: "Both inhibit **xanthine oxidase** → ↓ conversion of hypoxanthine → xanthine → uric acid → ↓ urate levels",
-        use: "Chronic gout prevention, tophaceous gout, tumor lysis syndrome (allopurinol). Febuxostat: used when allopurinol not tolerated",
-        se: "Allopurinol: **Stevens-Johnson syndrome** (rare, HLA-B*5801 in Asians), GI upset, can precipitate acute gout flare when first started. Febuxostat: ↑ cardiovascular events (FDA warning vs allopurinol)",
-        ci: "Allopurinol: concurrent azathioprine or 6-MP (inhibits xanthine oxidase → ↑ toxicity of these drugs). Do NOT start during acute attack",
-        pk: "Both must be started AFTER acute attack resolves. Use prophylactic colchicine for first 3–6 months to prevent mobilization flares",
-        pearl: "**Allopurinol + 6-MP or azathioprine = DANGEROUS:** Xanthine oxidase metabolizes 6-MP — blocking it → 6-MP toxicity (myelosuppression). Reduce dose by 75% if must use together. Also: start allopurinol after acute attack resolves, never during flare."
+        aka: "Allopurinol, Febuxostat",
+        tags: ["Gout", "Tumor Lysis"],
+        moa: "Inhibit **xanthine oxidase** → ↓ uric acid production",
+        use: "Chronic gout prevention, tumor lysis syndrome",
+        se: "**Stevens-Johnson syndrome** (Allopurinol), precipitates acute gout flare if started during attack",
+        ci: "Concurrent **azathioprine or 6-MP** (causes fatal toxicity)",
+        pk: "Do NOT start during an acute attack",
+        pearl: "Xanthine oxidase blocks 6-MP breakdown; blocking XO leads to **6-MP toxicity** (myelosuppression)."
       },
       {
         name: "Colchicine",
         summary: "Inhibits microtubule polymerization → ↓ neutrophil migration. Treats acute gout + pericarditis. Does NOT lower uric acid",
         tier: 1,
         aka: "Colcrys",
-        tags: ["Acute Gout", "Pericarditis", "FMF"],
-        moa: "Binds **tubulin** → inhibits microtubule polymerization → ↓ neutrophil migration and activation → ↓ inflammasome (NLRP3) activation → ↓ IL-1β release. Does NOT lower uric acid",
-        use: "Acute gout flare (first-line with NSAIDs). Prophylaxis when starting urate-lowering therapy. Pericarditis (acute and prevention of recurrence). Familial Mediterranean fever (FMF)",
-        se: "GI (diarrhea, nausea, vomiting — dose-limiting, very common). Myelosuppression (rare). Myopathy/neuropathy (especially with CYP3A4 inhibitors). Colchicine toxicity: multi-organ failure",
-        ci: "Severe renal/hepatic impairment (reduce dose). Concurrent strong CYP3A4 or P-gp inhibitors (clarithromycin, cyclosporine → ↑ colchicine toxicity). Pregnancy (relative)",
-        pk: "Metabolized by CYP3A4 and P-glycoprotein. Dose must be reduced with renal failure. Start within 24–36 hrs of gout attack onset for best effect",
-        pearl: "**Colchicine does NOT lower uric acid** — it only suppresses the inflammatory response to urate crystals. Key distinction: NSAIDs or colchicine for acute flares; allopurinol/febuxostat for chronic prevention. Classic board trap: 'Which drug lowers uric acid?' → colchicine does NOT."
+        tags: ["Acute Gout", "Pericarditis"],
+        moa: "Inhibits **microtubule polymerization** → ↓ neutrophil migration",
+        use: "Acute gout flare, pericarditis",
+        se: "GI distress (diarrhea), myelosuppression",
+        ci: "Severe renal/hepatic impairment",
+        pk: "Start within 24–36 hrs of onset",
+        pearl: "**Colchicine does NOT lower uric acid**."
       },
       {
         name: "Probenecid",
@@ -1281,30 +1305,17 @@ blood: [
         tier: 2,
         aka: "Benemid",
         tags: ["Gout", "Uricosuric"],
-        moa: "Blocks **URAT1 (urate transporter 1)** in proximal tubule → ↓ uric acid reabsorption → ↑ urinary uric acid excretion",
-        use: "Chronic gout in under-excreters (24-hr urine uric acid <800 mg — majority of gout patients are under-excreters). Also used to inhibit renal tubular secretion of penicillin (↑ penicillin levels)",
-        se: "Uric acid kidney stones (↑ urinary uric acid → precipitation), GI upset",
-        ci: "Aspirin (competes for same transporter — low-dose aspirin blocks uricosuric effect). Overproducers of uric acid (worsens stone risk). Renal failure (requires functional kidneys to work)",
-        pk: "Only effective in under-excreters. Alkalinize urine to prevent stone formation. Avoid aspirin concurrently",
-        pearl: "**Probenecid + penicillin:** Probenecid blocks tubular secretion of penicillin → ↑ plasma levels. Once used to extend penicillin doses during WWII penicillin shortage. Still occasionally used for gonorrhea treatment to ↑ antibiotic exposure."
-      },
-      {
-        name: "Hydroxychloroquine",
-        summary: "Antimalarial/DMARD for SLE and RA. Key SE: irreversible retinal toxicity (bull's-eye maculopathy) — annual eye screening required",
-        tier: 2,
-        aka: "Plaquenil",
-        tags: ["SLE", "Rheumatoid Arthritis", "Malaria"],
-        moa: "Accumulates in lysosomes → raises intralysosomal pH → impairs antigen processing → ↓ toll-like receptor (TLR) activation → ↓ inflammatory cytokines. Also weak antimalarial (↓ heme polymerization)",
-        use: "SLE (disease-modifying — ↓ flares, ↓ organ damage, ↓ mortality). Rheumatoid arthritis (DMARD). Malaria prevention and treatment of chloroquine-sensitive strains. Discoid lupus, Sjögren syndrome",
-        se: "**Retinal toxicity/maculopathy** (dose- and duration-dependent → bull's eye maculopathy → irreversible vision loss — screen annually with ophthalmology). QT prolongation. GI upset. Skin hyperpigmentation",
-        ci: "G6PD deficiency (hemolysis). Pre-existing retinal disease",
-        pk: "Annual ophthalmology screening mandatory. Cumulative dose and daily dose/weight both matter for retinal toxicity. Long t½ (weeks)",
-        pearl: "**Hydroxychloroquine is disease-modifying in SLE** — it reduces flares, hospitalizations, and mortality. Unlike most immunosuppressants, it's actually safe in pregnancy (used to prevent neonatal lupus). Retinal toxicity is the feared complication — baseline eye exam before starting, then annually."
+        moa: "Blocks **URAT1** in proximal tubule → ↓ uric acid reabsorption → ↑ urinary uric acid excretion",
+        use: "Chronic gout in under-excreters. Also inhibits renal secretion of **penicillin** (↑ levels)",
+        se: "Uric acid kidney stones, GI upset",
+        ci: "**Aspirin** (blocks uricosuric effect), renal failure",
+        pk: "Only effective in under-excreters",
+        pearl: "**Probenecid + Penicillin:** Once used to stretch penicillin supplies. High-yield: avoid aspirin—it competes for the same transporter and negates the drug's effect."
       },
     ]
   }
-],
 
+],
 neuro: [
 {
     group: "Sedatives & Analgesics",
@@ -2763,6 +2774,19 @@ onco: [
         pk: "**TPMT (thiopurine methyltransferase) genotype testing** before starting — TPMT deficiency → cannot metabolize 6-MP → severe myelosuppression. Metabolized by xanthine oxidase and TPMT. If allopurinol must be used, reduce azathioprine dose by 75%. Monitor CBC regularly",
         pearl: "**The azathioprine + allopurinol interaction is a classic Step 1 kill question.** Allopurinol inhibits xanthine oxidase → 6-MP cannot be cleared → toxic accumulation → fatal myelosuppression. TPMT testing is standard of care before initiation. Lymphocytes are uniquely dependent on de novo purine synthesis (no salvage pathway backup), which is why this drug selectively immunosuppresses."
       },
+      {
+  name: "Hydroxychloroquine",
+  summary: "Antimalarial/DMARD for SLE and RA. Key SE: irreversible retinal toxicity (bull's-eye maculopathy) — annual eye screening required",
+  tier: 2,
+  aka: "Plaquenil",
+  tags: ["SLE", "RA", "Lupus"],
+  moa: "Accumulates in lysosomes → impairs antigen processing → ↓ TLR activation",
+  use: "SLE (reduces flares/mortality), Rheumatoid Arthritis",
+  se: "**Retinal toxicity** (bull's-eye maculopathy) — dose/duration dependent",
+  ci: "G6PD deficiency, pre-existing retinal disease",
+  pk: "Requires annual ophthalmology screening",
+  pearl: "Safe in pregnancy and **disease-modifying in SLE**."
+},
       {
         name: "Mycophenolate Mofetil",
         summary: "Prodrug → mycophenolic acid → inhibits IMPDH → blocks de novo guanosine synthesis → selective suppression of T and B lymphocytes. Mainstay of solid organ transplant. Major teratogen",
