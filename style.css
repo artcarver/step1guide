@@ -302,15 +302,46 @@ body::before {
 }
 .info-banner strong { color: var(--red); }
 
-/* ── SECTION HEADERS (tracker pages) ── */
+/* ── COLLAPSIBLE GROUPS (tracker pages) ── */
+.collapsible-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 10px;
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: box-shadow 0.18s;
+}
+.collapsible-group:hover {
+  box-shadow: 0 4px 16px rgba(26,20,40,0.07);
+}
+
 .section-hdr {
   display: flex; align-items: center; gap: 14px;
   padding: 14px 20px;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   border-left: 4px solid;
-  margin-top: 24px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: background 0.15s;
 }
-.section-hdr:first-child { margin-top: 0; }
+.section-hdr:hover { background: rgba(26,20,40,0.02); }
+.collapsible-group.is-open .section-hdr {
+  border-bottom-color: var(--border);
+}
+
+.block-chevron {
+  font-size: 10px; color: var(--dim);
+  transition: transform 0.22s ease;
+  flex-shrink: 0; margin-left: 4px;
+}
+.collapsible-group.is-open .block-chevron {
+  transform: rotate(90deg);
+}
+
+.collapsible-content { display: none; }
+.collapsible-group.is-open .collapsible-content { display: block; }
+
 .section-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 18px; font-weight: 600; letter-spacing: -0.2px;
@@ -326,18 +357,29 @@ body::before {
 }
 .section-meta-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
 
-/* ── VIDEO LIST (tracker grid) ── */
+/* ── TIER DIVIDER (By Tier tab — non-collapsible section heading) ── */
+.tier-divider {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  border-left: 4px solid;
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+}
+
+
 .video-list {
-  border: 1px solid var(--border); border-top: none;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  margin-bottom: 4px; background: var(--surface);
+  background: var(--surface);
 }
 .sub-section-hdr {
   padding: 8px 20px; background: var(--surface2);
   display: flex; align-items: center; gap: 10px;
   border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
 }
-.sub-section-name { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
+.sub-section-name  { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
 .sub-section-count { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--dim); }
 
 /* ── VIDEO ROW GRID ── */
