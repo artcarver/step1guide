@@ -606,10 +606,12 @@ function renderByCat() {
     const groupId = 'grp-' + cat.id;
     const isOpen  = openGroups.has(groupId) ? ' is-open' : '';
 
+    const badge = cat.name.charAt(0).toUpperCase();
+
     html += `
     <div class="collapsible-group${isOpen}" id="${groupId}">
       <div class="section-hdr" style="background:${hbg};border-left-color:${hc}" onclick="toggleGroup('${groupId}')">
-        <div style="font-size:20px;flex-shrink:0">${cat.icon}</div>
+        <div class="cat-badge" style="background:${hc}18;color:${hc}">${badge}</div>
         <div style="flex:1;min-width:0">
           <div class="section-title" style="color:${hc}">${cat.name}</div>
           <div class="section-why">${cat.why}</div>
