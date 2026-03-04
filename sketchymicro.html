@@ -481,30 +481,35 @@ function toggleGroup(id) {
 function renderByTier() {
   const c = document.getElementById("bytier-content");
   const openGroups = new Set(
-    [...document.querySelectorAll('.collapsible-group.is-open')].map(el => el.id)
+    [...document.querySelectorAll('.collapsible-group.is-open, .tier-group.is-open')].map(el => el.id)
   );
   let html = "";
-  
+
   for (let t = 1; t <= 4; t++) {
     const d = TIER_DATA[t];
     const all = allVideos().filter(v => v.tier === t);
     const done = all.filter(v => isComplete(v.id)).length;
     const totalMins = all.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
     const pct = all.length ? Math.round((done / all.length) * 100) : 0;
-    
+    const tierId = `tier-group-${t}`;
+    const tierOpen = openGroups.has(tierId) ? " is-open" : "";
+
     html += `
-    <div class="tier-divider" style="border-left-color:${d.color}">
-      <div style="flex:1;min-width:0">
-        <div class="section-title" style="color:${d.color}">${d.label}</div>
-        <div class="section-why">${d.sub}</div>
-      </div>
-      <div class="section-meta">
-        <span class="section-meta-text">${done}/${all.length} &nbsp;·&nbsp; ~${Math.round(totalMins / 60 * 10) / 10} hrs</span>
-        <div class="section-meta-bar">
-          <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : d.color}"></div>
+    <div class="tier-group${tierOpen}" id="${tierId}">
+      <div class="tier-divider" style="border-left-color:${d.color};background:${TIER_BG[t]}" onclick="toggleTier('${tierId}')">
+        <div style="flex:1;min-width:0">
+          <div class="section-title" style="color:${d.color}">${d.label}</div>
+          <div class="section-why">${d.sub}</div>
         </div>
+        <div class="section-meta">
+          <span class="section-meta-text">${done}/${all.length} &nbsp;·&nbsp; ~${Math.round(totalMins / 60 * 10) / 10} hrs</span>
+          <div class="section-meta-bar">
+            <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : d.color}"></div>
+          </div>
+        </div>
+        <span class="block-chevron">▶</span>
       </div>
-    </div>`;
+      <div class="tier-group-body">`;
 
     categories.forEach(cat => {
       const cv = cat.videos.filter(v => v.tier === t).sort((a, b) => b.yield - a.yield);
@@ -514,11 +519,14 @@ function renderByTier() {
       const isOpen = openGroups.has(subId) ? " is-open" : "";
 
       html += `
-      <div class="collapsible-group${isOpen}" id="${subId}">
+      <div class="collapsible-group${isOpen}" id="${subId}" style="margin-top:8px">
         <div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}" onclick="toggleGroup('${subId}')">
           <div style="flex:1;min-width:0">
-            <span class="sub-section-name" style="color:${d.color}">${cat.name}</span>
-            <div class="sub-section-count" style="margin-top:2px">${cd}/${cv.length} videos</div>
+            <div class="section-title" style="color:${d.color}">${cat.name}</div>
+            <div class="section-why">${cat.why}</div>
+          </div>
+          <div class="section-meta">
+            <span class="section-meta-text">${cd}/${cv.length} videos</span>
           </div>
           <span class="block-chevron">▶</span>
         </div>
@@ -530,9 +538,14 @@ function renderByTier() {
       </div>`;
     });
 
-    html += `<div style="margin-bottom:20px"></div>`;
+    html += `</div></div>`;
   }
   c.innerHTML = html;
+}
+
+function toggleTier(id) {
+  const group = document.getElementById(id);
+  if (group) group.classList.toggle("is-open");
 }
 
 function updateTracker() {
