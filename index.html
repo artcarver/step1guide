@@ -93,6 +93,17 @@
         <div class="card-pills"><span class="pill">8 Systems</span><span class="pill">90+ Drugs</span><span class="pill">Searchable</span><span class="pill">Tier Ratings</span></div>
       </div>
     </a>
+    <a class="tool-card card-micro" href="microfacts.html">
+      <div class="card-inner">
+        <div class="card-top">
+          <div class="card-icon">🦠</div>
+          <div class="card-meta"><span class="card-tag">Microbiology</span><span class="card-arrow">↗</span></div>
+        </div>
+        <h2 class="card-title">Micro Facts Reference</h2>
+        <p class="card-desc">Complete Step 1 microbiology — gram stain, virulence factors, classic syndromes, treatment, and pearls for every organism.</p>
+        <div class="card-pills"><span class="pill">Bacteria</span><span class="pill">Viruses</span><span class="pill">Parasites</span><span class="pill">Fungi</span><span class="pill">Searchable</span></div>
+      </div>
+    </a>
     <a class="tool-card card-sketchy" href="sketchypharm.html">
       <div class="card-inner">
         <div class="card-top">
@@ -300,6 +311,7 @@ document.querySelectorAll('.tool-card').forEach(card => {
     if(card.classList.contains('card-dotd')) return;
 
     const isSecure = card.classList.contains('card-pharm') || 
+                     card.classList.contains('card-micro') ||
                      card.classList.contains('card-sketchy') || 
                      card.classList.contains('card-pixorize') || 
                      card.classList.contains('card-dash');

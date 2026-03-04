@@ -838,6 +838,10 @@ body::before {
 .card-pharm .card-icon { background: rgba(212,96,122,.10); color: var(--sakura2); }
 .card-pharm .card-tag  { background: rgba(212,96,122,.08); color: var(--sakura2); border-color: rgba(212,96,122,.20); }
 
+.card-micro   { border-top-color: #3a6e7a; }
+.card-micro .card-icon { background: rgba(58,110,122,.10); color: #3a6e7a; }
+.card-micro .card-tag  { background: rgba(58,110,122,.08); color: #3a6e7a; border-color: rgba(58,110,122,.20); }
+
 .card-sketchy { border-top-color: #9e6a3d; }
 .card-sketchy .card-icon { background: rgba(158,106,61,.10); color: #9e6a3d; }
 .card-sketchy .card-tag  { background: rgba(158,106,61,.08); color: #9e6a3d; border-color: rgba(158,106,61,.20); }
