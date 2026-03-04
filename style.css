@@ -311,6 +311,7 @@ body::before {
   box-shadow: var(--card-shadow);
   overflow: hidden;
   transition: box-shadow 0.18s;
+  max-width: 960px;
 }
 .collapsible-group:hover {
   box-shadow: 0 4px 16px rgba(26,20,40,0.07);
@@ -318,7 +319,7 @@ body::before {
 
 .section-hdr {
   display: flex; align-items: center; gap: 14px;
-  padding: 14px 20px;
+  padding: 16px 22px;
   border-left: 4px solid;
   cursor: pointer;
   user-select: none;
@@ -344,9 +345,9 @@ body::before {
 
 .section-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 600; letter-spacing: -0.2px;
+  font-size: 22px; font-weight: 600; letter-spacing: -0.3px;
 }
-.section-why { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.section-why { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; max-width: 560px; }
 .section-meta { margin-left: auto; text-align: right; flex-shrink: 0; }
 .section-meta-text { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
 .section-meta-bar {
@@ -357,18 +358,40 @@ body::before {
 }
 .section-meta-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
 
-/* ── TIER DIVIDER (By Tier tab — non-collapsible section heading) ── */
+/* Category letter badge (replaces emoji in Pixorize) */
+.cat-badge {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── TIER DIVIDER (By Tier tab — outer collapsible heading) ── */
 .tier-divider {
   display: flex; align-items: center; gap: 14px;
-  padding: 14px 20px;
+  padding: 16px 22px;
   border-left: 4px solid;
   border-radius: var(--radius-lg);
   margin-bottom: 8px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-left-width: 4px;
+  cursor: pointer;
+  user-select: none;
+  max-width: 960px;
+  transition: background 0.15s, box-shadow 0.18s;
+  box-shadow: var(--card-shadow);
 }
+.tier-divider:hover { box-shadow: 0 4px 16px rgba(26,20,40,0.07); }
+.tier-divider .section-title { font-size: 20px; }
+.tier-divider .block-chevron { margin-left: auto; }
 
+/* Tier group wrapper (collapsible outer shell in By Tier) */
+.tier-group { margin-bottom: 20px; max-width: 960px; }
+.tier-group-body { display: none; padding-left: 0; }
+.tier-group.is-open .tier-group-body { display: block; }
+.tier-group.is-open .tier-divider .block-chevron { transform: rotate(90deg); }
 
 .video-list {
   background: var(--surface);
