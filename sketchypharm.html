@@ -345,6 +345,9 @@ function videoRowHTML(v, showCat) {
 
 function renderByCat() {
   const c = document.getElementById("bycat-content");
+  const openGroups = new Set(
+    [...document.querySelectorAll('.collapsible-group.is-open')].map(el => el.id)
+  );
   let html = "";
 
   categories.forEach(cat => {
@@ -354,9 +357,10 @@ function renderByCat() {
     const minTier = Math.min(...cat.videos.map(v => v.tier));
     const hc = TIER_COLORS[minTier];
     const groupId = "grp-" + cat.id;
+    const isOpen = openGroups.has(groupId) ? " is-open" : "";
 
     html += `
-    <div class="collapsible-group" id="${groupId}">
+    <div class="collapsible-group${isOpen}" id="${groupId}">
       <div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}" onclick="toggleGroup('${groupId}')">
         <div style="flex:1;min-width:0">
           <div class="section-title" style="color:${hc}">${cat.name}</div>
@@ -389,6 +393,9 @@ function toggleGroup(id) {
 
 function renderByTier() {
   const c = document.getElementById("bytier-content");
+  const openGroups = new Set(
+    [...document.querySelectorAll('.collapsible-group.is-open')].map(el => el.id)
+  );
   let html = "";
   
   for (let t = 1; t <= 4; t++) {
@@ -417,9 +424,10 @@ function renderByTier() {
       if (!cv.length) return;
       const cd = cv.filter(v => isComplete(v.id)).length;
       const subId = `grp-tier${t}-${cat.id}`;
+      const isOpen = openGroups.has(subId) ? " is-open" : "";
 
       html += `
-      <div class="collapsible-group" id="${subId}">
+      <div class="collapsible-group${isOpen}" id="${subId}">
         <div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}" onclick="toggleGroup('${subId}')">
           <div style="flex:1;min-width:0">
             <span class="sub-section-name" style="color:${d.color}">${cat.name}</span>
