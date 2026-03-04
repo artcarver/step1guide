@@ -433,32 +433,45 @@ function videoRowHTML(v, showCat) {
 function renderByCat() {
   const c = document.getElementById("bycat-content");
   let html = "";
-  
+
   categories.forEach(cat => {
     const done = cat.videos.filter(v => isComplete(v.id)).length;
     const total = cat.videos.length;
     const pct = Math.round((done / total) * 100);
     const minTier = Math.min(...cat.videos.map(v => v.tier));
     const hc = TIER_COLORS[minTier];
-    
-    html += `<div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}">
-      <div>
-        <div class="section-title" style="color:${hc}">${cat.name}</div>
-        <div class="section-why">${cat.why}</div>
+    const groupId = "grp-" + cat.id;
+
+    html += `
+    <div class="collapsible-group" id="${groupId}">
+      <div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}" onclick="toggleGroup('${groupId}')">
+        <div style="flex:1;min-width:0">
+          <div class="section-title" style="color:${hc}">${cat.name}</div>
+          <div class="section-why">${cat.why}</div>
+        </div>
+        <div class="section-meta">
+          <span class="section-meta-text" style="color:${pct === 100 ? 'var(--green)' : 'var(--muted)'}">${done}/${total} &nbsp;·&nbsp; ${cat.totalTime}</span>
+          <div class="section-meta-bar">
+            <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : hc}"></div>
+          </div>
+        </div>
+        <span class="block-chevron">▶</span>
       </div>
-      <div class="section-meta">
-        <span class="section-meta-text" style="color:${pct === 100 ? 'var(--green)' : 'var(--muted)'}">${done}/${total} &nbsp;·&nbsp; ${cat.totalTime}</span>
-        <div class="section-meta-bar">
-          <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : hc}"></div>
+      <div class="collapsible-content">
+        <div class="video-list">
+          ${colHeaderHTML()}
+          ${cat.videos.map(v => videoRowHTML(v, false)).join("")}
         </div>
       </div>
-    </div>
-    <div class="video-list">
-      ${cat.videos.map(v => videoRowHTML(v, false)).join("")}
     </div>`;
   });
-  
+
   c.innerHTML = html;
+}
+
+function toggleGroup(id) {
+  const group = document.getElementById(id);
+  if (group) group.classList.toggle("is-open");
 }
 
 function renderByTier() {
@@ -472,8 +485,9 @@ function renderByTier() {
     const totalMins = all.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
     const pct = all.length ? Math.round((done / all.length) * 100) : 0;
     
-    html += `<div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}">
-      <div>
+    html += `
+    <div class="tier-divider" style="border-left-color:${d.color}">
+      <div style="flex:1;min-width:0">
         <div class="section-title" style="color:${d.color}">${d.label}</div>
         <div class="section-why">${d.sub}</div>
       </div>
@@ -484,22 +498,31 @@ function renderByTier() {
         </div>
       </div>
     </div>`;
-    
+
     categories.forEach(cat => {
       const cv = cat.videos.filter(v => v.tier === t).sort((a, b) => b.yield - a.yield);
       if (!cv.length) return;
       const cd = cv.filter(v => isComplete(v.id)).length;
-      
-      html += `<div class="video-list" style="border-radius:0;margin-bottom:0;border-top:none">
-        <div class="sub-section-hdr">
-          <span class="sub-section-name" style="color:${d.color}">${cat.name}</span>
-          <span class="sub-section-count">${cd}/${cv.length}</span>
+      const subId = `grp-tier${t}-${cat.id}`;
+
+      html += `
+      <div class="collapsible-group" id="${subId}">
+        <div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}" onclick="toggleGroup('${subId}')">
+          <div style="flex:1;min-width:0">
+            <span class="sub-section-name" style="color:${d.color}">${cat.name}</span>
+            <div class="sub-section-count" style="margin-top:2px">${cd}/${cv.length} videos</div>
+          </div>
+          <span class="block-chevron">▶</span>
         </div>
-        ${cv.map(v => videoRowHTML(v, false)).join("")}
+        <div class="collapsible-content">
+          <div class="video-list">
+            ${cv.map(v => videoRowHTML(v, false)).join("")}
+          </div>
+        </div>
       </div>`;
     });
-    
-    html += `<div style="margin-bottom:24px"></div>`;
+
+    html += `<div style="margin-bottom:20px"></div>`;
   }
   c.innerHTML = html;
 }
