@@ -23,7 +23,7 @@
         <a href="step1_dashboard.html">Dashboard</a>
         <a href="drugfacts.html">Pharm</a>
         <a href="microfacts.html">Micro</a>
-        <button id="auth-btn" class="auth-btn">Log in</button>
+        <button id="auth-btn" class="auth-btn" style="position:static; margin-left:8px;">Log in</button>
       </div>
     </div>
   </div>
@@ -48,7 +48,6 @@
 </div>
 
 <div class="wrap">
-
   <header class="hero">
     <div class="hero-eyebrow">Step 1 Study Hub</div>
     <h1 class="hero-name">Your <em>Study Resources,</em><br/>All in One Place</h1>
@@ -73,28 +72,28 @@
   </header>
 
   <div class="sec-label">📝 &nbsp;UWorld Progress</div>
-  <a href="uworld_tracker.html" class="widget-card" style="text-decoration: none; color: inherit; display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; transition: border-color 0.15s;">
-    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+  <a href="uworld_tracker.html" class="widget-card" style="text-decoration: none; color: inherit; display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; transition: border-color 0.15s; margin-bottom:44px; position:relative; z-index:10; box-shadow: var(--card-shadow);">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
       <h3 style="margin: 0; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);">UWorld Step 1</h3>
-      <span id="widget-uw-pct" style="font-family: 'Jost', sans-serif; font-size: 20px; font-weight: 600; color: var(--fuji);">0%</span>
+      <span id="widget-uw-pct" style="font-family: 'Jost', sans-serif; font-size: 24px; font-weight: 600; color: var(--fuji);">0%</span>
     </div>
 
-    <div style="height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 16px;">
+    <div style="height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 20px;">
       <div id="widget-uw-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--fuji), var(--sakura2)); border-radius: 99px; transition: width 0.5s ease;"></div>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
       <div>
-        <div id="widget-uw-done" style="font-family: 'Jost', sans-serif; font-size: 22px; font-weight: 600; color: var(--fuji); line-height: 1;">0</div>
-        <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 4px;">Unique Done</div>
+        <div id="widget-uw-done" style="font-family: 'Jost', sans-serif; font-size: 24px; font-weight: 600; color: var(--fuji); line-height: 1;">0</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 6px;">Unique Done</div>
       </div>
       <div style="border-left: 1px solid var(--border);">
-        <div id="widget-uw-remain" style="font-family: 'Jost', sans-serif; font-size: 22px; font-weight: 600; color: var(--ink2); line-height: 1;">0</div>
-        <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 4px;">Remaining</div>
+        <div id="widget-uw-remain" style="font-family: 'Jost', sans-serif; font-size: 24px; font-weight: 600; color: var(--ink2); line-height: 1;">0</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 6px;">Remaining</div>
       </div>
       <div style="border-left: 1px solid var(--border);">
-        <div id="widget-uw-needed" style="font-family: 'Jost', sans-serif; font-size: 22px; font-weight: 600; color: var(--ink2); line-height: 1;">N/A</div>
-        <div style="font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 4px;">Needed / Day</div>
+        <div id="widget-uw-needed" style="font-family: 'Jost', sans-serif; font-size: 24px; font-weight: 600; color: var(--ink2); line-height: 1;">N/A</div>
+        <div style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 6px;">Needed / Day</div>
       </div>
     </div>
   </a>
@@ -102,7 +101,7 @@
   <div class="sec-label">🌸 &nbsp;My Study Tools</div>
   <div class="tool-grid">
     
-    <div class="tool-card card-dotd" onclick="openDrugModal()">
+    <div class="tool-card card-dotd" onclick="openDrugModal()" style="--card-theme: var(--theme-5); --card-theme-light: rgba(138,110,16,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">💊</div>
@@ -119,7 +118,7 @@
       </div>
     </div>
 
-    <a class="tool-card card-pharm" href="drugfacts.html">
+    <a class="tool-card card-pharm" href="drugfacts.html" style="--card-theme: var(--theme-1); --card-theme-light: rgba(192,88,120,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">💊</div>
@@ -131,7 +130,7 @@
       </div>
     </a>
     
-    <a class="tool-card card-micro" href="microfacts.html">
+    <a class="tool-card card-micro" href="microfacts.html" style="--card-theme: var(--theme-8); --card-theme-light: rgba(42,138,106,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">🦠</div>
@@ -143,7 +142,7 @@
       </div>
     </a>
     
-    <a class="tool-card card-sketchy" href="sketchypharm.html">
+    <a class="tool-card card-sketchy" href="sketchypharm.html" style="--card-theme: var(--theme-4); --card-theme-light: rgba(192,140,62,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">🎨</div>
@@ -155,7 +154,7 @@
       </div>
     </a>
     
-    <a class="tool-card card-sketchy" href="sketchymicro.html">
+    <a class="tool-card card-sketchy" href="sketchymicro.html" style="--card-theme: var(--theme-12); --card-theme-light: rgba(90,68,144,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">🦠</div>
@@ -167,7 +166,7 @@
       </div>
     </a>
     
-    <a class="tool-card card-pixorize" href="pixorize.html">
+    <a class="tool-card card-pixorize" href="pixorize.html" style="--card-theme: var(--theme-14); --card-theme-light: rgba(122,58,138,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">🎨</div>
@@ -179,7 +178,7 @@
       </div>
     </a>
     
-    <a class="tool-card card-dash" href="step1_dashboard.html">
+    <a class="tool-card card-dash" href="step1_dashboard.html" style="--card-theme: var(--theme-11); --card-theme-light: rgba(61,110,138,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">📊</div>
@@ -194,7 +193,7 @@
 
   <div class="sec-label" style="margin-top:44px;">🌸 &nbsp;External Resources</div>
   <div class="tool-grid">
-    <a class="tool-card card-path" href="https://www.pathoma.com/login" target="_blank" rel="noopener">
+    <a class="tool-card card-path" href="https://www.pathoma.com/login" target="_blank" rel="noopener" style="--card-theme: var(--theme-16); --card-theme-light: rgba(192,48,80,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">🫀</div>
@@ -205,7 +204,7 @@
         <div class="card-pills"><span class="pill">Videos</span><span class="pill">Textbook</span><span class="pill">High-Yield</span></div>
       </div>
     </a>
-    <a class="tool-card card-uworld" href="https://www.uworld.com/app/index.html#/login/" target="_blank" rel="noopener">
+    <a class="tool-card card-uworld" href="https://www.uworld.com/app/index.html#/login/" target="_blank" rel="noopener" style="--card-theme: var(--theme-10); --card-theme-light: rgba(58,90,110,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">📝</div>
@@ -216,7 +215,7 @@
         <div class="card-pills"><span class="pill">QBank</span><span class="pill">Gold Standard</span></div>
       </div>
     </a>
-    <a class="tool-card card-bootcamp" href="https://www.bootcamp.com" target="_blank" rel="noopener">
+    <a class="tool-card card-bootcamp" href="https://www.bootcamp.com" target="_blank" rel="noopener" style="--card-theme: var(--theme-19); --card-theme-light: rgba(61,46,110,0.1);">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-icon">🏕️</div>
@@ -446,7 +445,7 @@ if (modalOverlay) {
   });
 }
 
-// UWorld Widget logic (Refactored to pull from Firestore Subcollections)
+// UWorld Widget logic (Refactored to pull defensively from Firestore Subcollections)
 async function initUWorldWidget(uid) {
   const elDone = document.getElementById('widget-uw-done');
   const elRemain = document.getElementById('widget-uw-remain');
@@ -457,25 +456,17 @@ async function initUWorldWidget(uid) {
   if (!elDone || !elRemain || !elNeeded || !elPct || !elFill) return;
 
   if (!uid || !db) {
-    // Reset to Empty State if not logged in
-    elDone.textContent = "0";
-    elRemain.textContent = "3661";
-    elNeeded.textContent = "N/A";
-    elPct.textContent = "0%";
-    elFill.style.width = "0%";
+    elDone.textContent = "0"; elRemain.textContent = "3661";
+    elNeeded.textContent = "N/A"; elPct.textContent = "0%"; elFill.style.width = "0%";
     return;
   }
 
   try {
     let settings = { total: 3661, finishBy: '', studyDays: [0,1,2,3,4,5], uniqueOffset: 0 };
     
-    // Fetch Settings
     const configDoc = await db.collection('users').doc(uid).collection('uworld').doc('config').get();
-    if (configDoc.exists) {
-      settings = { ...settings, ...configDoc.data() };
-    }
+    if (configDoc.exists) settings = { ...settings, ...configDoc.data() };
 
-    // Aggregate Logs
     const logsSnapshot = await db.collection('users').doc(uid).collection('uworld_logs').get();
     let loggedQs = 0;
     logsSnapshot.forEach(doc => {
@@ -483,13 +474,11 @@ async function initUWorldWidget(uid) {
       if (data.qs) loggedQs += data.qs;
     });
 
-    // Calculate done and remaining
     let done = Math.max(0, loggedQs + (settings.uniqueOffset || 0));
     const total = settings.total || 3661;
     const remaining = Math.max(0, total - done);
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
-    // Calculate Needed / Day
     let needed = "N/A";
     if (settings.finishBy && remaining > 0) {
       const now = new Date(); now.setHours(0,0,0,0);
@@ -505,7 +494,6 @@ async function initUWorldWidget(uid) {
       needed = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : remaining;
     }
 
-    // Update UI Elements
     elDone.textContent = done.toLocaleString();
     elRemain.textContent = remaining.toLocaleString();
     elNeeded.textContent = needed;
@@ -526,7 +514,6 @@ function initDrugOfTheDay() {
   const allDrugs = [];
   Object.keys(DRUGS).forEach(cat => {
     DRUGS[cat].forEach(group => {
-      // Find high yield Tier 1 drugs safely
       const tier1 = group.drugs.filter(d => {
         const tierVal = typeof d.tier === 'number' ? d.tier : parseInt(String(d.tier).replace(/\D/g,'')) || 99;
         return tierVal === 1;
@@ -569,10 +556,10 @@ function openDrugModal() {
   const fmt = (text) => text ? text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : 'See full reference.';
 
   const html = `
-    <div class="drug-row"><span class="drug-label">Mechanism</span><div class="drug-text">${fmt(currentDrug.moa)}</div></div>
-    <div class="drug-row"><span class="drug-label">Clinical Uses</span><div class="drug-text">${fmt(currentDrug.use)}</div></div>
-    <div class="drug-row"><span class="drug-label">Side Effects</span><div class="drug-text">${fmt(currentDrug.se)}</div></div>
-    ${currentDrug.pearl ? `<div class="drug-row" style="background:var(--surface2);border:1px solid var(--sakura-light);padding:10px;border-radius:8px;"><span class="drug-label" style="color:var(--sakura2);">💎 Pearl</span><div class="drug-text">${fmt(currentDrug.pearl)}</div></div>` : ''}
+    <div class="info-row" style="border:none; padding-bottom:0;"><span class="info-label" style="background:var(--sakura-light);color:var(--sakura2);">Mechanism</span><div class="info-text">${fmt(currentDrug.moa)}</div></div>
+    <div class="info-row" style="border:none; padding-bottom:0;"><span class="info-label" style="background:var(--sakura-light);color:var(--sakura2);">Clinical Uses</span><div class="info-text">${fmt(currentDrug.use)}</div></div>
+    <div class="info-row" style="border:none;"><span class="info-label" style="background:var(--sakura-light);color:var(--sakura2);">Side Effects</span><div class="info-text">${fmt(currentDrug.se)}</div></div>
+    ${currentDrug.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${fmt(currentDrug.pearl)}</div></div>` : ''}
   `;
 
   contentEl.innerHTML = html;
@@ -591,7 +578,6 @@ if (drugModalOverlay) {
   });
 }
 
-// Ensure init fires
 initDrugOfTheDay();
 </script>
 </body>
