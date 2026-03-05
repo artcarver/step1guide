@@ -23,6 +23,7 @@
         <a href="step1_dashboard.html">Dashboard</a>
         <a href="drugfacts.html">Pharm</a>
         <a href="microfacts.html">Micro</a>
+        <button id="auth-btn" class="auth-btn" style="position:static; margin-left:8px;">Log in</button>
       </div>
     </div>
     
@@ -45,10 +46,10 @@
     </div>
     
     <nav class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('bacteria', this)"><span class="tab-dot"></span>Bacteria</button>
-      <button class="tab-btn" onclick="switchTab('viruses', this)"><span class="tab-dot"></span>Viruses</button>
-      <button class="tab-btn" onclick="switchTab('parasites', this)"><span class="tab-dot"></span>Parasites</button>
-      <button class="tab-btn" onclick="switchTab('fungi', this)"><span class="tab-dot"></span>Fungi</button>
+      <button class="tab-btn active" onclick="switchTab('bacteria', this)" style="--theme-color: var(--theme-12);"><span class="tab-dot"></span>Bacteria</button>
+      <button class="tab-btn" onclick="switchTab('viruses', this)" style="--theme-color: var(--theme-2);"><span class="tab-dot"></span>Viruses</button>
+      <button class="tab-btn" onclick="switchTab('parasites', this)" style="--theme-color: var(--theme-8);"><span class="tab-dot"></span>Parasites</button>
+      <button class="tab-btn" onclick="switchTab('fungi', this)" style="--theme-color: var(--theme-18);"><span class="tab-dot"></span>Fungi</button>
     </nav>
   </div>
 </div>
@@ -68,7 +69,7 @@
       <div class="sys-intro-icon">🔬</div>
       <div>
         <div class="sys-intro-title">Bacteriology</div>
-        <div class="sys-intro-text">Master the Gram stain first — it halves your differential instantly. Then layer virulence factors, classic clinical syndromes, and treatment. High-yield sequences: cocci → rods; GP → GN; aerobic → anaerobic. Know the one-liner pearl for each organism cold.</div>
+        <div class="sys-intro-text">Master the Gram stain first — it halves your differential instantly. Then layer virulence factors, clinical syndromes, and treatment. High-yield sequences: cocci → rods; GP → GN.</div>
       </div>
     </div>
     <div id="bacteria-content"></div>
@@ -79,7 +80,7 @@
       <div class="sys-intro-icon">🧬</div>
       <div>
         <div class="sys-intro-title">Virology</div>
-        <div class="sys-intro-text">Group by genome type: RNA vs DNA, ss vs ds, +sense vs −sense, enveloped vs naked. The Baltimore classification is your scaffold. For each virus know its tropism, classic syndrome, and distinguishing lab finding. Enveloped = ether-labile = killed by alcohol.</div>
+        <div class="sys-intro-text">Group by genome type: RNA vs DNA, ss vs ds, +sense vs −sense. For each virus know its tropism and distinguishing lab findings.</div>
       </div>
     </div>
     <div id="viruses-content"></div>
@@ -90,7 +91,7 @@
       <div class="sys-intro-icon">🪱</div>
       <div>
         <div class="sys-intro-title">Parasitology</div>
-        <div class="sys-intro-text">Organize by habitat: intestinal protozoa → blood/tissue protozoa → helminths. Vector associations are heavily tested (mosquito/tick/fly/snail). Eosinophilia = helminth tissue migration. Treatment is narrow: know metronidazole, chloroquine, praziquantel, ivermectin, and albendazole targets.</div>
+        <div class="sys-intro-text">Organize by habitat: intestinal → blood/tissue. Vector associations (mosquito/tick) are heavily tested. Eosinophilia = helminth migration.</div>
       </div>
     </div>
     <div id="parasites-content"></div>
@@ -101,7 +102,7 @@
       <div class="sys-intro-icon">🍄</div>
       <div>
         <div class="sys-intro-title">Mycology</div>
-        <div class="sys-intro-text">Divide into systemic dimorphic fungi vs opportunistic fungi. Dimorphic rule: mold in cold (environment), yeast in heat (body). Geography matters — Histo (Ohio/Mississippi River Valley), Cocci (Southwest desert), Blasto (Great Lakes/Mississippi). Opportunists = immunocompromised hosts (HIV, transplant, steroids).</div>
+        <div class="sys-intro-text">Divide into systemic dimorphic fungi vs opportunistic. Dimorphic rule: mold in cold, yeast in heat. Geography matters.</div>
       </div>
     </div>
     <div id="fungi-content"></div>
@@ -110,77 +111,33 @@
 
 <script src="micro_data.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
-// GRAM STAIN → BADGE CLASS MAPPER
-// ═══════════════════════════════════════════════════════════════
+// ── Gram Stain Helper ──────────────────────────────────
 function gramClass(gram) {
   if (!gram) return 'gram-none';
   const g = gram.toLowerCase();
-  if (g.includes('gp') || g.includes('gram-pos') || g.includes('gram pos')) return 'gram-gp';
-  if (g.includes('gn') || g.includes('gram-neg') || g.includes('gram neg')) return 'gram-gn';
-  if (g.includes('acid') || g.includes('afb') || g.includes('mycobact')) return 'gram-acid';
-  if (g.includes('helminth') || g.includes('nematode') || g.includes('cestode') || g.includes('trematode') || g.includes('protozoa') || g.includes('parasite')) return 'gram-para';
-  if (g.includes('fung') || g.includes('yeast') || g.includes('mold') || g.includes('dimorphic')) return 'gram-fung';
+  if (g.includes('gp') || g.includes('pos')) return 'gram-gp';
+  if (g.includes('gn') || g.includes('neg')) return 'gram-gn';
+  if (g.includes('acid') || g.includes('afb')) return 'gram-acid';
+  if (g.includes('para') || g.includes('helminth')) return 'gram-para';
+  if (g.includes('fung') || g.includes('yeast')) return 'gram-fung';
   return 'gram-none';
 }
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER ENGINE & DEFENSIVE UTILITIES
-// ═══════════════════════════════════════════════════════════════
+// ── Rendering Engine ───────────────────────────────────
 let cardCounter = 0;
 
-// STEP 8 REFACTOR: STRICT HTML BULLETED LISTS
-function formatLines(text) {
-  if (!text) return '';
-  try {
-    // Convert custom bold syntax to strong tags
-    let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    let parts = [];
-    // Split sentences intelligently without breaking abbreviations
-    const sentenceSplit = processedText.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
-
-    sentenceSplit.forEach(segment => {
-      const midSplit = segment.split(/(?<=\w)\.\s+(?=(?:<[^>]+>)*[A-Z][a-zA-Z/\-]+(?:<\/[^>]+>)?:)/);
-      if (midSplit.length > 1) {
-        midSplit.forEach((p, i) => {
-          if (i < midSplit.length - 1) parts.push(p + '.');
-          else parts.push(p);
-        });
-      } else {
-        parts.push(segment);
-      }
-    });
-
-    parts = parts.map((p, i) => {
-      let clean = p.trim();
-      if (i < parts.length - 1 && !clean.endsWith('.') && !clean.endsWith('>') && !clean.endsWith(')')) {
-        return clean + '.';
-      }
-      return clean;
-    }).filter(p => p.length > 0);
-
-    // If it's just a single phrase/sentence, no bullet points needed
-    if (parts.length <= 1) return processedText;
-
-    // Output strict HTML ul/li bulleted lists
-    return `<ul>${parts.map(p => `<li>${p}</li>`).join('')}</ul>`;
-
-  } catch (err) {
-    console.error("Error formatting lines:", err);
-    return text; // Fallback to raw text if parsing fails
-  }
-}
-
-function orgCardHTML(org, colorClass, idx) {
+function orgCardHTML(org, id, themeNum) {
   if (!org) return '';
-  const id = `org-${colorClass}-${idx}-${cardCounter++}`;
+  const themeColor = `var(--theme-${themeNum})`;
+  const themeLight = `color-mix(in srgb, ${themeColor} 12%, transparent)`;
+  const styleAttr = `style="--theme-color: ${themeColor}; --theme-color-light: ${themeLight};"`;
+  
   const gc = gramClass(org.gram || '');
   const gramLabel = org.gram ? `<span class="gram-badge ${gc}">${org.gram}</span>` : '';
   const tagsHTML = (org.tags || []).map(t => `<span class="drug-tag">${t}</span>`).join('');
 
   return `
-  <div class="drug-card" id="${id}" onclick="toggleCard('${id}')">
+  <div class="drug-card" id="${id}" onclick="toggleCard('${id}')" ${styleAttr}>
     <div class="drug-card-header">
       <div style="flex:1;min-width:0">
         <div class="drug-name">${org.name || 'Unknown'}</div>
@@ -190,27 +147,45 @@ function orgCardHTML(org, colorClass, idx) {
     </div>
     ${org.summary ? `<div class="drug-summary">${org.summary}</div>` : ''}
     <div class="drug-body">
-      ${org.virulence ? `<div class="info-row"><span class="info-label vir">Virulence</span><div class="info-text">${formatLines(org.virulence)}</div></div>` : ''}
-      ${org.disease  ? `<div class="info-row"><span class="info-label dis">Disease</span><div class="info-text">${formatLines(org.disease)}</div></div>` : ''}
-      ${org.tx       ? `<div class="info-row"><span class="info-label tx">Treatment</span><div class="info-text">${formatLines(org.tx)}</div></div>` : ''}
-      ${tagsHTML     ? `<div class="info-row" style="border:none;padding-top:2px"><div style="display:flex;flex-wrap:wrap;gap:4px">${tagsHTML}</div></div>` : ''}
-      ${org.pearl    ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div></div>` : ''}
+      ${org.virulence ? `<div class="info-row"><span class="info-label">Virulence</span><div class="info-text">${formatLines(org.virulence)}</div></div>` : ''}
+      ${org.disease ? `<div class="info-row"><span class="info-label">Disease</span><div class="info-text">${formatLines(org.disease)}</div></div>` : ''}
+      ${org.tx ? `<div class="info-row"><span class="info-label">Treatment</span><div class="info-text">${formatLines(org.tx)}</div></div>` : ''}
+      ${tagsHTML ? `<div class="info-row" style="border:none;padding-top:2px"><div style="display:flex;flex-wrap:wrap;gap:4px">${tagsHTML}</div></div>` : ''}
+      ${org.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div></div>` : ''}
     </div>
   </div>`;
 }
 
+function formatLines(text) {
+  if (!text) return '';
+  try {
+    let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    let parts = processedText.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/).filter(p => p.trim().length > 0);
+    if (parts.length <= 1) return processedText;
+    return `<ul>${parts.map(p => `<li>${p.endsWith('.') ? p : p + '.'}</li>`).join('')}</ul>`;
+  } catch (err) {
+    console.error("Format error:", err);
+    return text;
+  }
+}
+
+const sysOffsets = { bacteria: 12, viruses: 2, parasites: 8, fungi: 18 };
+
 function renderSection(sectionId, sysKey) {
   try {
     if (typeof MICRO === 'undefined') return;
-
     const container = document.getElementById(sectionId);
     const groups = MICRO[sysKey];
     if (!groups || !container) return;
 
     let html = '';
     let globalIdx = 0;
+    const offset = sysOffsets[sysKey] || 0;
 
     groups.forEach((group, gi) => {
+      const themeNum = ((offset + gi) % 20) + 1;
+      const themeColor = `var(--theme-${themeNum})`;
+      const themeLight = `color-mix(in srgb, ${themeColor} 12%, transparent)`;
       const groupId = `grp-${sysKey}-${gi}`;
       
       const sortedOrgs = [...group.organisms].sort((a, b) => {
@@ -220,180 +195,121 @@ function renderSection(sectionId, sysKey) {
       });
 
       html += `
-      <div class="class-group" id="${groupId}">
+      <div class="class-group" id="${groupId}" style="--theme-color: ${themeColor}; --theme-color-light: ${themeLight};">
         <div class="class-group-header">
           <span class="class-label">${group.group}</span>
           <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
         </div>
         <div class="drug-grid">
-          ${sortedOrgs.map(o => orgCardHTML(o, group.color, globalIdx++)).join('')}
+          ${sortedOrgs.map(o => orgCardHTML(o, `org-${globalIdx++}`, themeNum)).join('')}
         </div>
       </div>`;
     });
-
     container.innerHTML = html;
-  } catch (err) {
-    console.error(`Error rendering section ${sectionId}:`, err);
-  }
+  } catch (err) { console.error("Render section error:", err); }
 }
 
-// Map tab content IDs → MICRO data keys
-const sysMap = {
-  'bacteria-content': 'bacteria',
-  'viruses-content':  'viruses',
-  'parasites-content':'parasites',
-  'fungi-content':    'fungi',
-};
+// ── Auth & Init ────────────────────────────────────────
+window.addEventListener('appAuthStateChanged', (e) => {
+  const user = e.detail.user;
+  const authBtn = document.getElementById('auth-btn');
+  if (authBtn) {
+    authBtn.textContent = user ? 'Log out' : 'Log in';
+    authBtn.classList.toggle('is-logged-in', !!user);
+  }
+});
 
-// Defensive Initialization
+const authBtn = document.getElementById('auth-btn');
+if (authBtn) {
+  authBtn.addEventListener('click', () => {
+    if (!auth) return;
+    if (auth.currentUser) auth.signOut();
+    else {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(console.error);
+    }
+  });
+}
+
 if (typeof MICRO !== 'undefined') {
-  Object.entries(sysMap).forEach(([id, key]) => renderSection(id, key));
-} else {
-  console.error("micro_data.js failed to load or MICRO variable is undefined.");
+  renderSection('bacteria-content', 'bacteria');
+  renderSection('viruses-content', 'viruses');
+  renderSection('parasites-content', 'parasites');
+  renderSection('fungi-content', 'fungi');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// CARD / GROUP TOGGLING
-// ═══════════════════════════════════════════════════════════════
+// ── UI Interactions ─────────────────────────────────────
 function toggleCard(id) {
-  try {
-    if (window.getSelection().toString().length > 0) return;
-    const card = document.getElementById(id);
-    if (card) card.classList.toggle('open');
-  } catch (err) {
-    console.error("Error toggling card:", err);
-  }
+  if (window.getSelection().toString().length > 0) return;
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle('open');
 }
 
 function toggleGroup(groupId, btn) {
-  try {
-    const group = document.getElementById(groupId);
-    if (!group) return;
-    const cards = group.querySelectorAll('.drug-card');
-    const anyOpen = [...cards].some(c => c.classList.contains('open'));
-    
-    if (anyOpen) {
-      cards.forEach(c => c.classList.remove('open'));
-      btn.textContent = '▼ Expand';
-    } else {
-      cards.forEach(c => c.classList.add('open'));
-      btn.textContent = '▲ Collapse';
-    }
-  } catch (err) {
-    console.error("Error toggling group:", err);
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const cards = group.querySelectorAll('.drug-card');
+  const anyOpen = [...cards].some(c => c.classList.contains('open'));
+  if (anyOpen) {
+    cards.forEach(c => c.classList.remove('open'));
+    btn.textContent = '▼ Expand';
+  } else {
+    cards.forEach(c => c.classList.add('open'));
+    btn.textContent = '▲ Collapse';
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB SWITCHING
-// ═══════════════════════════════════════════════════════════════
 function switchTab(name, btn) {
-  try {
-    document.querySelectorAll('.group-expand-btn').forEach(b => b.textContent = '▼ Expand');
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    const targetTab = document.getElementById('tab-' + name);
-    if (targetTab) targetTab.classList.add('active');
-    if (btn) btn.classList.add('active');
-    
-    const searchInput = document.getElementById('search-input');
-    const searchResults = document.getElementById('search-results');
-    const tabs = document.getElementById('tabs');
-    
-    if (searchInput) searchInput.value = '';
-    if (searchResults) searchResults.classList.remove('active');
-    
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
-    if (tabs) {
-      tabs.style.opacity = '1';
-      tabs.style.pointerEvents = '';
-    }
-  } catch (err) {
-    console.error("Error switching tab:", err);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SEARCH
-// ═══════════════════════════════════════════════════════════════
-function allOrgs() {
-  const results = [];
-  if (typeof MICRO === 'undefined') return results;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('tab-' + name);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
   
-  try {
-    Object.entries(MICRO).forEach(([sysKey, groups]) => {
-      groups.forEach(group => {
-        group.organisms.forEach(o => {
-          results.push({ ...o, colorClass: group.color, sysKey });
-        });
-      });
-    });
-  } catch (err) {
-    console.error("Error accumulating organisms:", err);
-  }
-  return results;
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) searchInput.value = '';
+  const searchResults = document.getElementById('search-results');
+  if (searchResults) searchResults.classList.remove('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
 }
 
 function handleSearch(q) {
-  try {
-    const sr       = document.getElementById('search-results');
-    const grid     = document.getElementById('search-grid');
-    const empty    = document.getElementById('search-empty');
-    const count    = document.getElementById('search-count');
-    const clearBtn = document.getElementById('search-clear');
-    const tabs     = document.getElementById('tabs');
+  const sr = document.getElementById('search-results'), grid = document.getElementById('search-grid');
+  const empty = document.getElementById('search-empty'), count = document.getElementById('search-count');
+  if (!sr || !grid || !empty || !count) return;
 
-    if (!sr || !grid || !empty || !count || !clearBtn || !tabs) return;
+  if (!q || q.length < 2) {
+    sr.classList.remove('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
+    return;
+  }
 
-    clearBtn.style.display = q.length > 0 ? 'block' : 'none';
+  sr.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
 
-    if (!q || q.length < 2) {
-      sr.classList.remove('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
-      tabs.style.opacity = '1';
-      tabs.style.pointerEvents = '';
-      return;
-    }
+  const ql = q.toLowerCase();
+  const allOrgs = [];
+  Object.values(MICRO).forEach(sys => sys.forEach(grp => grp.organisms.forEach(o => allOrgs.push(o))));
+  
+  const matches = allOrgs.filter(o => 
+    o.name.toLowerCase().includes(ql) || 
+    (o.summary || '').toLowerCase().includes(ql) ||
+    (o.pearl || '').toLowerCase().includes(ql)
+  );
 
-    sr.classList.add('active');
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-    tabs.style.opacity = '0.4';
-    tabs.style.pointerEvents = 'none';
-
-    const ql = q.toLowerCase();
-    const matches = allOrgs().filter(o =>
-      (o.name && o.name.toLowerCase().includes(ql)) ||
-      (o.gram && o.gram.toLowerCase().includes(ql)) ||
-      (o.virulence && o.virulence.toLowerCase().includes(ql)) ||
-      (o.disease && o.disease.toLowerCase().includes(ql)) ||
-      (o.tx && o.tx.toLowerCase().includes(ql)) ||
-      (o.pearl && o.pearl.toLowerCase().includes(ql)) ||
-      (o.summary && o.summary.toLowerCase().includes(ql)) ||
-      (o.tags && o.tags.some(t => t.toLowerCase().includes(ql)))
-    );
-
-    if (matches.length === 0) {
-      grid.innerHTML = '';
-      empty.style.display = 'block';
-      count.textContent = 'No results for "' + q + '"';
-      return;
-    }
-
+  if (matches.length === 0) {
+    grid.innerHTML = ''; empty.style.display = 'block';
+    count.textContent = 'No results for "' + q + '"';
+  } else {
     empty.style.display = 'none';
-    count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + q + '"';
-    grid.innerHTML = matches.map((o, i) => orgCardHTML(o, o.colorClass, 'search-' + i)).join('');
-  } catch (err) {
-    console.error("Error during search:", err);
+    count.textContent = matches.length + ' results for "' + q + '"';
+    grid.innerHTML = matches.map((o, i) => orgCardHTML(o, 'search-' + i, (i % 20) + 1)).join('');
   }
 }
 
 function clearSearch() {
   const input = document.getElementById('search-input');
-  if (input) {
-    input.value = '';
-    handleSearch('');
-  }
+  if (input) { input.value = ''; handleSearch(''); }
 }
 </script>
 </body>
