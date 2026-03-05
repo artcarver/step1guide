@@ -1,31 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
-<title>Drug Facts · Step 1 Pharmacology Reference</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <title>Drug Facts · Step 1 Pharmacology Reference</title>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-<script src="auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
 
+<!-- ── Sticky Header ───────────────────────────────────────── -->
 <div class="header">
   <div class="header-inner">
-    <div class="global-nav">
-      <a href="index.html" style="font-size:18px; font-weight:600; color:var(--sakura2);">🌸 Step 1 Hub</a>
-      <div style="display:flex; gap:16px; align-items:center;">
+
+    <nav class="global-nav">
+      <a href="index.html" class="global-nav-brand">🌸 Step 1 Hub</a>
+      <div class="global-nav-links">
         <a href="uworld_tracker.html">UWorld</a>
         <a href="step1_dashboard.html">Dashboard</a>
         <a href="drugfacts.html">Pharm</a>
         <a href="microfacts.html">Micro</a>
+        <button id="auth-btn" class="auth-btn">Log in</button>
       </div>
-    </div>
-    
+    </nav>
+
     <div class="header-top">
       <div>
         <p class="brand-super">Step 1 · Pharmacology Reference</p>
@@ -39,80 +42,43 @@
       </div>
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
-        <input class="search-input" type="text" id="search-input" placeholder="Search drug, class, mechanism..." oninput="handleSearch(this.value)"/>
+        <input class="search-input" type="text" id="search-input"
+               placeholder="Search drug, class, mechanism..."
+               oninput="handleSearch(this.value)"/>
         <button id="search-clear" onclick="clearSearch()">×</button>
       </div>
     </div>
-    
+
     <nav class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('micro', this)" style="--theme-color: var(--theme-8);"><span class="tab-dot"></span>Microbiology</button>
-      <button class="tab-btn" onclick="switchTab('autonomic', this)" style="--theme-color: var(--theme-1);"><span class="tab-dot"></span>Autonomics</button>
-      <button class="tab-btn" onclick="switchTab('cv', this)" style="--theme-color: var(--theme-11);"><span class="tab-dot"></span>Cardio &amp; Renal</button>
-      <button class="tab-btn" onclick="switchTab('blood', this)" style="--theme-color: var(--theme-16);"><span class="tab-dot"></span>Hematology</button>
-      <button class="tab-btn" onclick="switchTab('gi', this)" style="--theme-color: var(--theme-5);"><span class="tab-dot"></span>GI &amp; Motility</button>
-      <button class="tab-btn" onclick="switchTab('endo', this)" style="--theme-color: var(--theme-13);"><span class="tab-dot"></span>Endo &amp; Repro</button>
-      <button class="tab-btn" onclick="switchTab('neuro', this)" style="--theme-color: var(--theme-19);"><span class="tab-dot"></span>Neuro &amp; Psych</button>
-      <button class="tab-btn" onclick="switchTab('onco', this)" style="--theme-color: var(--theme-9);"><span class="tab-dot"></span>Oncology</button>
-      <button class="tab-btn" onclick="switchTab('toxicology', this)" style="--theme-color: var(--theme-3);"><span class="tab-dot"></span>Toxicology</button>
-      <button class="tab-btn" onclick="switchTab('pulm', this)" style="--theme-color: var(--theme-7);"><span class="tab-dot"></span>Pulmonary</button>
+      <button class="tab-btn active" onclick="switchTab('micro', this)"      style="--theme-color: var(--theme-8);" ><span class="tab-dot"></span>Microbiology</button>
+      <button class="tab-btn"        onclick="switchTab('autonomic', this)"  style="--theme-color: var(--theme-1);" ><span class="tab-dot"></span>Autonomics</button>
+      <button class="tab-btn"        onclick="switchTab('cv', this)"         style="--theme-color: var(--theme-11);"><span class="tab-dot"></span>Cardio &amp; Renal</button>
+      <button class="tab-btn"        onclick="switchTab('blood', this)"      style="--theme-color: var(--theme-16);"><span class="tab-dot"></span>Hematology</button>
+      <button class="tab-btn"        onclick="switchTab('gi', this)"         style="--theme-color: var(--theme-5);" ><span class="tab-dot"></span>GI &amp; Motility</button>
+      <button class="tab-btn"        onclick="switchTab('endo', this)"       style="--theme-color: var(--theme-13);"><span class="tab-dot"></span>Endo &amp; Repro</button>
+      <button class="tab-btn"        onclick="switchTab('neuro', this)"      style="--theme-color: var(--theme-19);"><span class="tab-dot"></span>Neuro &amp; Psych</button>
+      <button class="tab-btn"        onclick="switchTab('onco', this)"       style="--theme-color: var(--theme-9);" ><span class="tab-dot"></span>Oncology</button>
+      <button class="tab-btn"        onclick="switchTab('toxicology', this)" style="--theme-color: var(--theme-3);" ><span class="tab-dot"></span>Toxicology</button>
+      <button class="tab-btn"        onclick="switchTab('pulm', this)"       style="--theme-color: var(--theme-7);" ><span class="tab-dot"></span>Pulmonary</button>
     </nav>
+
   </div>
 </div>
 
+<!-- ── Content ─────────────────────────────────────────────── -->
 <div class="content-wide">
+
+  <!-- Search Results (hidden until active) -->
   <div id="search-results">
-    <div class="search-count" id="search-count"></div>
+    <p class="search-count" id="search-count"></p>
     <div class="drug-grid" id="search-grid"></div>
-    <div class="empty" id="search-empty" style="display:none">
+    <div class="empty" id="search-empty" style="display:none;">
       <div class="empty-icon">◇</div>
-      <div class="empty-text">No drugs found matching your search</div>
+      <p class="empty-text">No drugs found matching your search</p>
     </div>
   </div>
 
-  <div id="tab-autonomic" class="tab-panel">
-    <div class="sys-intro">
-      <div class="sys-intro-icon">⚡</div>
-      <div>
-        <div class="sys-intro-title">Autonomic Pharmacology</div>
-        <div class="sys-intro-text">Parasympathetic (cholinergic) and sympathetic (adrenergic) drug classes. Master receptor subtypes first — M1/M2/M3, α1/α2, β1/β2 — and the drugs fall into place. High-yield for organ-specific side effects and clinical applications.</div>
-      </div>
-    </div>
-    <div id="autonomic-content"></div>
-  </div>
-
-  <div id="tab-cv" class="tab-panel">
-    <div class="sys-intro">
-      <div class="sys-intro-icon">♥</div>
-      <div>
-        <div class="sys-intro-title">Cardiovascular &amp; Renal Pharmacology</div>
-        <div class="sys-intro-text">The most tested drug system on Step 1. Know ACEi/ARBs cold — they appear in HF, HTN, CKD, and post-MI vignettes. Antiarrhythmic classes: think ion channels first, then drugs. Diuretic electrolyte effects are guaranteed questions.</div>
-      </div>
-    </div>
-    <div id="cv-content"></div>
-  </div>
-
-  <div id="tab-blood" class="tab-panel">
-    <div class="sys-intro">
-      <div class="sys-intro-icon">🩸</div>
-      <div>
-        <div class="sys-intro-title">Blood &amp; Inflammation</div>
-        <div class="sys-intro-text">Anticoagulants appear on nearly every Step 1 exam — know reversal agents cold. Heparin-induced thrombocytopenia (HIT) is a classic trap. NSAIDs are the most-prescribed drugs in medicine; their mechanism and GI/renal toxicity are ubiquitous.</div>
-      </div>
-    </div>
-    <div id="blood-content"></div>
-  </div>
-
-  <div id="tab-neuro" class="tab-panel">
-    <div class="sys-intro">
-      <div class="sys-intro-icon">🧠</div>
-      <div>
-        <div class="sys-intro-title">Neuro &amp; Psych</div>
-        <div class="sys-intro-text">Psych block is massive on Step 1. Memorize antidepressant side effect profiles — TCA overdose, SSRI serotonin syndrome, and bupropion seizures appear constantly. Antipsychotic EPS and NMS are classic vignettes. Lithium toxicity has a narrow therapeutic window.</div>
-      </div>
-    </div>
-    <div id="neuro-content"></div>
-  </div>
-
+  <!-- Microbiology (default active) -->
   <div id="tab-micro" class="tab-panel active">
     <div class="sys-intro">
       <div class="sys-intro-icon">🦠</div>
@@ -124,6 +90,43 @@
     <div id="micro-content"></div>
   </div>
 
+  <!-- Autonomics -->
+  <div id="tab-autonomic" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">⚡</div>
+      <div>
+        <div class="sys-intro-title">Autonomic Pharmacology</div>
+        <div class="sys-intro-text">Parasympathetic (cholinergic) and sympathetic (adrenergic) drug classes. Master receptor subtypes first — M1/M2/M3, α1/α2, β1/β2 — and the drugs fall into place. High-yield for organ-specific side effects and clinical applications.</div>
+      </div>
+    </div>
+    <div id="autonomic-content"></div>
+  </div>
+
+  <!-- Cardio & Renal -->
+  <div id="tab-cv" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">♥</div>
+      <div>
+        <div class="sys-intro-title">Cardiovascular &amp; Renal Pharmacology</div>
+        <div class="sys-intro-text">The most tested drug system on Step 1. Know ACEi/ARBs cold — they appear in HF, HTN, CKD, and post-MI vignettes. Antiarrhythmic classes: think ion channels first, then drugs. Diuretic electrolyte effects are guaranteed questions.</div>
+      </div>
+    </div>
+    <div id="cv-content"></div>
+  </div>
+
+  <!-- Hematology -->
+  <div id="tab-blood" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">🩸</div>
+      <div>
+        <div class="sys-intro-title">Blood &amp; Inflammation</div>
+        <div class="sys-intro-text">Anticoagulants appear on nearly every Step 1 exam — know reversal agents cold. Heparin-induced thrombocytopenia (HIT) is a classic trap. NSAIDs are the most-prescribed drugs in medicine; their mechanism and GI/renal toxicity are ubiquitous.</div>
+      </div>
+    </div>
+    <div id="blood-content"></div>
+  </div>
+
+  <!-- GI & Motility -->
   <div id="tab-gi" class="tab-panel">
     <div class="sys-intro">
       <div class="sys-intro-icon">🍽️</div>
@@ -135,6 +138,7 @@
     <div id="gi-content"></div>
   </div>
 
+  <!-- Endo & Repro -->
   <div id="tab-endo" class="tab-panel">
     <div class="sys-intro">
       <div class="sys-intro-icon">🧬</div>
@@ -146,6 +150,31 @@
     <div id="endo-content"></div>
   </div>
 
+  <!-- Neuro & Psych -->
+  <div id="tab-neuro" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">🧠</div>
+      <div>
+        <div class="sys-intro-title">Neuro &amp; Psych</div>
+        <div class="sys-intro-text">Psych block is massive on Step 1. Memorize antidepressant side effect profiles — TCA overdose, SSRI serotonin syndrome, and bupropion seizures appear constantly. Antipsychotic EPS and NMS are classic vignettes. Lithium toxicity has a narrow therapeutic window.</div>
+      </div>
+    </div>
+    <div id="neuro-content"></div>
+  </div>
+
+  <!-- Oncology -->
+  <div id="tab-onco" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">⚗</div>
+      <div>
+        <div class="sys-intro-title">Antineoplastics</div>
+        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong>every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
+      </div>
+    </div>
+    <div id="onco-content"></div>
+  </div>
+
+  <!-- Toxicology -->
   <div id="tab-toxicology" class="tab-panel">
     <div class="sys-intro">
       <div class="sys-intro-icon">⚠️</div>
@@ -157,6 +186,7 @@
     <div id="toxicology-content"></div>
   </div>
 
+  <!-- Pulmonary -->
   <div id="tab-pulm" class="tab-panel">
     <div class="sys-intro">
       <div class="sys-intro-icon">🫁</div>
@@ -168,72 +198,69 @@
     <div id="pulm-content"></div>
   </div>
 
-  <div id="tab-onco" class="tab-panel">
-    <div class="sys-intro">
-      <div class="sys-intro-icon">⚗</div>
-      <div>
-        <div class="sys-intro-title">Antineoplastics</div>
-        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong style="color:var(--sakura2)">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
-      </div>
-    </div>
-    <div id="onco-content"></div>
-  </div>
-</div>
+</div><!-- /.content-wide -->
 
 <script src="drug_data.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
-// RENDER ENGINE & DEFENSIVE UTILITIES
-// ═══════════════════════════════════════════════════════════════
+// ── Auth ───────────────────────────────────────────────────
+window.addEventListener('appAuthStateChanged', (e) => {
+  const user = e.detail.user;
+  const btn  = document.getElementById('auth-btn');
+  if (!btn) return;
+  btn.textContent = user ? 'Log out' : 'Log in';
+  btn.classList.toggle('is-logged-in', !!user);
+});
 
-let cardCounter = 0;
+document.getElementById('auth-btn').addEventListener('click', () => {
+  if (!auth) return;
+  if (auth.currentUser) auth.signOut();
+  else auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
+});
 
+// ── Render Engine ──────────────────────────────────────────
 function drugCardHTML(drug, id, themeNum) {
   if (!drug) return '';
   const themeColor = `var(--theme-${themeNum})`;
   const themeLight = `color-mix(in srgb, ${themeColor} 12%, transparent)`;
-  const styleAttr = `style="--theme-color: ${themeColor}; --theme-color-light: ${themeLight};"`;
-  
-  const akaHTML = drug.aka ? drug.aka.replace(/·/g, '<span style="color:var(--dim);font-style:normal;margin:0 3px">·</span>') : '';
-  
+  const styleAttr  = `style="--theme-color:${themeColor};--theme-color-light:${themeLight};"`;
+
+  const akaHTML = drug.aka
+    ? drug.aka.replace(/·/g, '<span class="aka-dot">·</span>')
+    : '';
+
   return `
   <div class="drug-card" id="${id}" onclick="toggleCard('${id}')" ${styleAttr}>
     <div class="drug-card-header">
-      <div style="flex:1;min-width:0">
+      <div class="drug-card-meta">
         <div class="drug-name">${drug.name || 'Unknown'}</div>
         ${akaHTML ? `<div class="drug-aka">${akaHTML}</div>` : ''}
       </div>
-      <span class="expand-arrow" style="flex-shrink:0;margin-left:10px;margin-top:4px">▼</span>
+      <span class="expand-arrow">▼</span>
     </div>
     ${drug.summary ? `<div class="drug-summary">${drug.summary}</div>` : ''}
     <div class="drug-body">
-      ${drug.moa ? `<div class="info-row"><span class="info-label moa">Mechanism</span><div class="info-text">${formatLines(drug.moa)}</div></div>` : ''}
-      ${drug.use ? `<div class="info-row"><span class="info-label use">Uses</span><div class="info-text">${formatLines(drug.use)}</div></div>` : ''}
-      ${drug.se ? `<div class="info-row"><span class="info-label se">Side Effects</span><div class="info-text">${formatLines(drug.se)}</div></div>` : ''}
-      ${drug.ci ? `<div class="info-row"><span class="info-label ci">Contraindications</span><div class="info-text">${formatLines(drug.ci)}</div></div>` : ''}
-      ${drug.pk ? `<div class="info-row"><span class="info-label pk">Pharmacokinetics</span><div class="info-text">${formatLines(drug.pk)}</div></div>` : ''}
+      ${drug.moa   ? `<div class="info-row"><span class="info-label">Mechanism</span><div class="info-text">${formatLines(drug.moa)}</div></div>`   : ''}
+      ${drug.use   ? `<div class="info-row"><span class="info-label">Uses</span><div class="info-text">${formatLines(drug.use)}</div></div>`          : ''}
+      ${drug.se    ? `<div class="info-row"><span class="info-label">Side Effects</span><div class="info-text">${formatLines(drug.se)}</div></div>`   : ''}
+      ${drug.ci    ? `<div class="info-row"><span class="info-label">Contra</span><div class="info-text">${formatLines(drug.ci)}</div></div>`         : ''}
+      ${drug.pk    ? `<div class="info-row"><span class="info-label">PK</span><div class="info-text">${formatLines(drug.pk)}</div></div>`             : ''}
+      ${(drug.tags || []).length ? `<div class="info-row" style="border:none;padding-top:2px"><div class="drug-tags-row">${(drug.tags).map(t=>`<span class="drug-tag">${t}</span>`).join('')}</div></div>` : ''}
       ${drug.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(drug.pearl)}</div></div>` : ''}
     </div>
   </div>`;
 }
 
-// Strict HTML bulleted lists and string parsing logic
 function formatLines(text) {
   if (!text) return '';
   try {
-    // Convert custom bold syntax to strong tags (which inherit the theme color now)
-    let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
+    let processed = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     let parts = [];
-    const sentenceSplit = processedText.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
+    const sentenceSplit = processed.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
 
     sentenceSplit.forEach(segment => {
       const midSplit = segment.split(/(?<=\w)\.\s+(?=(?:<[^>]+>)*[A-Z][a-zA-Z/\-]+(?:<\/[^>]+>)?:)/);
       if (midSplit.length > 1) {
-        midSplit.forEach((p, i) => {
-          if (i < midSplit.length - 1) parts.push(p + '.');
-          else parts.push(p);
-        });
+        midSplit.forEach((p, i) => parts.push(i < midSplit.length - 1 ? p + '.' : p));
       } else {
         parts.push(segment);
       }
@@ -241,51 +268,49 @@ function formatLines(text) {
 
     parts = parts.map((p, i) => {
       let clean = p.trim();
-      if (i < parts.length - 1 && !clean.endsWith('.') && !clean.endsWith('>') && !clean.endsWith(')')) {
+      if (i < parts.length - 1 && !clean.endsWith('.') && !clean.endsWith('>') && !clean.endsWith(')'))
         return clean + '.';
-      }
       return clean;
     }).filter(p => p.length > 0);
 
-    if (parts.length <= 1) return processedText;
-
+    if (parts.length <= 1) return processed;
     return `<ul>${parts.map(p => `<li>${p}</li>`).join('')}</ul>`;
-
   } catch (err) {
-    console.error("Error formatting lines:", err);
-    return text; 
+    console.error('formatLines error:', err);
+    return text;
   }
 }
 
-// Systematic color mapping offset to ensure visual variety across tabs
-const sysOffsets = { autonomic: 0, cv: 2, blood: 4, neuro: 6, micro: 8, gi: 10, endo: 12, pulm: 14, onco: 16, toxicology: 18 };
+// Systematic color offset per system for visual variety
+const sysOffsets = {
+  autonomic: 0, cv: 2, blood: 4, neuro: 6, micro: 8,
+  gi: 10, endo: 12, pulm: 14, onco: 16, toxicology: 18
+};
 
 function renderSection(sectionId, sysKey) {
   try {
     if (typeof DRUGS === 'undefined') return;
-    
     const container = document.getElementById(sectionId);
-    const groups = DRUGS[sysKey];
-    if(!groups || !container) return;
-    
-    let html = '';
-    let globalIdx = 0;
+    const groups    = DRUGS[sysKey];
+    if (!groups || !container) return;
+
+    let html = '', globalIdx = 0;
     const offset = sysOffsets[sysKey] || 0;
-    
+
     groups.forEach((group, gi) => {
-      const groupId = `grp-${sysKey}-${gi}`;
-      const themeNum = ((offset + gi) % 20) + 1;
+      const themeNum   = ((offset + gi) % 20) + 1;
       const themeColor = `var(--theme-${themeNum})`;
       const themeLight = `color-mix(in srgb, ${themeColor} 12%, transparent)`;
-      
-      const sortedDrugs = group.drugs.sort((a, b) => {
-        const valA = typeof a.tier === 'number' ? a.tier : parseInt(String(a.tier).replace(/\D/g,'')) || 99;
-        const valB = typeof b.tier === 'number' ? b.tier : parseInt(String(b.tier).replace(/\D/g,'')) || 99;
-        return valA - valB;
+      const groupId    = `grp-${sysKey}-${gi}`;
+
+      const sortedDrugs = [...group.drugs].sort((a, b) => {
+        const va = typeof a.tier === 'number' ? a.tier : parseInt(String(a.tier).replace(/\D/g,'')) || 99;
+        const vb = typeof b.tier === 'number' ? b.tier : parseInt(String(b.tier).replace(/\D/g,'')) || 99;
+        return va - vb;
       });
 
       html += `
-      <div class="class-group" id="${groupId}" style="--theme-color: ${themeColor}; --theme-color-light: ${themeLight};">
+      <div class="class-group" id="${groupId}" style="--theme-color:${themeColor};--theme-color-light:${themeLight};">
         <div class="class-group-header">
           <span class="class-label">${group.group}</span>
           <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
@@ -295,167 +320,155 @@ function renderSection(sectionId, sysKey) {
         </div>
       </div>`;
     });
+
     container.innerHTML = html;
   } catch (err) {
-    console.error(`Error rendering section ${sectionId}:`, err);
+    console.error(`renderSection(${sectionId}) error:`, err);
   }
 }
 
 const sysMap = {
-  'autonomic-content': 'autonomic',
-  'cv-content': 'cv',
-  'blood-content': 'blood',
-  'neuro-content': 'neuro',
-  'micro-content': 'micro',
-  'gi-content': 'gi',
-  'endo-content': 'endo',
-  'pulm-content': 'pulm',
-  'onco-content': 'onco',
+  'autonomic-content':  'autonomic',
+  'cv-content':         'cv',
+  'blood-content':      'blood',
+  'neuro-content':      'neuro',
+  'micro-content':      'micro',
+  'gi-content':         'gi',
+  'endo-content':       'endo',
+  'pulm-content':       'pulm',
+  'onco-content':       'onco',
   'toxicology-content': 'toxicology',
 };
 
-// Defensive Initialization
 if (typeof DRUGS !== 'undefined') {
   Object.entries(sysMap).forEach(([id, key]) => renderSection(id, key));
 } else {
-  console.error("drug_data.js failed to load or DRUGS variable is undefined.");
+  console.error('drug_data.js failed to load — DRUGS is undefined.');
 }
 
+// ── UI Interactions ────────────────────────────────────────
 function toggleCard(id) {
-  try {
-    if (window.getSelection().toString().length > 0) return;
-    const card = document.getElementById(id);
-    if(card) card.classList.toggle('open');
-  } catch (err) {
-    console.error("Error toggling card:", err);
-  }
+  if (window.getSelection().toString().length > 0) return;
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle('open');
 }
 
 function toggleGroup(groupId, btn) {
-  try {
-    const group = document.getElementById(groupId);
-    if(!group) return;
-    const cards = group.querySelectorAll('.drug-card');
-    const anyOpen = [...cards].some(c => c.classList.contains('open'));
-    
-    if(anyOpen) {
-      cards.forEach(c => c.classList.remove('open'));
-      btn.textContent = '▼ Expand';
-    } else {
-      cards.forEach(c => c.classList.add('open'));
-      btn.textContent = '▲ Collapse';
-    }
-  } catch (err) {
-    console.error("Error toggling group:", err);
-  }
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const cards  = group.querySelectorAll('.drug-card');
+  const anyOpen = [...cards].some(c => c.classList.contains('open'));
+  cards.forEach(c => c.classList.toggle('open', !anyOpen));
+  btn.textContent = anyOpen ? '▼ Expand' : '▲ Collapse';
 }
 
 function switchTab(name, btn) {
-  try {
-    document.querySelectorAll('.group-expand-btn').forEach(b => b.textContent = '▼ Expand');
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    const targetTab = document.getElementById('tab-' + name);
-    if (targetTab) targetTab.classList.add('active');
-    if (btn) btn.classList.add('active');
-    
-    const searchInput = document.getElementById('search-input');
-    const searchResults = document.getElementById('search-results');
-    const tabs = document.getElementById('tabs');
-    
-    if (searchInput) searchInput.value = '';
-    if (searchResults) searchResults.classList.remove('active');
-    
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
-    if (tabs) {
-      tabs.style.opacity = '1';
-      tabs.style.pointerEvents = '';
-    }
-  } catch (err) {
-    console.error("Error switching tab:", err);
-  }
+  document.querySelectorAll('.group-expand-btn').forEach(b => b.textContent = '▼ Expand');
+  document.querySelectorAll('.tab-panel').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById('tab-' + name);
+  if (target) target.classList.add('active');
+  if (btn)    btn.classList.add('active');
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const tabs = document.getElementById('tabs');
+  if (searchInput)   searchInput.value = '';
+  if (searchResults) searchResults.classList.remove('active');
+  if (tabs) { tabs.style.opacity = '1'; tabs.style.pointerEvents = ''; }
 }
 
+// ── Search ─────────────────────────────────────────────────
 function allDrugs() {
+  if (typeof DRUGS === 'undefined') return [];
   const results = [];
-  if (typeof DRUGS === 'undefined') return results;
-  
-  try {
-    Object.entries(DRUGS).forEach(([sysKey, groups]) => {
-      groups.forEach(group => {
-        group.drugs.forEach(d => {
-          results.push({ ...d, sysKey });
-        });
-      });
-    });
-  } catch (err) {
-    console.error("Error accumulating drugs:", err);
-  }
+  Object.entries(DRUGS).forEach(([sysKey, groups]) =>
+    groups.forEach(group =>
+      group.drugs.forEach(d => results.push({ ...d, sysKey }))
+    )
+  );
   return results;
 }
 
 function handleSearch(q) {
-  try {
-    const sr = document.getElementById('search-results');
-    const grid = document.getElementById('search-grid');
-    const empty = document.getElementById('search-empty');
-    const count = document.getElementById('search-count');
-    const clearBtn = document.getElementById('search-clear');
-    const tabs = document.getElementById('tabs');
+  const sr     = document.getElementById('search-results');
+  const grid   = document.getElementById('search-grid');
+  const empty  = document.getElementById('search-empty');
+  const count  = document.getElementById('search-count');
+  const tabs   = document.getElementById('tabs');
+  if (!sr || !grid || !empty || !count || !tabs) return;
 
-    if (!sr || !grid || !empty || !count || !clearBtn || !tabs) return;
-
-    clearBtn.style.display = q.length > 0 ? 'block' : 'none';
-
-    if(!q || q.length < 2) {
-      sr.classList.remove('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
-      tabs.style.opacity = '1';
-      tabs.style.pointerEvents = '';
-      return;
-    }
-
-    sr.classList.add('active');
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-    tabs.style.opacity = '0.4';
-    tabs.style.pointerEvents = 'none';
-
-    const ql = q.toLowerCase();
-    const matches = allDrugs().filter(d =>
-      (d.name && d.name.toLowerCase().includes(ql)) ||
-      (d.aka && d.aka.toLowerCase().includes(ql)) ||
-      (d.moa && d.moa.toLowerCase().includes(ql)) ||
-      (d.se && d.se.toLowerCase().includes(ql)) ||
-      (d.use && d.use.toLowerCase().includes(ql)) ||
-      (d.pearl && d.pearl.toLowerCase().includes(ql)) ||
-      (d.tags && d.tags.some(t => t.toLowerCase().includes(ql)))
-    );
-
-    if(matches.length === 0) {
-      grid.innerHTML = '';
-      empty.style.display = 'block';
-      count.textContent = 'No results for "' + q + '"';
-      return;
-    }
-
-    empty.style.display = 'none';
-    count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + q + '"';
-    
-    // Cycle colors dynamically for search results
-    grid.innerHTML = matches.map((d, i) => drugCardHTML(d, 'search-' + i, (i % 20) + 1)).join('');
-  } catch (err) {
-    console.error("Error during search:", err);
+  if (!q || q.length < 2) {
+    sr.classList.remove('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
+    tabs.style.opacity = '1';
+    tabs.style.pointerEvents = '';
+    return;
   }
+
+  sr.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+  tabs.style.opacity = '0.4';
+  tabs.style.pointerEvents = 'none';
+
+  const ql = q.toLowerCase();
+  const matches = allDrugs().filter(d =>
+    (d.name  && d.name.toLowerCase().includes(ql))  ||
+    (d.aka   && d.aka.toLowerCase().includes(ql))   ||
+    (d.moa   && d.moa.toLowerCase().includes(ql))   ||
+    (d.se    && d.se.toLowerCase().includes(ql))    ||
+    (d.use   && d.use.toLowerCase().includes(ql))   ||
+    (d.pearl && d.pearl.toLowerCase().includes(ql)) ||
+    (d.tags  && d.tags.some(t => t.toLowerCase().includes(ql)))
+  );
+
+  if (matches.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    count.textContent = `No results for "${q}"`;
+    return;
+  }
+
+  empty.style.display = 'none';
+  count.textContent = `${matches.length} result${matches.length !== 1 ? 's' : ''} for "${q}"`;
+  grid.innerHTML = matches.map((d, i) => drugCardHTML(d, `search-${i}`, (i % 20) + 1)).join('');
 }
 
 function clearSearch() {
   const input = document.getElementById('search-input');
-  if (input) {
-    input.value = '';
-    handleSearch('');
-  }
+  if (input) { input.value = ''; handleSearch(''); }
 }
 </script>
+
+<style>
+  /* ── Drugfacts-specific extras ───────────────────── */
+  .global-nav-brand {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--sakura2);
+  }
+
+  .drug-card-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .drug-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .aka-dot {
+    color: var(--dim);
+    font-style: normal;
+    margin: 0 3px;
+  }
+
+  /* Subtle oncology pearl highlight */
+  #tab-onco .sys-intro-text strong {
+    color: var(--sakura2);
+  }
+</style>
+
 </body>
 </html>
