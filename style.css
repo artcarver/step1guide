@@ -1,9 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════
-   STEP 1 STUDY HUB — MASTER STYLESHEET (SOFT & CUTE EDITION)
-   Aesthetic: Pastel Palette | Typography: Quicksand & Cormorant
+   STEP 1 STUDY HUB — COMPLETE MASTER STYLESHEET (SOFT & CUTE)
+   Aesthetic: Pastel Bubble | Typography: Quicksand & Cormorant
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Font Pairing: Cormorant for elegance, Quicksand for bubbly/cute feel */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Quicksand:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
@@ -18,7 +17,7 @@
   --border:       #f2e1e9;
   --border2:      #e8d5df;
 
-  /* Accent Colors (Softened) */
+  /* Brand Accents (Softened) */
   --sakura:       #f4abbf;
   --sakura2:      #e0809b;
   --sakura-light: rgba(244, 171, 191, 0.15);
@@ -29,14 +28,14 @@
   --red:          #f19099;
   --orange:       #f3a683;
 
-  /* 20-Color Pastel Theme System */
+  /* 20-Color Pastel Theme Palette */
   --theme-1: #f3a683; --theme-2: #f7d794; --theme-3: #778beb; --theme-4: #e77f67;
   --theme-5: #cf6a87; --theme-6: #786fa6; --theme-7: #546de5; --theme-8: #63cdda;
   --theme-9: #574b90; --theme-10: #f19066; --theme-11: #f5cd79; --theme-12: #54a0ff;
   --theme-13: #5f27cd; --theme-14: #ff9f43; --theme-15: #ff6b6b; --theme-16: #48dbfb;
   --theme-17: #1dd1a1; --theme-18: #feca57; --theme-19: #ff9ff3; --theme-20: #00d2d3;
 
-  /* Soft UI Elements */
+  /* Bubble UI Physics */
   --radius-lg:    24px; 
   --radius-sm:    12px;
   --card-shadow:  0 10px 30px rgba(224,128,155,0.08);
@@ -55,7 +54,7 @@ body {
 h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight: 600; }
 
 /* ══════════════════════════════════════════════════
-   GLOBAL NAVIGATION & STICKY HEADER
+   GLOBAL NAVIGATION (STICKY BLUSH HEADER)
    ══════════════════════════════════════════════════ */
 .header { 
   background: rgba(255, 255, 255, 0.9); 
@@ -81,13 +80,12 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .auth-btn.is-logged-in { background: var(--green); box-shadow: 0 4px 10px rgba(168, 213, 186, 0.4); }
 
 /* ══════════════════════════════════════════════════
-   BACKGROUND FLOURISHES (FIXED PETALS & FUJI)
+   BACKGROUNDS (FIXED SCALE & VISIBILITY)
    ══════════════════════════════════════════════════ */
 .fuji-bg { 
   position: fixed; bottom: -10px; left: 0; right: 0; 
   width: 100%; height: 50vh; pointer-events: none; z-index: 1; opacity: 1; 
 }
-
 .petals { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 2; }
 .petal { 
   position: absolute; width: 12px; height: 14px; 
@@ -95,14 +93,12 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
   border-radius: 50% 0 50% 50%; opacity: 0; top: -20px; 
   animation: fall linear infinite; 
 }
-
 @keyframes fall {
   0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
   10%  { opacity: 0.9; }
   90%  { opacity: 0.6; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
-
 .p1 { left: 5%; animation-duration: 12s; } 
 .p2 { left: 20%; animation-duration: 15s; animation-delay: 2s; }
 .p3 { left: 40%; animation-duration: 11s; animation-delay: 5s; } 
@@ -110,7 +106,7 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .p5 { left: 85%; animation-duration: 13s; animation-delay: 3s; }
 
 /* ══════════════════════════════════════════════════
-   INDEX TOOL CARDS & HERO
+   INDEX HERO & TOOL CARDS
    ══════════════════════════════════════════════════ */
 .wrap { max-width: 1000px; margin: 0 auto; padding: 50px 24px 120px; position: relative; z-index: 10; }
 .hero { text-align: center; margin-bottom: 50px; }
@@ -136,11 +132,11 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .card-desc { font-size: 15px; color: var(--ink2); font-weight: 500; line-height: 1.6; }
 
 /* ══════════════════════════════════════════════════
-   REFERENCE CARDS (DRUGFACTS / MICROFACTS)
+   REFERENCE CARDS (FIXED GRID & VERTICAL TAGS)
    ══════════════════════════════════════════════════ */
 .drug-grid { 
   display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
-  gap: 20px; align-items: flex-start; /* FIX: Prevents neighbour stretching */
+  gap: 20px; align-items: flex-start; 
 }
 .drug-card {
   background: #fff; border: 2px solid var(--border); 
@@ -153,7 +149,6 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .drug-card-header { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; }
 .drug-name { font-size: 21px; font-weight: 600; color: var(--ink); line-height: 1.2; }
 .drug-aka { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 4px; }
-.drug-summary { font-size: 13px; color: var(--muted); padding: 0 20px 15px; font-style: italic; }
 
 /* Fixed Tag Positioning (Above Text) */
 .info-row { display: flex; flex-direction: column; padding: 18px 20px; border-bottom: 1px solid var(--border); gap: 8px; }
@@ -165,7 +160,6 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .info-text { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.7; width: 100%; }
 .info-text strong { color: var(--theme-color, var(--sakura2)); background: rgba(224, 128, 155, 0.05); padding: 0 4px; border-radius: 4px; }
 .info-text ul { padding-left: 20px; list-style-type: '🌸 '; margin-top: 8px; }
-.info-text li { margin-bottom: 8px; }
 
 /* Gram Stain Badges */
 .gram-badge { display: inline-flex; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; border: 2px solid transparent; margin-top: 8px; }
@@ -174,7 +168,7 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .gram-acid { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
 
 /* ══════════════════════════════════════════════════
-   TRACKERS (SKETCHY / PIXORIZE)
+   TRACKERS (PROGRESS BARS & COLLAPSED)
    ══════════════════════════════════════════════════ */
 .cat-section { margin-bottom: 20px; }
 .cat-header {
@@ -187,8 +181,6 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .cat-section.open .cat-header { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 
 .cat-name { font-size: 20px; font-weight: 600; color: var(--ink); }
-.cat-meta { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-
 .cat-prog-wrap { height: 10px; width: 140px; background: var(--border); border-radius: 20px; overflow: hidden; margin-top: 10px; }
 .cat-prog-fill { height: 100%; background: var(--theme-color, var(--sakura)); transition: width 1s cubic-bezier(0.22, 1, 0.36, 1); }
 
@@ -196,7 +188,6 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .cat-section.open .cat-body { display: block; }
 
 .video-row { display: flex; align-items: center; padding: 16px 25px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 14px; }
-.video-row:last-child { border-bottom: none; }
 .video-time { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); margin-left: auto; margin-right: 20px; }
 
 /* ══════════════════════════════════════════════════
@@ -217,7 +208,7 @@ h1, h2, h3, .brand-title { font-family: 'Cormorant Garamond', serif; font-weight
 .japan-card-text { font-size: 16px; font-weight: 600; line-height: 1.7; color: var(--ink); }
 
 /* ══════════════════════════════════════════════════
-   UWORLD LOGS & STATS
+   UWORLD LOGS & STATS (FIXED TABLES)
    ══════════════════════════════════════════════════ */
 .uw-wrap { max-width: 1050px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 10; }
 .prog-stat { 
