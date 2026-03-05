@@ -32,10 +32,10 @@
       </div>
     </div>
     <nav class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('bacteria', this)"><span class="tab-dot" style="background:var(--bact)"></span>Bacteria</button>
-      <button class="tab-btn" onclick="switchTab('viruses', this)"><span class="tab-dot" style="background:var(--vir)"></span>Viruses</button>
-      <button class="tab-btn" onclick="switchTab('parasites', this)"><span class="tab-dot" style="background:var(--para)"></span>Parasites</button>
-      <button class="tab-btn" onclick="switchTab('fungi', this)"><span class="tab-dot" style="background:var(--fung)"></span>Fungi</button>
+      <button class="tab-btn active" onclick="switchTab('bacteria', this)"><span class="tab-dot"></span>Bacteria</button>
+      <button class="tab-btn" onclick="switchTab('viruses', this)"><span class="tab-dot"></span>Viruses</button>
+      <button class="tab-btn" onclick="switchTab('parasites', this)"><span class="tab-dot"></span>Parasites</button>
+      <button class="tab-btn" onclick="switchTab('fungi', this)"><span class="tab-dot"></span>Fungi</button>
     </nav>
   </div>
 </div>
@@ -45,7 +45,7 @@
   <div id="search-results">
     <div class="search-count" id="search-count"></div>
     <div class="drug-grid" id="search-grid"></div>
-    <div class="empty" id="search-empty">
+    <div class="empty" id="search-empty" style="display:none">
       <div class="empty-icon">◇</div>
       <div class="empty-text">No organisms found matching your search</div>
     </div>
@@ -53,10 +53,10 @@
 
   <!-- BACTERIA TAB -->
   <div id="tab-bacteria" class="tab-panel active">
-    <div class="sys-intro bg-bact-intro">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🔬</div>
       <div>
-        <div class="sys-intro-title c-bact">Bacteriology</div>
+        <div class="sys-intro-title">Bacteriology</div>
         <div class="sys-intro-text">Master the Gram stain first — it halves your differential instantly. Then layer virulence factors, classic clinical syndromes, and treatment. High-yield sequences: cocci → rods; GP → GN; aerobic → anaerobic. Know the one-liner pearl for each organism cold.</div>
       </div>
     </div>
@@ -65,10 +65,10 @@
 
   <!-- VIRUSES TAB -->
   <div id="tab-viruses" class="tab-panel">
-    <div class="sys-intro bg-vir-intro">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🧬</div>
       <div>
-        <div class="sys-intro-title c-vir">Virology</div>
+        <div class="sys-intro-title">Virology</div>
         <div class="sys-intro-text">Group by genome type: RNA vs DNA, ss vs ds, +sense vs −sense, enveloped vs naked. The Baltimore classification is your scaffold. For each virus know its tropism, classic syndrome, and distinguishing lab finding. Enveloped = ether-labile = killed by alcohol.</div>
       </div>
     </div>
@@ -77,10 +77,10 @@
 
   <!-- PARASITES TAB -->
   <div id="tab-parasites" class="tab-panel">
-    <div class="sys-intro bg-para-intro">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🪱</div>
       <div>
-        <div class="sys-intro-title c-para">Parasitology</div>
+        <div class="sys-intro-title">Parasitology</div>
         <div class="sys-intro-text">Organize by habitat: intestinal protozoa → blood/tissue protozoa → helminths. Vector associations are heavily tested (mosquito/tick/fly/snail). Eosinophilia = helminth tissue migration. Treatment is narrow: know metronidazole, chloroquine, praziquantel, ivermectin, and albendazole targets.</div>
       </div>
     </div>
@@ -89,10 +89,10 @@
 
   <!-- FUNGI TAB -->
   <div id="tab-fungi" class="tab-panel">
-    <div class="sys-intro bg-fung-intro">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🍄</div>
       <div>
-        <div class="sys-intro-title c-fung">Mycology</div>
+        <div class="sys-intro-title">Mycology</div>
         <div class="sys-intro-text">Divide into systemic dimorphic fungi vs opportunistic fungi. Dimorphic rule: mold in cold (environment), yeast in heat (body). Geography matters — Histo (Ohio/Mississippi River Valley), Cocci (Southwest desert), Blasto (Great Lakes/Mississippi). Opportunists = immunocompromised hosts (HIV, transplant, steroids).</div>
       </div>
     </div>
@@ -156,20 +156,20 @@ function orgCardHTML(org, colorClass, idx) {
   const tagsHTML = (org.tags || []).map(t => `<span class="drug-tag">${t}</span>`).join('');
 
   return `
-  <div class="drug-card b-${colorClass}" id="${id}" onclick="toggleCard('${id}')">
+  <div class="drug-card " id="${id}" onclick="toggleCard('${id}')">
     <div class="drug-card-header">
-      <div class="card-name-block">
+      <div style="flex:1;min-width:0">
         <div class="drug-name">${org.name}</div>
         ${gramLabel}
       </div>
-      <span class="expand-arrow" class="expand-arrow">▼</span>
+      <span class="expand-arrow" style="flex-shrink:0;margin-left:10px;margin-top:4px">▼</span>
     </div>
     ${org.summary ? `<div class="drug-summary">${org.summary}</div>` : ''}
     <div class="drug-body">
       ${org.virulence ? `<div class="info-row"><span class="info-label vir">Virulence</span><div class="info-text">${formatLines(org.virulence)}</div></div>` : ''}
       ${org.disease  ? `<div class="info-row"><span class="info-label dis">Disease</span><div class="info-text">${formatLines(org.disease)}</div></div>` : ''}
       ${org.tx       ? `<div class="info-row"><span class="info-label tx">Treatment</span><div class="info-text">${formatLines(org.tx)}</div></div>` : ''}
-      ${tagsHTML     ? `<div class="info-row"><div class="tag-row">${tagsHTML}</div></div>` : ''}
+      ${tagsHTML     ? `<div class="info-row" style="border:none;padding-top:2px"><div style="display:flex;flex-wrap:wrap;gap:4px">${tagsHTML}</div></div>` : ''}
       ${org.pearl    ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div></div>` : ''}
     </div>
   </div>`;
@@ -194,7 +194,7 @@ function renderSection(sectionId, sysKey) {
     html += `
     <div class="class-group" id="${groupId}">
       <div class="class-group-header">
-        <span class="class-label bg-${group.color}">${group.group}</span>
+        <span class="class-label">${group.group}</span>
         <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
       </div>
       <div class="drug-grid">

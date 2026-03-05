@@ -32,15 +32,15 @@
       </div>
     </div>
   <nav class="tabs" id="tabs">
-  <button class="tab-btn active" onclick="switchTab('micro', this)"><span class="tab-dot" style="background:var(--micro)"></span>Microbiology</button>
-  <button class="tab-btn" onclick="switchTab('autonomic', this)"><span class="tab-dot" style="background:var(--auto)"></span>Autonomics</button>
-  <button class="tab-btn" onclick="switchTab('cv', this)"><span class="tab-dot" style="background:var(--cv)"></span>Cardio &amp; Renal</button>
-  <button class="tab-btn" onclick="switchTab('blood', this)"><span class="tab-dot" style="background:var(--blood)"></span>Hematology</button>
-  <button class="tab-btn" onclick="switchTab('gi', this)"><span class="tab-dot" style="background:var(--gi)"></span>GI &amp; Motility</button>
-  <button class="tab-btn" onclick="switchTab('endo', this)"><span class="tab-dot" style="background:var(--endo)"></span>Endo &amp; Repro</button>
-  <button class="tab-btn" onclick="switchTab('neuro', this)"><span class="tab-dot" style="background:var(--neuro)"></span>Neuro &amp; Psych</button>
-  <button class="tab-btn" onclick="switchTab('onco', this)"><span class="tab-dot" style="background:var(--onco)"></span>Oncology</button>
-  <button class="tab-btn" onclick="switchTab('toxicology', this)"><span class="tab-dot" style="background:var(--toxic)"></span>Toxicology</button>
+  <button class="tab-btn active" onclick="switchTab('micro', this)"><span class="tab-dot"></span>Microbiology</button>
+  <button class="tab-btn" onclick="switchTab('autonomic', this)"><span class="tab-dot"></span>Autonomics</button>
+  <button class="tab-btn" onclick="switchTab('cv', this)"><span class="tab-dot"></span>Cardio &amp; Renal</button>
+  <button class="tab-btn" onclick="switchTab('blood', this)"><span class="tab-dot"></span>Hematology</button>
+  <button class="tab-btn" onclick="switchTab('gi', this)"><span class="tab-dot"></span>GI &amp; Motility</button>
+  <button class="tab-btn" onclick="switchTab('endo', this)"><span class="tab-dot"></span>Endo &amp; Repro</button>
+  <button class="tab-btn" onclick="switchTab('neuro', this)"><span class="tab-dot"></span>Neuro &amp; Psych</button>
+  <button class="tab-btn" onclick="switchTab('onco', this)"><span class="tab-dot"></span>Oncology</button>
+  <button class="tab-btn" onclick="switchTab('toxicology', this)"><span class="tab-dot"></span>Toxicology</button>
 </nav>
   </div>
 </div>
@@ -49,17 +49,17 @@
   <div id="search-results">
     <div class="search-count" id="search-count"></div>
     <div class="drug-grid" id="search-grid"></div>
-    <div class="empty" id="search-empty">
+    <div class="empty" id="search-empty" style="display:none">
       <div class="empty-icon">◇</div>
       <div class="empty-text">No drugs found matching your search</div>
     </div>
   </div>
 
   <div id="tab-autonomic" class="tab-panel">
-    <div class="sys-intro bg-auto">
+    <div class="sys-intro">
       <div class="sys-intro-icon">⚡</div>
       <div>
-        <div class="sys-intro-title c-auto">Autonomic Pharmacology</div>
+        <div class="sys-intro-title">Autonomic Pharmacology</div>
         <div class="sys-intro-text">Parasympathetic (cholinergic) and sympathetic (adrenergic) drug classes. Master receptor subtypes first — M1/M2/M3, α1/α2, β1/β2 — and the drugs fall into place. High-yield for organ-specific side effects and clinical applications.</div>
       </div>
     </div>
@@ -67,10 +67,10 @@
   </div>
 
   <div id="tab-cv" class="tab-panel">
-    <div class="sys-intro bg-cv">
+    <div class="sys-intro">
       <div class="sys-intro-icon">♥</div>
       <div>
-        <div class="sys-intro-title c-cv">Cardiovascular &amp; Renal Pharmacology</div>
+        <div class="sys-intro-title">Cardiovascular &amp; Renal Pharmacology</div>
         <div class="sys-intro-text">The most tested drug system on Step 1. Know ACEi/ARBs cold — they appear in HF, HTN, CKD, and post-MI vignettes. Antiarrhythmic classes: think ion channels first, then drugs. Diuretic electrolyte effects are guaranteed questions.</div>
       </div>
     </div>
@@ -78,10 +78,10 @@
   </div>
 
   <div id="tab-blood" class="tab-panel">
-    <div class="sys-intro bg-blood">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🩸</div>
       <div>
-        <div class="sys-intro-title c-blood">Blood &amp; Inflammation</div>
+        <div class="sys-intro-title">Blood &amp; Inflammation</div>
         <div class="sys-intro-text">Anticoagulants appear on nearly every Step 1 exam — know reversal agents cold. Heparin-induced thrombocytopenia (HIT) is a classic trap. NSAIDs are the most-prescribed drugs in medicine; their mechanism and GI/renal toxicity are ubiquitous.</div>
       </div>
     </div>
@@ -89,10 +89,10 @@
   </div>
 
   <div id="tab-neuro" class="tab-panel">
-    <div class="sys-intro bg-neuro">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🧠</div>
       <div>
-        <div class="sys-intro-title c-neuro">Neuro &amp; Psych</div>
+        <div class="sys-intro-title">Neuro &amp; Psych</div>
         <div class="sys-intro-text">Psych block is massive on Step 1. Memorize antidepressant side effect profiles — TCA overdose, SSRI serotonin syndrome, and bupropion seizures appear constantly. Antipsychotic EPS and NMS are classic vignettes. Lithium toxicity has a narrow therapeutic window.</div>
       </div>
     </div>
@@ -100,10 +100,10 @@
   </div>
 
   <div id="tab-micro" class="tab-panel active">
-    <div class="sys-intro bg-micro">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🦠</div>
       <div>
-        <div class="sys-intro-title c-micro">Antimicrobial Pharmacology</div>
+        <div class="sys-intro-title">Antimicrobial Pharmacology</div>
         <div class="sys-intro-text">Organized by mechanism: cell wall inhibitors → protein synthesis → DNA/folate → cell membrane. For each drug know its unique toxicity, not just its coverage. Antibiotic-associated C. diff (clindamycin, fluoroquinolones, cephalosporins) is a perennial vignette.</div>
       </div>
     </div>
@@ -111,10 +111,10 @@
   </div>
 
 <div id="tab-gi" class="tab-panel">
-  <div class="sys-intro bg-gi">
+  <div class="sys-intro">
     <div class="sys-intro-icon">🍽️</div>
     <div>
-      <div class="sys-intro-title c-gi">Gastrointestinal &amp; Motility</div>
+      <div class="sys-intro-title">Gastrointestinal &amp; Motility</div>
       <div class="sys-intro-text">Focus on acid suppression, motility agents, and mucosal protection. High-yield for C. difficile and metabolic interactions.</div>
     </div>
   </div>
@@ -122,10 +122,10 @@
 </div>
 
 <div id="tab-endo" class="tab-panel">
-  <div class="sys-intro bg-endo">
+  <div class="sys-intro">
     <div class="sys-intro-icon">🧬</div>
     <div>
-      <div class="sys-intro-title c-endo">Endocrine &amp; Reproductive</div>
+      <div class="sys-intro-title">Endocrine &amp; Reproductive</div>
       <div class="sys-intro-text">Master the hypothalamic-pituitary axes, diabetes management, and reproductive hormones. High-yield for Step 1 feedback loops.</div>
     </div>
   </div>
@@ -133,10 +133,10 @@
 </div>
 
 <div id="tab-toxicology" class="tab-panel">
-  <div class="sys-intro bg-toxic">
+  <div class="sys-intro">
     <div class="sys-intro-icon">⚠️</div>
     <div>
-      <div class="sys-intro-title c-toxic">Drug Toxicology &amp; Antidotes</div>
+      <div class="sys-intro-title">Drug Toxicology &amp; Antidotes</div>
       <div class="sys-intro-text">Crucial reversal agents and toxidromes. Focus on the mechanism of toxicity and the logic of the chosen antidote.</div>
     </div>
   </div>
@@ -144,10 +144,10 @@
 </div>
 
   <div id="tab-pulm" class="tab-panel">
-    <div class="sys-intro bg-pulm">
+    <div class="sys-intro">
       <div class="sys-intro-icon">🫁</div>
       <div>
-        <div class="sys-intro-title c-pulm">Smooth Muscle</div>
+        <div class="sys-intro-title">Smooth Muscle</div>
         <div class="sys-intro-text">Asthma step therapy is heavily tested — know which drugs are for acute relief vs. maintenance. Nitrate tolerance (Monday disease) is a classic Step 1 vignette. Antihistamine receptor subtypes (H1 vs H2) determine organ effects and drug indication.</div>
       </div>
     </div>
@@ -155,11 +155,11 @@
   </div>
 
   <div id="tab-onco" class="tab-panel">
-    <div class="sys-intro bg-onco">
+    <div class="sys-intro">
       <div class="sys-intro-icon">⚗</div>
       <div>
-        <div class="sys-intro-title c-onco">Antineoplastics</div>
-        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong class="c-onco">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
+        <div class="sys-intro-title">Antineoplastics</div>
+        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong style="color:var(--sakura2)">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
       </div>
     </div>
     <div id="onco-content"></div>
@@ -181,13 +181,13 @@ function drugCardHTML(drug, colorClass, idx) {
   const id = `drug-${colorClass}-${idx}-${cardCounter++}`;
   const akaHTML = drug.aka ? drug.aka.replace(/·/g, '<span style="color:var(--dim);font-style:normal;margin:0 3px">·</span>') : '';
   return `
-  <div class="drug-card b-${colorClass}" id="${id}" onclick="toggleCard('${id}')">
+  <div class="drug-card " id="${id}" onclick="toggleCard('${id}')">
     <div class="drug-card-header">
-      <div class="card-name-block">
+      <div style="flex:1;min-width:0">
         <div class="drug-name">${drug.name}</div>
         ${akaHTML ? `<div class="drug-aka">${akaHTML}</div>` : ''}
       </div>
-      <span class="expand-arrow" class="expand-arrow">▼</span>
+      <span class="expand-arrow" style="flex-shrink:0;margin-left:10px;margin-top:4px">▼</span>
     </div>
     ${drug.summary ? `<div class="drug-summary">${drug.summary}</div>` : ''}
     <div class="drug-body">
@@ -257,7 +257,7 @@ function renderSection(sectionId, sysKey) {
     html += `
     <div class="class-group" id="${groupId}">
       <div class="class-group-header">
-        <span class="class-label bg-${group.color}">${group.group}</span>
+        <span class="class-label">${group.group}</span>
         <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
       </div>
       <div class="drug-grid">
