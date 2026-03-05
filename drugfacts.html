@@ -49,14 +49,14 @@
   <div id="search-results">
     <div class="search-count" id="search-count"></div>
     <div class="drug-grid" id="search-grid"></div>
-    <div class="empty" id="search-empty" style="display:none">
+    <div class="empty" id="search-empty">
       <div class="empty-icon">◇</div>
       <div class="empty-text">No drugs found matching your search</div>
     </div>
   </div>
 
   <div id="tab-autonomic" class="tab-panel">
-    <div class="sys-intro bg-auto" style="border-color:rgba(181,90,112,0.2)">
+    <div class="sys-intro bg-auto">
       <div class="sys-intro-icon">⚡</div>
       <div>
         <div class="sys-intro-title c-auto">Autonomic Pharmacology</div>
@@ -67,7 +67,7 @@
   </div>
 
   <div id="tab-cv" class="tab-panel">
-    <div class="sys-intro bg-cv" style="border-color:rgba(148,48,80,0.2)">
+    <div class="sys-intro bg-cv">
       <div class="sys-intro-icon">♥</div>
       <div>
         <div class="sys-intro-title c-cv">Cardiovascular &amp; Renal Pharmacology</div>
@@ -78,7 +78,7 @@
   </div>
 
   <div id="tab-blood" class="tab-panel">
-    <div class="sys-intro bg-blood" style="border-color:rgba(138,58,110,0.2)">
+    <div class="sys-intro bg-blood">
       <div class="sys-intro-icon">🩸</div>
       <div>
         <div class="sys-intro-title c-blood">Blood &amp; Inflammation</div>
@@ -89,7 +89,7 @@
   </div>
 
   <div id="tab-neuro" class="tab-panel">
-    <div class="sys-intro bg-neuro" style="border-color:rgba(107,90,158,0.2)">
+    <div class="sys-intro bg-neuro">
       <div class="sys-intro-icon">🧠</div>
       <div>
         <div class="sys-intro-title c-neuro">Neuro &amp; Psych</div>
@@ -100,7 +100,7 @@
   </div>
 
   <div id="tab-micro" class="tab-panel active">
-    <div class="sys-intro bg-micro" style="border-color:rgba(66,110,90,0.2)">
+    <div class="sys-intro bg-micro">
       <div class="sys-intro-icon">🦠</div>
       <div>
         <div class="sys-intro-title c-micro">Antimicrobial Pharmacology</div>
@@ -111,7 +111,7 @@
   </div>
 
 <div id="tab-gi" class="tab-panel">
-  <div class="sys-intro bg-gi" style="border-color:rgba(158,106,61,0.2)">
+  <div class="sys-intro bg-gi">
     <div class="sys-intro-icon">🍽️</div>
     <div>
       <div class="sys-intro-title c-gi">Gastrointestinal &amp; Motility</div>
@@ -122,7 +122,7 @@
 </div>
 
 <div id="tab-endo" class="tab-panel">
-  <div class="sys-intro bg-endo" style="border-color:rgba(192,140,62,0.2)">
+  <div class="sys-intro bg-endo">
     <div class="sys-intro-icon">🧬</div>
     <div>
       <div class="sys-intro-title c-endo">Endocrine &amp; Reproductive</div>
@@ -133,7 +133,7 @@
 </div>
 
 <div id="tab-toxicology" class="tab-panel">
-  <div class="sys-intro bg-toxic" style="border-color:rgba(166,62,62,0.2)">
+  <div class="sys-intro bg-toxic">
     <div class="sys-intro-icon">⚠️</div>
     <div>
       <div class="sys-intro-title c-toxic">Drug Toxicology &amp; Antidotes</div>
@@ -144,7 +144,7 @@
 </div>
 
   <div id="tab-pulm" class="tab-panel">
-    <div class="sys-intro bg-pulm" style="border-color:rgba(58,120,120,0.2)">
+    <div class="sys-intro bg-pulm">
       <div class="sys-intro-icon">🫁</div>
       <div>
         <div class="sys-intro-title c-pulm">Smooth Muscle</div>
@@ -155,11 +155,11 @@
   </div>
 
   <div id="tab-onco" class="tab-panel">
-    <div class="sys-intro bg-onco" style="border-color:rgba(58,96,96,0.2)">
+    <div class="sys-intro bg-onco">
       <div class="sys-intro-icon">⚗</div>
       <div>
         <div class="sys-intro-title c-onco">Antineoplastics</div>
-        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong style="color:var(--onco)">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
+        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong class="c-onco">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
       </div>
     </div>
     <div id="onco-content"></div>
@@ -183,11 +183,11 @@ function drugCardHTML(drug, colorClass, idx) {
   return `
   <div class="drug-card b-${colorClass}" id="${id}" onclick="toggleCard('${id}')">
     <div class="drug-card-header">
-      <div style="flex:1;min-width:0">
+      <div class="card-name-block">
         <div class="drug-name">${drug.name}</div>
         ${akaHTML ? `<div class="drug-aka">${akaHTML}</div>` : ''}
       </div>
-      <span class="expand-arrow" style="flex-shrink:0;margin-left:10px;margin-top:4px">▼</span>
+      <span class="expand-arrow" class="expand-arrow">▼</span>
     </div>
     ${drug.summary ? `<div class="drug-summary">${drug.summary}</div>` : ''}
     <div class="drug-body">

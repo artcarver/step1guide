@@ -10,304 +10,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <title>UWorld Tracker · Step 1</title>
-<style>
-/* ── Page shell ── */
-.uw-wrap { max-width: 860px; margin: 0 auto; padding: 28px 24px 80px; }
-
-/* ── Auth banner ── */
-.uw-auth-banner {
-  background: #fdf6e8; border: 1px solid #e8d08a; border-radius: 10px;
-  padding: 11px 16px; font-size: 12.5px; color: #7a6020;
-  margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
-}
-.uw-auth-banner a { color: #7a6020; font-weight: 600; }
-.uw-auth-banner.hidden { display: none; }
-
-/* ── Page header ── */
-.uw-back { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--muted); text-decoration:none;
-  display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; }
-.uw-back:hover { color:var(--ink2); }
-.uw-eyebrow { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2.5px;
-  text-transform:uppercase; color:var(--sakura2); margin-bottom:6px;
-  display:flex; align-items:center; gap:8px; }
-.uw-page-title { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,6vw,52px);
-  font-weight:300; color:var(--ink); line-height:1.05; margin:0 0 28px; }
-.uw-page-title em { font-style:italic; color:var(--sakura2); font-weight:400; }
-
-/* ── Log card ── */
-.log-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px 22px; margin-bottom: 20px;
-}
-.log-tabs { display:flex; gap:0; margin-bottom:18px; border-bottom:1px solid var(--border); }
-.log-tab {
-  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--muted); background:none; border:none;
-  padding:8px 14px 10px; cursor:pointer; position:relative; transition:color .15s;
-}
-.log-tab.active { color:var(--ink2); }
-.log-tab.active::after {
-  content:''; position:absolute; bottom:-1px; left:0; right:0; height:2px;
-  background:var(--sakura2); border-radius:2px 2px 0 0;
-}
-.log-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
-.log-field { display:flex; flex-direction:column; gap:5px; }
-.log-field label { font-family:'DM Mono',monospace; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.log-field input, .log-field select {
-  background:var(--bg); border:1px solid var(--border2);
-  border-radius:8px; padding:9px 12px; font-family:'Jost',sans-serif;
-  font-size:13px; color:var(--ink); outline:none; transition:border-color .15s;
-}
-.log-field input:focus, .log-field select:focus { border-color:var(--sakura); }
-.log-field input[type=date] { width:148px; }
-.log-field input[type=number] { width:100px; }
-.log-field select { min-width:180px; }
-.log-btn {
-  background:var(--fuji); color:#fff; border:none; border-radius:8px;
-  padding:10px 22px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
-  transition:all .15s; white-space:nowrap; align-self:flex-end;
-}
-.log-btn.editing { background:var(--sakura2); }
-.log-btn:hover { opacity:.85; }
-.cancel-edit { 
-  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--dim); cursor:pointer; background:none; 
-  border:none; padding:10px; display:none; 
-}
-
-/* ── Progress strip ── */
-.prog-strip {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:18px 22px; margin-bottom:20px;
-  display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0;
-}
-.prog-stat { text-align:center; padding:4px 8px; }
-.prog-stat + .prog-stat { border-left:1px solid var(--border); }
-.stat-clickable { cursor:pointer; transition: opacity .15s; }
-.stat-clickable:hover { opacity: 0.6; }
-.prog-stat-num {
-  font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600;
-  color:var(--fuji); line-height:1; margin-bottom:3px;
-}
-.prog-stat-num.ok    { color: #4a8c6a; }
-.prog-stat-num.warn  { color: #b87a2a; }
-.prog-stat-num.alert { color: #b84040; }
-.prog-stat-lbl { font-family:'DM Mono',monospace; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.click-hint { font-size:7px; color:var(--dim); display:block; margin-top:3px; }
-
-/* ── Progress bar ── */
-.prog-bar-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:16px 22px; margin-bottom:20px;
-}
-.prog-bar-head { display:flex; justify-content:space-between; align-items:baseline;
-  margin-bottom:10px; }
-.prog-bar-title { font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:8px;}
-.edit-unique-btn {
-  background:var(--bg); border:1px solid var(--border2); border-radius:4px;
-  color:var(--ink2); font-family:'DM Mono',monospace; font-size:8px; cursor:pointer;
-  padding:3px 6px; letter-spacing:1px; transition:all .15s;
-}
-.edit-unique-btn:hover { border-color:var(--sakura); color:var(--sakura); }
-.prog-bar-pct { font-family:'Cormorant Garamond',serif; font-size:20px;
-  font-weight:600; color:var(--fuji); }
-.prog-bar-bg { height:7px; background:var(--border); border-radius:99px; overflow:hidden; }
-.prog-bar-fill { height:100%; background:linear-gradient(90deg,var(--fuji),var(--sakura2));
-  border-radius:99px; transition:width .5s ease; }
-.prog-bar-sub { display:flex; justify-content:space-between; margin-top:7px;
-  font-size:11.5px; color:var(--muted); }
-.pace-row { display:flex; align-items:center; gap:8px; margin-top:10px;
-  padding-top:10px; border-top:1px solid var(--border); font-size:12.5px; color:var(--ink2); }
-.pace-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-.pace-dot.ok    { background:#4a8c6a; }
-.pace-dot.warn  { background:#b87a2a; }
-.pace-dot.behind { background:#b84040; }
-
-/* ── Charts section ── */
-.charts-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px 22px; margin-bottom:20px;
-}
-.charts-head { display:flex; justify-content:space-between; align-items:center;
-  flex-wrap:wrap; gap:10px; margin-bottom:18px; }
-.charts-title { font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.view-tabs { display:flex; gap:2px; background:var(--bg);
-  border:1px solid var(--border); border-radius:8px; padding:3px; }
-.view-tab { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--muted); background:none; border:none;
-  padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .15s; }
-.view-tab.active { background:var(--fuji); color:#fff; }
-.chart-label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
-.chart-canvas-wrap { position:relative; height:190px;
-  border-radius:10px; padding:12px; background:var(--bg); margin-bottom:18px; }
-.chart-canvas-wrap:last-child { margin-bottom:0; }
-.charts-empty { text-align:center; padding:40px 20px;
-  font-family:'Cormorant Garamond',serif; font-size:18px; font-style:italic;
-  color:var(--dim); }
-.import-link { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--dim); background:none; border:none;
-  cursor:pointer; text-decoration:underline; text-underline-offset:3px;
-  padding:0; transition:color .15s; }
-.import-link:hover { color:var(--muted); }
-
-/* ── History table ── */
-.history-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px 22px; margin-bottom:20px;
-}
-.history-head { display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:14px; }
-.history-title { font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.uw-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-.uw-table th { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--dim); padding:6px 10px 10px;
-  text-align:left; border-bottom:1px solid var(--border); }
-.uw-table td { padding:9px 10px; border-bottom:1px solid var(--border);
-  color:var(--ink2); vertical-align:middle; }
-.uw-table tr:last-child td { border-bottom:none; }
-.uw-table tr:hover td { background:var(--bg); }
-.uw-badge { display:inline-block; padding:2px 8px; border-radius:99px;
-  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.5px;
-  border:1px solid transparent; }
-.uw-badge.qs   { background:rgba(61,46,110,.08); color:var(--fuji2); border-color:rgba(61,46,110,.15); }
-.uw-badge.good { background:rgba(74,140,106,.1);  color:#2e6b50; border-color:rgba(74,140,106,.25); }
-.uw-badge.warn { background:rgba(184,122,42,.1);  color:#7a4e10; border-color:rgba(184,122,42,.25); }
-.uw-badge.bad  { background:rgba(184,64,64,.1);   color:#7a2020; border-color:rgba(184,64,64,.25); }
-.uw-badge.csv  { background:rgba(61,46,110,.06);  color:var(--fuji2); border-color:rgba(61,46,110,.12); font-size:8px; }
-.uw-badge.pred { background:rgba(212,96,122,.1);  color:var(--sakura2); border-color:rgba(212,96,122,.2); }
-.action-btn { background:none; border:none; color:var(--dim); cursor:pointer;
-  font-size:11px; padding:3px 6px; border-radius:4px; transition:all .15s; }
-.action-btn:hover { background:rgba(61,46,110,.08); color:var(--ink2); }
-.action-btn.del:hover { background:rgba(184,64,64,.1); color:#b84040; }
-.uw-empty { text-align:center; padding:28px; font-family:'Cormorant Garamond',serif;
-  font-size:16px; font-style:italic; color:var(--dim); }
-
-/* ── Setup (collapsible) ── */
-.setup-toggle {
-  display:flex; align-items:center; gap:8px; background:none; border:none;
-  cursor:pointer; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--dim);
-  padding:0; margin-bottom:16px; transition:color .15s;
-}
-.setup-toggle:hover { color:var(--muted); }
-.setup-toggle svg { transition:transform .2s; }
-.setup-toggle.open svg { transform:rotate(180deg); }
-.setup-panel {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px 22px; margin-bottom:20px;
-  display:none;
-}
-.setup-panel.open { display:block; }
-.setup-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-.setup-field { display:flex; flex-direction:column; gap:5px; }
-.setup-field label { font-family:'DM Mono',monospace; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.setup-field input { background:var(--bg); border:1px solid var(--border2);
-  border-radius:8px; padding:9px 12px; font-family:'Jost',sans-serif;
-  font-size:13px; color:var(--ink); outline:none; width:100%;
-  box-sizing:border-box; transition:border-color .15s; }
-.setup-field input:focus { border-color:var(--sakura); }
-.day-chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-.day-chip { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:1px;
-  padding:6px 12px; border-radius:99px; border:1px solid var(--border2);
-  cursor:pointer; background:var(--bg); color:var(--muted); transition:all .15s; }
-.day-chip.active { background:var(--fuji); color:#fff; border-color:var(--fuji); }
-.save-btn { background:var(--fuji); color:#fff; border:none; border-radius:8px;
-  padding:10px 22px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
-  margin-top:16px; transition:opacity .15s; }
-.save-btn:hover { opacity:.85; }
-
-/* ── Import modal ── */
-.modal-overlay {
-  position:fixed; inset:0; background:rgba(26,20,40,.5);
-  display:flex; align-items:center; justify-content:center;
-  z-index:1000; padding:20px; opacity:0; pointer-events:none;
-  transition:opacity .2s;
-}
-.modal-overlay.open { opacity:1; pointer-events:all; }
-.modal {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; padding:28px; width:100%; max-width:520px;
-  max-height:85vh; overflow-y:auto;
-  transform:translateY(12px); transition:transform .2s;
-}
-.modal-overlay.open .modal { transform:translateY(0); }
-.modal-title { font-family:'Cormorant Garamond',serif; font-size:22px;
-  font-weight:600; color:var(--ink); margin:0 0 4px; }
-.modal-sub { font-size:12.5px; color:var(--muted); margin:0 0 20px; line-height:1.55; }
-.modal-close { float:right; background:none; border:none; cursor:pointer;
-  color:var(--dim); font-size:18px; line-height:1; padding:0; margin-left:12px; }
-.modal-close:hover { color:var(--ink2); }
-.drop-zone {
-  border:2px dashed var(--border2); border-radius:10px;
-  padding:28px 20px; text-align:center; cursor:pointer;
-  transition:border-color .18s, background .18s; margin-bottom:16px;
-}
-.drop-zone:hover, .drop-zone.drag-over {
-  border-color:var(--sakura); background:rgba(236,180,195,.06);
-}
-.drop-zone-icon { font-size:24px; margin-bottom:6px; }
-.drop-zone-text { font-size:13px; color:var(--ink2); font-weight:500; }
-.drop-zone-sub { font-size:11px; color:var(--dim); margin-top:4px; }
-.mapper-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
-.map-row { display:flex; flex-direction:column; gap:5px; }
-.map-label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--muted); }
-.map-select { background:var(--bg); border:1px solid var(--border2);
-  border-radius:7px; padding:8px 10px; font-family:'Jost',sans-serif;
-  font-size:12px; color:var(--ink); outline:none; width:100%; }
-.map-select:focus { border-color:var(--sakura); }
-.modal-actions { display:flex; gap:10px; margin-top:16px; }
-.modal-btn-primary { background:var(--fuji); color:#fff; border:none; border-radius:8px;
-  padding:10px 20px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:opacity .15s; }
-.modal-btn-primary:hover { opacity:.85; }
-.modal-btn-ghost { background:none; border:1px solid var(--border2); color:var(--muted);
-  border-radius:8px; padding:10px 16px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .15s; }
-.modal-btn-ghost:hover { border-color:var(--muted); color:var(--ink2); }
-.file-info { font-size:11.5px; color:var(--dim); margin-bottom:12px; }
-
-/* ── Toast ── */
-.uw-toast {
-  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px);
-  background:rgba(26,20,40,.9); color:#fff; padding:10px 20px; border-radius:99px;
-  font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1px;
-  pointer-events:none; opacity:0; transition:all .25s; z-index:2000; white-space:nowrap;
-}
-.uw-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-@media (max-width:640px) {
-  .prog-strip { grid-template-columns:1fr 1fr; }
-  .prog-stat:nth-child(3) { border-left:none; border-top:1px solid var(--border); }
-  .setup-grid { grid-template-columns:1fr; }
-  .mapper-grid { grid-template-columns:1fr; }
-  .log-field input[type=date] { width:130px; }
-}
-</style>
 </head>
 <body>
 
-<div class="petals" aria-hidden="true">
-  <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
-  <div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
-  <div class="petal p7"></div><div class="petal p8"></div><div class="petal p9"></div>
-</div>
 
 <div class="uw-wrap">
 
   <a class="uw-back" href="index.html">← Back to Study Hub</a>
 
-  <div class="uw-eyebrow">📝 Question Bank</div>
+  <div class="uw-eyebrow">Question Bank</div>
   <h1 class="uw-page-title">UWorld <em>Tracker</em></h1>
 
   <div class="uw-auth-banner hidden" id="auth-banner">
@@ -370,13 +81,13 @@
         <button class="cancel-edit" id="cancel-edit-qs" onclick="cancelEditEntry()">Cancel</button>
       </div>
     </div>
-    <div id="log-exam-panel" style="display:none;">
+    <div id="log-exam-panel" style="display:none">
       <div class="log-row">
         <div class="log-field">
           <label>Date</label>
           <input type="date" id="exam-date"/>
         </div>
-        <div class="log-field" style="flex:2;">
+        <div class="log-field log-field--wide">
           <label>Exam Name</label>
           <select id="exam-name">
             <option value="">Select exam…</option>
@@ -442,7 +153,7 @@
   <div class="charts-wrap">
     <div class="charts-head">
       <span class="charts-title">Activity Charts</span>
-      <div style="display:flex;gap:12px;align-items:center;">
+      <div class="charts-controls">
         <button class="import-link" onclick="openImportModal()">↑ Import past data</button>
         <div class="view-tabs" id="chart-view-toggle">
           <button class="view-tab active" data-view="daily"   onclick="setChartView('daily')">Daily</button>
@@ -452,7 +163,7 @@
       </div>
     </div>
     <div id="charts-body">
-      <div class="charts-empty">Log your first session to start tracking 🌸</div>
+      <div class="charts-empty">Log your first session to start tracking</div>
     </div>
   </div>
 
@@ -461,7 +172,7 @@
       <span class="history-title">Session Log</span>
     </div>
     <div id="history-container">
-      <div class="uw-empty">No entries yet 🌸</div>
+      <div class="uw-empty">No entries yet</div>
     </div>
   </div>
 
@@ -470,7 +181,7 @@
       <span class="history-title">Practice Exams</span>
     </div>
     <div id="exam-container">
-      <div class="uw-empty">No practice exams logged yet 🌸</div>
+      <div class="uw-empty">No practice exams logged yet</div>
     </div>
   </div>
 
@@ -482,9 +193,9 @@
     <div class="modal-title">Import Past Data</div>
     <p class="modal-sub">Upload a CSV to load your history. Needs a <strong>date</strong> and <strong>questions</strong> column (score is optional). Maps to your log automatically.</p>
     
-    <div style="font-size:12px; color:var(--muted); margin-bottom:20px; background:var(--bg); padding:16px; border-radius:10px; border: 1px solid var(--border2);">
-      <div style="color:var(--ink2); font-weight:600; margin-bottom:8px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase;">How to export your data</div>
-      <ol style="margin:0 0 0 20px; padding:0; display:flex; flex-direction:column; gap:6px; line-height:1.4;">
+    <div class="import-instructions">
+      <div class="import-instructions-title">How to export your data</div>
+      <ol>
         <li>Go to the UWorld <strong>Previous Tests</strong> page and set "Items per page" to 100.</li>
         <li>Highlight the entire table and copy it.</li>
         <li>Paste the text into an AI with this prompt:<br>
@@ -496,7 +207,7 @@
 
     <div class="drop-zone" id="drop-zone" onclick="document.getElementById('csv-file-input').click()">
       <div class="drop-zone-icon">📂</div>
-      <div class="drop-zone-text">Drop CSV here or <span style="color:var(--sakura2);">click to browse</span></div>
+      <div class="drop-zone-text">Drop CSV here or <span class="browse-link">click to browse</span></div>
       <div class="drop-zone-sub">UWorld exports, spreadsheets, any CSV</div>
       <input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none"/>
     </div>
@@ -510,11 +221,11 @@
       </div>
     </div>
     <div id="import-success" style="display:none;">
-      <div style="text-align:center;padding:16px 0;">
-        <div style="font-size:28px;margin-bottom:8px;">✦</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ink);margin-bottom:4px;" id="import-success-msg"></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Your stats, progress, and charts have been updated.</div>
-        <div style="display:flex;gap:8px;justify-content:center;">
+      <div class="import-success-wrap">
+        <div class="import-success-icon">✦</div>
+        <div class="import-success-title" id="import-success-msg"></div>
+        <div class="import-success-sub">Your stats, progress, and charts have been updated.</div>
+        <div class="import-success-actions">
           <button class="modal-btn-primary" onclick="closeImportModal()">Done</button>
           <button class="modal-btn-ghost" onclick="resetImport()">Re-import</button>
         </div>

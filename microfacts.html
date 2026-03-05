@@ -7,80 +7,6 @@
 <link rel="stylesheet" href="style.css"/>
 <title>Micro Facts — Step 1 Microbiology Reference</title>
 
-<style>
-/* ── MICRO-SPECIFIC OVERRIDES ── */
-
-/* Organism card label colors */
-.info-label.vir    { background: rgba(58,110,122,0.10); color: var(--micro); }
-.info-label.dis    { background: rgba(42,138,106,0.10); color: var(--green); }
-.info-label.tx     { background: rgba(192,140,62,0.10); color: var(--endo); }
-.info-label.gram   { background: rgba(90,68,144,0.10);  color: var(--neuro); }
-
-/* Gram-stain badge on card header */
-.gram-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: 'DM Mono', monospace;
-  font-size: 9.5px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  padding: 2px 7px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-.gram-gp   { background: rgba(192,48,80,0.10);   color: #c03050; border: 1px solid rgba(192,48,80,0.20); }
-.gram-gn   { background: rgba(184,120,32,0.10);  color: #b87820; border: 1px solid rgba(184,120,32,0.20); }
-.gram-acid { background: rgba(90,68,144,0.10);   color: var(--neuro); border: 1px solid rgba(90,68,144,0.22); }
-.gram-none { background: rgba(58,110,122,0.10);  color: var(--micro); border: 1px solid rgba(58,110,122,0.18); }
-.gram-para { background: rgba(42,138,106,0.10);  color: var(--green); border: 1px solid rgba(42,138,106,0.20); }
-.gram-fung { background: rgba(158,106,61,0.10);  color: var(--gi);    border: 1px solid rgba(158,106,61,0.22); }
-
-/* Tab colors for micro categories */
-:root {
-  --bact:       #3a6e7a; --bact-bg:  #f0f8fa; --bact-light: rgba(58,110,122,0.08);
-  --vir:        #5a4490; --vir-bg:   #f4f0fd; --vir-light:  rgba(90,68,144,0.08);
-  --para:       #2a8a6a; --para-bg:  #f0f9f6; --para-light: rgba(42,138,106,0.08);
-  --fung:       #9e6a3d; --fung-bg:  #fdf5ee; --fung-light: rgba(158,106,61,0.08);
-}
-
-/* Re-use class-label/bg system for micro colors */
-.bg-bact { background: var(--bact-light); color: var(--bact); border-color: rgba(58,110,122,0.25); }
-.bg-vir  { background: var(--vir-light);  color: var(--vir);  border-color: rgba(90,68,144,0.25); }
-.bg-para { background: var(--para-light); color: var(--para); border-color: rgba(42,138,106,0.25); }
-.bg-fung { background: var(--fung-light); color: var(--fung); border-color: rgba(158,106,61,0.25); }
-
-.b-bact { border-color: rgba(58,110,122,0.22); }
-.b-vir  { border-color: rgba(90,68,144,0.22); }
-.b-para { border-color: rgba(42,138,106,0.22); }
-.b-fung { border-color: rgba(158,106,61,0.22); }
-
-.b-bact .drug-card-header { background: linear-gradient(135deg, rgba(58,110,122,0.04) 0%, rgba(240,248,250,0.4) 100%); }
-.b-vir  .drug-card-header { background: linear-gradient(135deg, rgba(90,68,144,0.04) 0%, rgba(244,240,253,0.4) 100%); }
-.b-para .drug-card-header { background: linear-gradient(135deg, rgba(42,138,106,0.04) 0%, rgba(240,249,246,0.4) 100%); }
-.b-fung .drug-card-header { background: linear-gradient(135deg, rgba(158,106,61,0.04) 0%, rgba(253,245,238,0.4) 100%); }
-
-.b-bact.open { border-color: rgba(58,110,122,0.45); box-shadow: 0 4px 20px rgba(58,110,122,0.08), 0 1px 3px rgba(0,0,0,0.04); }
-.b-vir.open  { border-color: rgba(90,68,144,0.45);  box-shadow: 0 4px 20px rgba(90,68,144,0.08),  0 1px 3px rgba(0,0,0,0.04); }
-.b-para.open { border-color: rgba(42,138,106,0.45); box-shadow: 0 4px 20px rgba(42,138,106,0.08), 0 1px 3px rgba(0,0,0,0.04); }
-.b-fung.open { border-color: rgba(158,106,61,0.45); box-shadow: 0 4px 20px rgba(158,106,61,0.08), 0 1px 3px rgba(0,0,0,0.04); }
-
-/* Intro accent colors */
-.bg-bact-intro { background: rgba(58,110,122,0.06); border-left: 3px solid var(--bact); }
-.bg-vir-intro  { background: rgba(90,68,144,0.06);  border-left: 3px solid var(--vir); }
-.bg-para-intro { background: rgba(42,138,106,0.06); border-left: 3px solid var(--para); }
-.bg-fung-intro { background: rgba(158,106,61,0.06); border-left: 3px solid var(--fung); }
-
-.c-bact { color: var(--bact); }
-.c-vir  { color: var(--vir); }
-.c-para { color: var(--para); }
-.c-fung { color: var(--fung); }
-
-/* Organism card name italic for genus */
-.drug-name em { font-style: italic; font-weight: 400; }
-</style>
 
 </head>
 <body>
@@ -119,7 +45,7 @@
   <div id="search-results">
     <div class="search-count" id="search-count"></div>
     <div class="drug-grid" id="search-grid"></div>
-    <div class="empty" id="search-empty" style="display:none">
+    <div class="empty" id="search-empty">
       <div class="empty-icon">◇</div>
       <div class="empty-text">No organisms found matching your search</div>
     </div>
@@ -127,7 +53,7 @@
 
   <!-- BACTERIA TAB -->
   <div id="tab-bacteria" class="tab-panel active">
-    <div class="sys-intro bg-bact-intro" style="border-color:rgba(58,110,122,0.2)">
+    <div class="sys-intro bg-bact-intro">
       <div class="sys-intro-icon">🔬</div>
       <div>
         <div class="sys-intro-title c-bact">Bacteriology</div>
@@ -139,7 +65,7 @@
 
   <!-- VIRUSES TAB -->
   <div id="tab-viruses" class="tab-panel">
-    <div class="sys-intro bg-vir-intro" style="border-color:rgba(90,68,144,0.2)">
+    <div class="sys-intro bg-vir-intro">
       <div class="sys-intro-icon">🧬</div>
       <div>
         <div class="sys-intro-title c-vir">Virology</div>
@@ -151,7 +77,7 @@
 
   <!-- PARASITES TAB -->
   <div id="tab-parasites" class="tab-panel">
-    <div class="sys-intro bg-para-intro" style="border-color:rgba(42,138,106,0.2)">
+    <div class="sys-intro bg-para-intro">
       <div class="sys-intro-icon">🪱</div>
       <div>
         <div class="sys-intro-title c-para">Parasitology</div>
@@ -163,7 +89,7 @@
 
   <!-- FUNGI TAB -->
   <div id="tab-fungi" class="tab-panel">
-    <div class="sys-intro bg-fung-intro" style="border-color:rgba(158,106,61,0.2)">
+    <div class="sys-intro bg-fung-intro">
       <div class="sys-intro-icon">🍄</div>
       <div>
         <div class="sys-intro-title c-fung">Mycology</div>
@@ -232,18 +158,18 @@ function orgCardHTML(org, colorClass, idx) {
   return `
   <div class="drug-card b-${colorClass}" id="${id}" onclick="toggleCard('${id}')">
     <div class="drug-card-header">
-      <div style="flex:1;min-width:0">
+      <div class="card-name-block">
         <div class="drug-name">${org.name}</div>
         ${gramLabel}
       </div>
-      <span class="expand-arrow" style="flex-shrink:0;margin-left:10px;margin-top:4px">▼</span>
+      <span class="expand-arrow" class="expand-arrow">▼</span>
     </div>
     ${org.summary ? `<div class="drug-summary">${org.summary}</div>` : ''}
     <div class="drug-body">
       ${org.virulence ? `<div class="info-row"><span class="info-label vir">Virulence</span><div class="info-text">${formatLines(org.virulence)}</div></div>` : ''}
       ${org.disease  ? `<div class="info-row"><span class="info-label dis">Disease</span><div class="info-text">${formatLines(org.disease)}</div></div>` : ''}
       ${org.tx       ? `<div class="info-row"><span class="info-label tx">Treatment</span><div class="info-text">${formatLines(org.tx)}</div></div>` : ''}
-      ${tagsHTML     ? `<div class="info-row" style="border:none;padding-top:2px"><div style="display:flex;flex-wrap:wrap;gap:4px">${tagsHTML}</div></div>` : ''}
+      ${tagsHTML     ? `<div class="info-row"><div class="tag-row">${tagsHTML}</div></div>` : ''}
       ${org.pearl    ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div></div>` : ''}
     </div>
   </div>`;
