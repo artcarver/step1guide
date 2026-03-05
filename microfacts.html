@@ -5,319 +5,449 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
-<title>Micro Facts — Step 1 Microbiology Reference</title>
+<title>Drug Facts · Step 1 Pharmacology Reference</title>
 
-
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
 </head>
 <body>
 
 <div class="header">
   <div class="header-inner">
-    <a href="index.html" class="back-link">← Back to Hub</a>
+    <div class="global-nav">
+      <a href="index.html" style="font-size:18px; font-weight:600; color:var(--sakura2);">🌸 Step 1 Hub</a>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <a href="uworld_tracker.html">UWorld</a>
+        <a href="step1_dashboard.html">Dashboard</a>
+        <a href="drugfacts.html">Pharm</a>
+        <a href="microfacts.html">Micro</a>
+      </div>
+    </div>
+    
     <div class="header-top">
       <div>
-        <p class="brand-super">Step 1 · Microbiology Reference</p>
-        <h1 class="brand-title">Micro Facts</h1>
+        <p class="brand-super">Step 1 · Pharmacology Reference</p>
+        <h1 class="brand-title">Drug Facts</h1>
         <div class="brand-flourish">
           <div class="flourish-line"></div>
           <div class="flourish-dot"></div>
           <div class="flourish-line right"></div>
         </div>
-        <p class="brand-sub">Gram Stain · Virulence · Disease · Treatment · Pearls</p>
+        <p class="brand-sub">MOA · Uses · Side Effects · PK · Clinical Pearls</p>
       </div>
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
-        <input class="search-input" type="text" id="search-input" placeholder="Search organism, disease, toxin, treatment..." oninput="handleSearch(this.value)"/>
+        <input class="search-input" type="text" id="search-input" placeholder="Search drug, class, mechanism..." oninput="handleSearch(this.value)"/>
         <button id="search-clear" onclick="clearSearch()">×</button>
       </div>
     </div>
+    
     <nav class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('bacteria', this)"><span class="tab-dot"></span>Bacteria</button>
-      <button class="tab-btn" onclick="switchTab('viruses', this)"><span class="tab-dot"></span>Viruses</button>
-      <button class="tab-btn" onclick="switchTab('parasites', this)"><span class="tab-dot"></span>Parasites</button>
-      <button class="tab-btn" onclick="switchTab('fungi', this)"><span class="tab-dot"></span>Fungi</button>
+      <button class="tab-btn active" onclick="switchTab('micro', this)"><span class="tab-dot"></span>Microbiology</button>
+      <button class="tab-btn" onclick="switchTab('autonomic', this)"><span class="tab-dot"></span>Autonomics</button>
+      <button class="tab-btn" onclick="switchTab('cv', this)"><span class="tab-dot"></span>Cardio &amp; Renal</button>
+      <button class="tab-btn" onclick="switchTab('blood', this)"><span class="tab-dot"></span>Hematology</button>
+      <button class="tab-btn" onclick="switchTab('gi', this)"><span class="tab-dot"></span>GI &amp; Motility</button>
+      <button class="tab-btn" onclick="switchTab('endo', this)"><span class="tab-dot"></span>Endo &amp; Repro</button>
+      <button class="tab-btn" onclick="switchTab('neuro', this)"><span class="tab-dot"></span>Neuro &amp; Psych</button>
+      <button class="tab-btn" onclick="switchTab('onco', this)"><span class="tab-dot"></span>Oncology</button>
+      <button class="tab-btn" onclick="switchTab('toxicology', this)"><span class="tab-dot"></span>Toxicology</button>
+      <button class="tab-btn" onclick="switchTab('pulm', this)"><span class="tab-dot"></span>Pulmonary</button>
     </nav>
   </div>
 </div>
 
 <div class="content-wide">
-  <!-- SEARCH RESULTS -->
   <div id="search-results">
     <div class="search-count" id="search-count"></div>
     <div class="drug-grid" id="search-grid"></div>
     <div class="empty" id="search-empty" style="display:none">
       <div class="empty-icon">◇</div>
-      <div class="empty-text">No organisms found matching your search</div>
+      <div class="empty-text">No drugs found matching your search</div>
     </div>
   </div>
 
-  <!-- BACTERIA TAB -->
-  <div id="tab-bacteria" class="tab-panel active">
+  <div id="tab-autonomic" class="tab-panel">
     <div class="sys-intro">
-      <div class="sys-intro-icon">🔬</div>
+      <div class="sys-intro-icon">⚡</div>
       <div>
-        <div class="sys-intro-title">Bacteriology</div>
-        <div class="sys-intro-text">Master the Gram stain first — it halves your differential instantly. Then layer virulence factors, classic clinical syndromes, and treatment. High-yield sequences: cocci → rods; GP → GN; aerobic → anaerobic. Know the one-liner pearl for each organism cold.</div>
+        <div class="sys-intro-title">Autonomic Pharmacology</div>
+        <div class="sys-intro-text">Parasympathetic (cholinergic) and sympathetic (adrenergic) drug classes. Master receptor subtypes first — M1/M2/M3, α1/α2, β1/β2 — and the drugs fall into place. High-yield for organ-specific side effects and clinical applications.</div>
       </div>
     </div>
-    <div id="bacteria-content"></div>
+    <div id="autonomic-content"></div>
   </div>
 
-  <!-- VIRUSES TAB -->
-  <div id="tab-viruses" class="tab-panel">
+  <div id="tab-cv" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">♥</div>
+      <div>
+        <div class="sys-intro-title">Cardiovascular &amp; Renal Pharmacology</div>
+        <div class="sys-intro-text">The most tested drug system on Step 1. Know ACEi/ARBs cold — they appear in HF, HTN, CKD, and post-MI vignettes. Antiarrhythmic classes: think ion channels first, then drugs. Diuretic electrolyte effects are guaranteed questions.</div>
+      </div>
+    </div>
+    <div id="cv-content"></div>
+  </div>
+
+  <div id="tab-blood" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">🩸</div>
+      <div>
+        <div class="sys-intro-title">Blood &amp; Inflammation</div>
+        <div class="sys-intro-text">Anticoagulants appear on nearly every Step 1 exam — know reversal agents cold. Heparin-induced thrombocytopenia (HIT) is a classic trap. NSAIDs are the most-prescribed drugs in medicine; their mechanism and GI/renal toxicity are ubiquitous.</div>
+      </div>
+    </div>
+    <div id="blood-content"></div>
+  </div>
+
+  <div id="tab-neuro" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">🧠</div>
+      <div>
+        <div class="sys-intro-title">Neuro &amp; Psych</div>
+        <div class="sys-intro-text">Psych block is massive on Step 1. Memorize antidepressant side effect profiles — TCA overdose, SSRI serotonin syndrome, and bupropion seizures appear constantly. Antipsychotic EPS and NMS are classic vignettes. Lithium toxicity has a narrow therapeutic window.</div>
+      </div>
+    </div>
+    <div id="neuro-content"></div>
+  </div>
+
+  <div id="tab-micro" class="tab-panel active">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">🦠</div>
+      <div>
+        <div class="sys-intro-title">Antimicrobial Pharmacology</div>
+        <div class="sys-intro-text">Organized by mechanism: cell wall inhibitors → protein synthesis → DNA/folate → cell membrane. For each drug know its unique toxicity, not just its coverage. Antibiotic-associated C. diff (clindamycin, fluoroquinolones, cephalosporins) is a perennial vignette.</div>
+      </div>
+    </div>
+    <div id="micro-content"></div>
+  </div>
+
+  <div id="tab-gi" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">🍽️</div>
+      <div>
+        <div class="sys-intro-title">Gastrointestinal &amp; Motility</div>
+        <div class="sys-intro-text">Focus on acid suppression, motility agents, and mucosal protection. High-yield for C. difficile and metabolic interactions.</div>
+      </div>
+    </div>
+    <div id="gi-content"></div>
+  </div>
+
+  <div id="tab-endo" class="tab-panel">
     <div class="sys-intro">
       <div class="sys-intro-icon">🧬</div>
       <div>
-        <div class="sys-intro-title">Virology</div>
-        <div class="sys-intro-text">Group by genome type: RNA vs DNA, ss vs ds, +sense vs −sense, enveloped vs naked. The Baltimore classification is your scaffold. For each virus know its tropism, classic syndrome, and distinguishing lab finding. Enveloped = ether-labile = killed by alcohol.</div>
+        <div class="sys-intro-title">Endocrine &amp; Reproductive</div>
+        <div class="sys-intro-text">Master the hypothalamic-pituitary axes, diabetes management, and reproductive hormones. High-yield for Step 1 feedback loops.</div>
       </div>
     </div>
-    <div id="viruses-content"></div>
+    <div id="endo-content"></div>
   </div>
 
-  <!-- PARASITES TAB -->
-  <div id="tab-parasites" class="tab-panel">
+  <div id="tab-toxicology" class="tab-panel">
     <div class="sys-intro">
-      <div class="sys-intro-icon">🪱</div>
+      <div class="sys-intro-icon">⚠️</div>
       <div>
-        <div class="sys-intro-title">Parasitology</div>
-        <div class="sys-intro-text">Organize by habitat: intestinal protozoa → blood/tissue protozoa → helminths. Vector associations are heavily tested (mosquito/tick/fly/snail). Eosinophilia = helminth tissue migration. Treatment is narrow: know metronidazole, chloroquine, praziquantel, ivermectin, and albendazole targets.</div>
+        <div class="sys-intro-title">Drug Toxicology &amp; Antidotes</div>
+        <div class="sys-intro-text">Crucial reversal agents and toxidromes. Focus on the mechanism of toxicity and the logic of the chosen antidote.</div>
       </div>
     </div>
-    <div id="parasites-content"></div>
+    <div id="toxicology-content"></div>
   </div>
 
-  <!-- FUNGI TAB -->
-  <div id="tab-fungi" class="tab-panel">
+  <div id="tab-pulm" class="tab-panel">
     <div class="sys-intro">
-      <div class="sys-intro-icon">🍄</div>
+      <div class="sys-intro-icon">🫁</div>
       <div>
-        <div class="sys-intro-title">Mycology</div>
-        <div class="sys-intro-text">Divide into systemic dimorphic fungi vs opportunistic fungi. Dimorphic rule: mold in cold (environment), yeast in heat (body). Geography matters — Histo (Ohio/Mississippi River Valley), Cocci (Southwest desert), Blasto (Great Lakes/Mississippi). Opportunists = immunocompromised hosts (HIV, transplant, steroids).</div>
+        <div class="sys-intro-title">Smooth Muscle &amp; Pulmonary</div>
+        <div class="sys-intro-text">Asthma step therapy is heavily tested — know which drugs are for acute relief vs. maintenance. Nitrate tolerance (Monday disease) is a classic Step 1 vignette. Antihistamine receptor subtypes (H1 vs H2) determine organ effects and drug indication.</div>
       </div>
     </div>
-    <div id="fungi-content"></div>
+    <div id="pulm-content"></div>
+  </div>
+
+  <div id="tab-onco" class="tab-panel">
+    <div class="sys-intro">
+      <div class="sys-intro-icon">⚗</div>
+      <div>
+        <div class="sys-intro-title">Antineoplastics</div>
+        <div class="sys-intro-text">Step 1 tests toxicities more than mechanisms. Key rule: <strong style="color:var(--sakura2)">every chemo drug has one unique, memorable toxicity</strong> — bleomycin → pulmonary fibrosis, cisplatin → nephrotoxicity/ototoxicity, vincristine → peripheral neuropathy (NOT bone marrow suppression). Learn these cold.</div>
+      </div>
+    </div>
+    <div id="onco-content"></div>
   </div>
 </div>
 
-<script src="micro_data.js"></script>
+<script src="drug_data.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
-// GRAM STAIN → BADGE CLASS MAPPER
+// RENDER ENGINE & DEFENSIVE UTILITIES
 // ═══════════════════════════════════════════════════════════════
-function gramClass(gram) {
-  if (!gram) return 'gram-none';
-  const g = gram.toLowerCase();
-  if (g.includes('gp') || g.includes('gram-pos') || g.includes('gram pos')) return 'gram-gp';
-  if (g.includes('gn') || g.includes('gram-neg') || g.includes('gram neg')) return 'gram-gn';
-  if (g.includes('acid') || g.includes('afb') || g.includes('mycobact')) return 'gram-acid';
-  if (g.includes('helminth') || g.includes('nematode') || g.includes('cestode') || g.includes('trematode') || g.includes('protozoa') || g.includes('parasite')) return 'gram-para';
-  if (g.includes('fung') || g.includes('yeast') || g.includes('mold') || g.includes('dimorphic')) return 'gram-fung';
-  return 'gram-none';
-}
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER ENGINE
-// ═══════════════════════════════════════════════════════════════
 let cardCounter = 0;
 
-function formatLines(text) {
-  if (!text) return text;
-  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-  let parts = [];
-  const sentenceSplit = text.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
-  sentenceSplit.forEach(segment => {
-    const midSplit = segment.split(/(?<=\w)\.\s+(?=(?:<[^>]+>)*[A-Z][a-zA-Z/\-]+(?:<\/[^>]+>)?:)/);
-    if (midSplit.length > 1) {
-      midSplit.forEach((p, i) => {
-        if (i < midSplit.length - 1) parts.push(p + '.');
-        else parts.push(p);
-      });
-    } else {
-      parts.push(segment);
-    }
-  });
-
-  parts = parts.map((p, i) => {
-    p = p.trim();
-    if (i < parts.length - 1 && !p.endsWith('.') && !p.endsWith('>') && !p.endsWith(')')) return p + '.';
-    return p;
-  }).filter(p => p.length > 0);
-
-  if (parts.length <= 1) return text;
-  return parts.map(p => `<div class="info-line">${p}</div>`).join('');
-}
-
-function orgCardHTML(org, colorClass, idx) {
-  const id = `org-${colorClass}-${idx}-${cardCounter++}`;
-  const gc = gramClass(org.gram || '');
-  const gramLabel = org.gram ? `<span class="gram-badge ${gc}">${org.gram}</span>` : '';
-  const tagsHTML = (org.tags || []).map(t => `<span class="drug-tag">${t}</span>`).join('');
-
+function drugCardHTML(drug, colorClass, idx) {
+  if (!drug) return '';
+  const id = `drug-${colorClass}-${idx}-${cardCounter++}`;
+  const akaHTML = drug.aka ? drug.aka.replace(/·/g, '<span style="color:var(--dim);font-style:normal;margin:0 3px">·</span>') : '';
+  
   return `
-  <div class="drug-card " id="${id}" onclick="toggleCard('${id}')">
+  <div class="drug-card" id="${id}" onclick="toggleCard('${id}')">
     <div class="drug-card-header">
       <div style="flex:1;min-width:0">
-        <div class="drug-name">${org.name}</div>
-        ${gramLabel}
+        <div class="drug-name">${drug.name || 'Unknown'}</div>
+        ${akaHTML ? `<div class="drug-aka">${akaHTML}</div>` : ''}
       </div>
       <span class="expand-arrow" style="flex-shrink:0;margin-left:10px;margin-top:4px">▼</span>
     </div>
-    ${org.summary ? `<div class="drug-summary">${org.summary}</div>` : ''}
+    ${drug.summary ? `<div class="drug-summary">${drug.summary}</div>` : ''}
     <div class="drug-body">
-      ${org.virulence ? `<div class="info-row"><span class="info-label vir">Virulence</span><div class="info-text">${formatLines(org.virulence)}</div></div>` : ''}
-      ${org.disease  ? `<div class="info-row"><span class="info-label dis">Disease</span><div class="info-text">${formatLines(org.disease)}</div></div>` : ''}
-      ${org.tx       ? `<div class="info-row"><span class="info-label tx">Treatment</span><div class="info-text">${formatLines(org.tx)}</div></div>` : ''}
-      ${tagsHTML     ? `<div class="info-row" style="border:none;padding-top:2px"><div style="display:flex;flex-wrap:wrap;gap:4px">${tagsHTML}</div></div>` : ''}
-      ${org.pearl    ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div></div>` : ''}
+      ${drug.moa ? `<div class="info-row"><span class="info-label moa">Mechanism</span><div class="info-text">${formatLines(drug.moa)}</div></div>` : ''}
+      ${drug.use ? `<div class="info-row"><span class="info-label use">Uses</span><div class="info-text">${formatLines(drug.use)}</div></div>` : ''}
+      ${drug.se ? `<div class="info-row"><span class="info-label se">Side Effects</span><div class="info-text">${formatLines(drug.se)}</div></div>` : ''}
+      ${drug.ci ? `<div class="info-row"><span class="info-label ci">Contraindications</span><div class="info-text">${formatLines(drug.ci)}</div></div>` : ''}
+      ${drug.pk ? `<div class="info-row"><span class="info-label pk">Pharmacokinetics</span><div class="info-text">${formatLines(drug.pk)}</div></div>` : ''}
+      ${drug.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(drug.pearl)}</div></div>` : ''}
     </div>
   </div>`;
 }
 
-function renderSection(sectionId, sysKey) {
-  const container = document.getElementById(sectionId);
-  const groups = MICRO[sysKey];
-  if (!groups || !container) return;
+// ═══════════════════════════════════════════════════════════════
+// STEP 8 REFACTOR: STRICT HTML BULLETED LISTS
+// ═══════════════════════════════════════════════════════════════
+function formatLines(text) {
+  if (!text) return '';
+  try {
+    // Convert custom bold syntax to strong tags
+    let processedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  let html = '';
-  let globalIdx = 0;
+    let parts = [];
+    // Split sentences intelligently without breaking abbreviations
+    const sentenceSplit = processedText.split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/);
 
-  groups.forEach((group, gi) => {
-    const groupId = `grp-${sysKey}-${gi}`;
-    const sortedOrgs = [...group.organisms].sort((a, b) => {
-      const va = typeof a.tier === 'number' ? a.tier : parseInt(String(a.tier).replace(/\D/g, '')) || 99;
-      const vb = typeof b.tier === 'number' ? b.tier : parseInt(String(b.tier).replace(/\D/g, '')) || 99;
-      return va - vb;
+    sentenceSplit.forEach(segment => {
+      const midSplit = segment.split(/(?<=\w)\.\s+(?=(?:<[^>]+>)*[A-Z][a-zA-Z/\-]+(?:<\/[^>]+>)?:)/);
+      if (midSplit.length > 1) {
+        midSplit.forEach((p, i) => {
+          if (i < midSplit.length - 1) parts.push(p + '.');
+          else parts.push(p);
+        });
+      } else {
+        parts.push(segment);
+      }
     });
 
-    html += `
-    <div class="class-group" id="${groupId}">
-      <div class="class-group-header">
-        <span class="class-label">${group.group}</span>
-        <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
-      </div>
-      <div class="drug-grid">
-        ${sortedOrgs.map(o => orgCardHTML(o, group.color, globalIdx++)).join('')}
-      </div>
-    </div>`;
-  });
+    parts = parts.map((p, i) => {
+      let clean = p.trim();
+      if (i < parts.length - 1 && !clean.endsWith('.') && !clean.endsWith('>') && !clean.endsWith(')')) {
+        return clean + '.';
+      }
+      return clean;
+    }).filter(p => p.length > 0);
 
-  container.innerHTML = html;
-}
+    // If it's just a single phrase/sentence, no bullet points needed
+    if (parts.length <= 1) return processedText;
 
-// Map tab content IDs → MICRO data keys
-const sysMap = {
-  'bacteria-content': 'bacteria',
-  'viruses-content':  'viruses',
-  'parasites-content':'parasites',
-  'fungi-content':    'fungi',
-};
-Object.entries(sysMap).forEach(([id, key]) => renderSection(id, key));
+    // Output strict HTML ul/li bulleted lists
+    return `<ul>${parts.map(p => `<li>${p}</li>`).join('')}</ul>`;
 
-// ═══════════════════════════════════════════════════════════════
-// CARD / GROUP TOGGLING
-// ═══════════════════════════════════════════════════════════════
-function toggleCard(id) {
-  if (window.getSelection().toString().length > 0) return;
-  const card = document.getElementById(id);
-  if (card) card.classList.toggle('open');
-}
-
-function toggleGroup(groupId, btn) {
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  const cards = group.querySelectorAll('.drug-card');
-  const anyOpen = [...cards].some(c => c.classList.contains('open'));
-  if (anyOpen) {
-    cards.forEach(c => c.classList.remove('open'));
-    btn.textContent = '▼ Expand';
-  } else {
-    cards.forEach(c => c.classList.add('open'));
-    btn.textContent = '▲ Collapse';
+  } catch (err) {
+    console.error("Error formatting lines:", err);
+    return text; // Fallback to raw text if parsing fails
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB SWITCHING
-// ═══════════════════════════════════════════════════════════════
-function switchTab(name, btn) {
-  document.querySelectorAll('.group-expand-btn').forEach(b => b.textContent = '▼ Expand');
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (btn) btn.classList.add('active');
-  document.getElementById('search-input').value = '';
-  document.getElementById('search-results').classList.remove('active');
-  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
-  document.getElementById('tabs').style.opacity = '1';
-  document.getElementById('tabs').style.pointerEvents = '';
+function renderSection(sectionId, sysKey) {
+  try {
+    if (typeof DRUGS === 'undefined') return;
+    
+    const container = document.getElementById(sectionId);
+    const groups = DRUGS[sysKey];
+    if(!groups || !container) return;
+    
+    let html = '';
+    let globalIdx = 0;
+    
+    groups.forEach((group, gi) => {
+      const groupId = `grp-${sysKey}-${gi}`;
+      
+      const sortedDrugs = group.drugs.sort((a, b) => {
+        const valA = typeof a.tier === 'number' ? a.tier : parseInt(String(a.tier).replace(/\D/g,'')) || 99;
+        const valB = typeof b.tier === 'number' ? b.tier : parseInt(String(b.tier).replace(/\D/g,'')) || 99;
+        return valA - valB;
+      });
+
+      html += `
+      <div class="class-group" id="${groupId}">
+        <div class="class-group-header">
+          <span class="class-label">${group.group}</span>
+          <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
+        </div>
+        <div class="drug-grid">
+          ${sortedDrugs.map(d => drugCardHTML(d, group.color, globalIdx++)).join('')}
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+  } catch (err) {
+    console.error(`Error rendering section ${sectionId}:`, err);
+  }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// SEARCH
-// ═══════════════════════════════════════════════════════════════
-function allOrgs() {
+const sysMap = {
+  'autonomic-content': 'autonomic',
+  'cv-content': 'cv',
+  'blood-content': 'blood',
+  'neuro-content': 'neuro',
+  'micro-content': 'micro',
+  'gi-content': 'gi',
+  'endo-content': 'endo',
+  'pulm-content': 'pulm',
+  'onco-content': 'onco',
+  'toxicology-content': 'toxicology',
+};
+
+// Defensive Initialization
+if (typeof DRUGS !== 'undefined') {
+  Object.entries(sysMap).forEach(([id, key]) => renderSection(id, key));
+} else {
+  console.error("drug_data.js failed to load or DRUGS variable is undefined.");
+}
+
+function toggleCard(id) {
+  try {
+    if (window.getSelection().toString().length > 0) return;
+    const card = document.getElementById(id);
+    if(card) card.classList.toggle('open');
+  } catch (err) {
+    console.error("Error toggling card:", err);
+  }
+}
+
+function toggleGroup(groupId, btn) {
+  try {
+    const group = document.getElementById(groupId);
+    if(!group) return;
+    const cards = group.querySelectorAll('.drug-card');
+    const anyOpen = [...cards].some(c => c.classList.contains('open'));
+    
+    if(anyOpen) {
+      cards.forEach(c => c.classList.remove('open'));
+      btn.textContent = '▼ Expand';
+    } else {
+      cards.forEach(c => c.classList.add('open'));
+      btn.textContent = '▲ Collapse';
+    }
+  } catch (err) {
+    console.error("Error toggling group:", err);
+  }
+}
+
+function switchTab(name, btn) {
+  try {
+    document.querySelectorAll('.group-expand-btn').forEach(b => b.textContent = '▼ Expand');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    const targetTab = document.getElementById('tab-' + name);
+    if (targetTab) targetTab.classList.add('active');
+    if (btn) btn.classList.add('active');
+    
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const tabs = document.getElementById('tabs');
+    
+    if (searchInput) searchInput.value = '';
+    if (searchResults) searchResults.classList.remove('active');
+    
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
+    if (tabs) {
+      tabs.style.opacity = '1';
+      tabs.style.pointerEvents = '';
+    }
+  } catch (err) {
+    console.error("Error switching tab:", err);
+  }
+}
+
+function allDrugs() {
   const results = [];
-  Object.entries(MICRO).forEach(([sysKey, groups]) => {
-    groups.forEach(group => {
-      group.organisms.forEach(o => {
-        results.push({ ...o, colorClass: group.color, sysKey });
+  if (typeof DRUGS === 'undefined') return results;
+  
+  try {
+    Object.entries(DRUGS).forEach(([sysKey, groups]) => {
+      groups.forEach(group => {
+        group.drugs.forEach(d => {
+          results.push({ ...d, colorClass: group.color, sysKey });
+        });
       });
     });
-  });
+  } catch (err) {
+    console.error("Error accumulating drugs:", err);
+  }
   return results;
 }
 
 function handleSearch(q) {
-  const sr       = document.getElementById('search-results');
-  const grid     = document.getElementById('search-grid');
-  const empty    = document.getElementById('search-empty');
-  const count    = document.getElementById('search-count');
-  const clearBtn = document.getElementById('search-clear');
-  clearBtn.style.display = q.length > 0 ? 'block' : 'none';
+  try {
+    const sr = document.getElementById('search-results');
+    const grid = document.getElementById('search-grid');
+    const empty = document.getElementById('search-empty');
+    const count = document.getElementById('search-count');
+    const clearBtn = document.getElementById('search-clear');
+    const tabs = document.getElementById('tabs');
 
-  if (!q || q.length < 2) {
-    sr.classList.remove('active');
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
-    document.getElementById('tabs').style.opacity = '1';
-    document.getElementById('tabs').style.pointerEvents = '';
-    return;
+    if (!sr || !grid || !empty || !count || !clearBtn || !tabs) return;
+
+    clearBtn.style.display = q.length > 0 ? 'block' : 'none';
+
+    if(!q || q.length < 2) {
+      sr.classList.remove('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = '');
+      tabs.style.opacity = '1';
+      tabs.style.pointerEvents = '';
+      return;
+    }
+
+    sr.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    tabs.style.opacity = '0.4';
+    tabs.style.pointerEvents = 'none';
+
+    const ql = q.toLowerCase();
+    const matches = allDrugs().filter(d =>
+      (d.name && d.name.toLowerCase().includes(ql)) ||
+      (d.aka && d.aka.toLowerCase().includes(ql)) ||
+      (d.moa && d.moa.toLowerCase().includes(ql)) ||
+      (d.se && d.se.toLowerCase().includes(ql)) ||
+      (d.use && d.use.toLowerCase().includes(ql)) ||
+      (d.pearl && d.pearl.toLowerCase().includes(ql)) ||
+      (d.tags && d.tags.some(t => t.toLowerCase().includes(ql)))
+    );
+
+    if(matches.length === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      count.textContent = 'No results for "' + q + '"';
+      return;
+    }
+
+    empty.style.display = 'none';
+    count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + q + '"';
+    grid.innerHTML = matches.map((d, i) => drugCardHTML(d, d.colorClass, 'search-' + i)).join('');
+  } catch (err) {
+    console.error("Error during search:", err);
   }
-
-  sr.classList.add('active');
-  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-  document.getElementById('tabs').style.opacity = '0.4';
-  document.getElementById('tabs').style.pointerEvents = 'none';
-
-  const ql = q.toLowerCase();
-  const matches = allOrgs().filter(o =>
-    o.name.toLowerCase().includes(ql) ||
-    (o.gram       || '').toLowerCase().includes(ql) ||
-    (o.virulence  || '').toLowerCase().includes(ql) ||
-    (o.disease    || '').toLowerCase().includes(ql) ||
-    (o.tx         || '').toLowerCase().includes(ql) ||
-    (o.pearl      || '').toLowerCase().includes(ql) ||
-    (o.summary    || '').toLowerCase().includes(ql) ||
-    (o.tags || []).some(t => t.toLowerCase().includes(ql))
-  );
-
-  if (matches.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    count.textContent = 'No results for "' + q + '"';
-    return;
-  }
-
-  empty.style.display = 'none';
-  count.textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' for "' + q + '"';
-  grid.innerHTML = matches.map((o, i) => orgCardHTML(o, o.colorClass, 'search-' + i)).join('');
 }
 
 function clearSearch() {
   const input = document.getElementById('search-input');
-  input.value = '';
-  handleSearch('');
+  if (input) {
+    input.value = '';
+    handleSearch('');
+  }
 }
 </script>
 </body>
