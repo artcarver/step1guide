@@ -1,23 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Quicksand:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
-<title>Step 1 Study Hub</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <title>Step 1 Study Hub</title>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-<script src="auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+  <script src="auth.js"></script>
+
+  <style>
+    /* ── Index-specific styles ─────────────────────── */
+    .uw-widget-card {
+      display: block;
+      margin-bottom: 40px;
+    }
+
+    .uw-widget-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .uw-widget-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .uw-widget-pct {
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--fuji);
+      line-height: 1;
+    }
+
+    .uw-widget-bar-bg {
+      height: 10px;
+      background: var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .uw-widget-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--fuji), var(--sakura2));
+      border-radius: 20px;
+      transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .uw-widget-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .uw-widget-stat-num {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .uw-widget-stat-lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .countdown-inner {
+      display: inline-flex;
+      gap: 30px;
+      align-items: stretch;
+    }
+
+    .cd-divider {
+      width: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      align-self: stretch;
+    }
+
+    .cd-days-num {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--sakura2);
+      line-height: 1;
+    }
+
+    .cd-days-lbl {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .cd-date-lbl {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .cd-date-val {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .cd-edit-btn {
+      background: none;
+      border: none;
+      color: var(--fuji);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+
+    .cd-edit-btn:hover { color: var(--sakura2); }
+
+    .date-modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      margin-bottom: 20px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--cream);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .date-modal-input:focus {
+      border-color: var(--sakura2);
+      box-shadow: 0 0 0 3px rgba(229,120,152,0.12);
+      background: var(--card-bg);
+    }
+
+    /* Petal extras for index */
+    .p6  { left: 85%; width:10px; height:10px; background: var(--theme-20); animation-duration:13s; animation-delay:3s; }
+    .p7  { left: 42%; width:14px; height:14px; background: var(--theme-1);  animation-duration:8s;  animation-delay:7s; }
+    .p8  { left: 64%; width:16px; height:16px; background: var(--theme-3);  animation-duration:15s; animation-delay:0.5s; }
+    .p9  { left: 25%; width:11px; height:11px; background: var(--theme-6);  animation-duration:11s; animation-delay:5s; }
+    .p10 { left: 90%; width:13px; height:13px; background: var(--theme-2);  animation-duration:9s;  animation-delay:8s; }
+  </style>
 </head>
 <body>
 
+<!-- ── Sticky Header ───────────────────────────────────────── -->
 <div class="header">
   <div class="header-inner">
-    <div class="global-nav">
-      <a href="index.html" style="font-size:18px; font-weight:700; color:var(--sakura2);">🌸 Step 1 Hub</a>
+    <nav class="global-nav">
+      <a href="index.html" class="global-nav-brand">🌸 Step 1 Hub</a>
       <div class="global-nav-links">
         <a href="uworld_tracker.html">UWorld</a>
         <a href="step1_dashboard.html">Dashboard</a>
@@ -25,15 +187,25 @@
         <a href="microfacts.html">Micro</a>
         <button id="auth-btn" class="auth-btn">Log in</button>
       </div>
-    </div>
+    </nav>
   </div>
 </div>
 
+<!-- ── Cherry Blossom Petals ──────────────────────────────── -->
 <div class="petals" aria-hidden="true">
-  <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
-  <div class="petal p4"></div><div class="petal p5"></div>
+  <div class="petal p1"></div>
+  <div class="petal p2"></div>
+  <div class="petal p3"></div>
+  <div class="petal p4"></div>
+  <div class="petal p5"></div>
+  <div class="petal p6"></div>
+  <div class="petal p7"></div>
+  <div class="petal p8"></div>
+  <div class="petal p9"></div>
+  <div class="petal p10"></div>
 </div>
 
+<!-- ── Mount Fuji SVG ─────────────────────────────────────── -->
 <div class="fuji-bg" aria-hidden="true">
   <svg viewBox="0 0 1440 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" style="width:100%;height:100%;">
     <path d="M0 380 Q200 300 400 340 Q600 370 800 320 Q1000 280 1200 330 Q1340 355 1440 340 L1440 400 L0 400Z" fill="#f2e1e9" opacity="0.6"/>
@@ -44,58 +216,66 @@
   </svg>
 </div>
 
+<!-- ── Main Content ────────────────────────────────────────── -->
 <div class="wrap">
+
+  <!-- Hero -->
   <header class="hero">
-    <div class="hero-eyebrow">USMLE Step 1</div>
+    <p class="hero-eyebrow">USMLE Step 1</p>
     <h1 class="hero-name">Your <em>Study Resources,</em><br/>All in One Place</h1>
-    <div class="brand-flourish" style="justify-content:center; max-width: 400px; margin: 0 auto;">
-        <div class="flourish-line"></div>
-        <div class="flourish-dot"></div>
-        <div class="flourish-line right"></div>
+    <div class="brand-flourish" style="justify-content:center; max-width:400px; margin:0 auto;">
+      <div class="flourish-line"></div>
+      <div class="flourish-dot"></div>
+      <div class="flourish-line right"></div>
     </div>
-    
-    <div class="countdown-wrap" style="background: white; border: 2px solid var(--border); border-radius: 20px; padding: 25px; margin-top: 20px; display: inline-flex; gap: 30px; box-shadow: var(--card-shadow);">
-      <div>
-        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); font-weight: 700;">Days Remaining</div>
-        <div id="cd-days" style="font-size: 48px; font-weight: 700; color: var(--sakura2); line-height: 1;">—</div>
-      </div>
-      <div style="width: 2px; background: var(--border);"></div>
-      <div style="text-align: left;">
-        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); font-weight: 700; margin-bottom: 5px;">Exam Date</div>
-        <div id="cd-date" style="font-size: 20px; font-weight: 600; color: var(--ink);">Not set</div>
-        <button onclick="openModal()" style="background: none; border: none; color: var(--fuji); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; margin-top: 5px;">✎ Edit Date</button>
+
+    <!-- Countdown -->
+    <div class="countdown-wrap">
+      <div class="countdown-inner">
+        <div>
+          <p class="cd-days-lbl">Days Remaining</p>
+          <div id="cd-days" class="cd-days-num">—</div>
+        </div>
+        <div class="cd-divider"></div>
+        <div>
+          <p class="cd-date-lbl">Exam Date</p>
+          <div id="cd-date" class="cd-date-val">Not set</div>
+          <button class="cd-edit-btn" onclick="openModal()">✎ Edit Date</button>
+        </div>
       </div>
     </div>
   </header>
 
-  <div class="sec-label" style="font-weight: 700; color: var(--muted); margin-bottom: 15px;">UWorld Overview</div>
-  <a href="uworld_tracker.html" class="tool-card" style="display: block; padding: 30px; margin-bottom: 40px; --card-theme: var(--theme-3);">
-    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px;">
-      <h3 style="margin: 0; font-size: 24px; color: var(--ink);">QBank Completion</h3>
-      <span id="widget-uw-pct" style="font-size: 28px; font-weight: 700; color: var(--fuji);">0%</span>
+  <!-- UWorld Overview Widget -->
+  <p class="sec-label">UWorld Overview</p>
+  <a href="uworld_tracker.html" class="tool-card uw-widget-card" style="--card-theme: var(--theme-3);">
+    <div class="uw-widget-head">
+      <h3 class="uw-widget-title">QBank Completion</h3>
+      <span id="widget-uw-pct" class="uw-widget-pct">0%</span>
     </div>
-    <div style="height: 10px; background: var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 25px;">
-      <div id="widget-uw-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--fuji), var(--sakura2)); transition: width 1s ease;"></div>
+    <div class="uw-widget-bar-bg">
+      <div id="widget-uw-fill" class="uw-widget-bar-fill"></div>
     </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
+    <div class="uw-widget-stats">
       <div>
-        <div id="widget-uw-done" style="font-size: 26px; font-weight: 700; color: var(--ink);">0</div>
-        <div style="font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 700;">Unique Done</div>
+        <div id="widget-uw-done" class="uw-widget-stat-num">0</div>
+        <div class="uw-widget-stat-lbl">Unique Done</div>
       </div>
       <div>
-        <div id="widget-uw-remain" style="font-size: 26px; font-weight: 700; color: var(--ink);">0</div>
-        <div style="font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 700;">Remaining</div>
+        <div id="widget-uw-remain" class="uw-widget-stat-num">0</div>
+        <div class="uw-widget-stat-lbl">Remaining</div>
       </div>
       <div>
-        <div id="widget-uw-needed" style="font-size: 26px; font-weight: 700; color: var(--ink);">N/A</div>
-        <div style="font-size: 10px; text-transform: uppercase; color: var(--muted); font-weight: 700;">Needed / Day</div>
+        <div id="widget-uw-needed" class="uw-widget-stat-num">N/A</div>
+        <div class="uw-widget-stat-lbl">Needed / Day</div>
       </div>
     </div>
   </a>
 
-  <div class="sec-label" style="font-weight: 700; color: var(--muted); margin-bottom: 15px;">Core Study Tools</div>
+  <!-- Core Study Tools -->
+  <p class="sec-label">Core Study Tools</p>
   <div class="tool-grid">
-    
+
     <a href="drugfacts.html" class="tool-card" style="--card-theme: var(--theme-5);">
       <div class="card-inner">
         <span class="card-icon">💊</span>
@@ -103,7 +283,7 @@
         <p class="card-desc">High-yield reference guide for mechanism of action, clinical uses, and toxicities.</p>
       </div>
     </a>
-    
+
     <a href="microfacts.html" class="tool-card" style="--card-theme: var(--theme-8);">
       <div class="card-inner">
         <span class="card-icon">🦠</span>
@@ -111,7 +291,7 @@
         <p class="card-desc">Complete guide to gram stains, virulence factors, and antimicrobial treatments.</p>
       </div>
     </a>
-    
+
     <a href="sketchypharm.html" class="tool-card" style="--card-theme: var(--theme-1);">
       <div class="card-inner">
         <span class="card-icon">🎨</span>
@@ -119,7 +299,7 @@
         <p class="card-desc">Track your progress through Sketchy Pharmacology videos by category.</p>
       </div>
     </a>
-    
+
     <a href="sketchymicro.html" class="tool-card" style="--card-theme: var(--theme-12);">
       <div class="card-inner">
         <span class="card-icon">🧬</span>
@@ -127,7 +307,7 @@
         <p class="card-desc">Monitor which bacteria, viruses, fungi, and parasites you've mastered.</p>
       </div>
     </a>
-    
+
     <a href="pixorize.html" class="tool-card" style="--card-theme: var(--theme-13);">
       <div class="card-inner">
         <span class="card-icon">💎</span>
@@ -135,7 +315,7 @@
         <p class="card-desc">Visual mnemonics for biochemistry, immunology, and metabolic pathways.</p>
       </div>
     </a>
-    
+
     <a href="step1_dashboard.html" class="tool-card" style="--card-theme: var(--theme-11);">
       <div class="card-inner">
         <span class="card-icon">📊</span>
@@ -143,19 +323,22 @@
         <p class="card-desc">View overall performance, exam countdown, and targeted study plan.</p>
       </div>
     </a>
+
   </div>
 
-  <footer class="footer" style="margin-top: 80px; padding-top: 30px; border-top: 2px solid var(--border); display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--dim);">
+  <!-- Footer -->
+  <footer class="footer">
     <span>Step 1 Study Hub</span>
     <span id="footer-date"></span>
   </footer>
 </div>
 
+<!-- ── Exam Date Modal ─────────────────────────────────────── -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h2 class="modal-title">Set Your Exam Date</h2>
     <p class="modal-sub">The countdown will update automatically.</p>
-    <input type="date" id="date-input" style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--border); margin-bottom: 20px; font-family: inherit;"/>
+    <input type="date" id="date-input" class="date-modal-input"/>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-save" onclick="saveDate()">Save Date ✦</button>
@@ -164,7 +347,7 @@
 </div>
 
 <script>
-// Authentication State Management
+// ── Auth State ─────────────────────────────────────────────
 window.addEventListener('appAuthStateChanged', async (e) => {
   const user = e.detail.user;
   const btn = document.getElementById('auth-btn');
@@ -183,16 +366,13 @@ window.addEventListener('appAuthStateChanged', async (e) => {
   }
 });
 
-const authBtn = document.getElementById('auth-btn');
-if (authBtn) {
-  authBtn.addEventListener('click', () => {
-    if (!auth) return;
-    if (auth.currentUser) auth.signOut();
-    else auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
-  });
-}
+document.getElementById('auth-btn').addEventListener('click', () => {
+  if (!auth) return;
+  if (auth.currentUser) auth.signOut();
+  else auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
+});
 
-// Countdown Logic
+// ── Countdown ──────────────────────────────────────────────
 async function fetchUserConfig(uid) {
   if (!db) return;
   try {
@@ -206,13 +386,12 @@ function updateCountdown(dateStr) {
   const daysEl = document.getElementById('cd-days');
   const dateEl = document.getElementById('cd-date');
   if (!daysEl || !dateEl) return;
-
-  const exam = new Date(dateStr + 'T12:00:00'), now = new Date();
-  now.setHours(0,0,0,0);
+  const exam = new Date(dateStr + 'T12:00:00');
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
   const diff = Math.round((exam - now) / 86400000);
-  
   daysEl.textContent = diff >= 0 ? diff : '0';
-  dateEl.textContent = exam.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+  dateEl.textContent = exam.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 function resetCountdown() {
@@ -222,7 +401,7 @@ function resetCountdown() {
   if (dateEl) dateEl.textContent = 'Not set';
 }
 
-function openModal() { document.getElementById('modal').classList.add('open'); }
+function openModal()  { document.getElementById('modal').classList.add('open'); }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
 async function saveDate() {
@@ -234,36 +413,48 @@ async function saveDate() {
   closeModal();
 }
 
-// UWorld Widget Integration
+// ── UWorld Widget ──────────────────────────────────────────
 async function initUWorldWidget(uid) {
   const el = (id) => document.getElementById(id);
   if (!uid || !db) {
-    if (el('widget-uw-done')) el('widget-uw-done').textContent = '0';
-    if (el('widget-uw-pct')) el('widget-uw-pct').textContent = '0%';
+    ['widget-uw-done', 'widget-uw-remain', 'widget-uw-needed'].forEach(id => {
+      if (el(id)) el(id).textContent = id === 'widget-uw-needed' ? 'N/A' : '0';
+    });
+    if (el('widget-uw-pct'))  el('widget-uw-pct').textContent = '0%';
     if (el('widget-uw-fill')) el('widget-uw-fill').style.width = '0%';
     return;
   }
   try {
-    const config = await db.collection('users').doc(uid).collection('uworld').doc('config').get();
+    const config   = await db.collection('users').doc(uid).collection('uworld').doc('config').get();
     const settings = config.exists ? config.data() : { total: 3661 };
-    
-    const logs = await db.collection('users').doc(uid).collection('uworld_logs').get();
-    let loggedQs = 0;
+    const logs     = await db.collection('users').doc(uid).collection('uworld_logs').get();
+    let loggedQs   = 0;
     logs.forEach(d => { if (d.data().qs) loggedQs += d.data().qs; });
 
-    const done = loggedQs + (settings.uniqueOffset || 0);
+    const done  = loggedQs + (settings.uniqueOffset || 0);
     const total = settings.total || 3661;
-    const pct = Math.round((done / total) * 100);
+    const pct   = Math.round((done / total) * 100);
 
-    if (el('widget-uw-done')) el('widget-uw-done').textContent = done.toLocaleString();
+    if (el('widget-uw-done'))   el('widget-uw-done').textContent   = done.toLocaleString();
     if (el('widget-uw-remain')) el('widget-uw-remain').textContent = (total - done).toLocaleString();
-    if (el('widget-uw-pct')) el('widget-uw-pct').textContent = pct + '%';
-    if (el('widget-uw-fill')) el('widget-uw-fill').style.width = pct + '%';
+    if (el('widget-uw-pct'))    el('widget-uw-pct').textContent    = pct + '%';
+    if (el('widget-uw-fill'))   el('widget-uw-fill').style.width   = pct + '%';
+
+    // Needed per day
+    const examDateStr = (await db.collection('users').doc(uid).get()).data()?.examDate;
+    if (examDateStr) {
+      const now  = new Date(); now.setHours(0,0,0,0);
+      const exam = new Date(examDateStr + 'T12:00:00');
+      const days = Math.max(1, Math.round((exam - now) / 86400000));
+      const needed = Math.ceil((total - done) / days);
+      if (el('widget-uw-needed')) el('widget-uw-needed').textContent = needed > 0 ? needed : '✓';
+    }
   } catch (err) { console.error(err); }
 }
 
-const today = new Date();
-document.getElementById('footer-date').textContent = today.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+// ── Footer Date ────────────────────────────────────────────
+document.getElementById('footer-date').textContent =
+  new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 </script>
 </body>
 </html>
