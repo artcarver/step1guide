@@ -24,6 +24,7 @@
         <a href="step1_dashboard.html">Dashboard</a>
         <a href="drugfacts.html">Pharm</a>
         <a href="microfacts.html">Micro</a>
+        <button id="auth-btn" class="auth-btn" style="position:static; margin-left:8px;">Log in</button>
       </div>
     </div>
 
@@ -31,7 +32,7 @@
       <div>
         <p class="eyebrow">USMLE Step 1 · Performance Tracker</p>
         <h1 class="brand-title">Performance Dashboard</h1>
-        <div class="brand-flourish"><div class="fl l"></div><div class="fd"></div><div class="fl r"></div></div>
+        <div class="brand-flourish"><div class="flourish-line"></div><div class="flourish-dot"></div><div class="flourish-line right"></div></div>
         <p class="brand-sub">Exam Date: <strong>April 13, 2026</strong> &nbsp;·&nbsp; <span id="days-remaining"></span> days remaining</p>
       </div>
       <div class="scores-widget">
@@ -60,11 +61,11 @@
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
-      <button class="tab-btn" onclick="switchTab('disciplines',this)">Disciplines</button>
-      <button class="tab-btn" onclick="switchTab('systems',this)">Systems</button>
-      <button class="tab-btn" onclick="switchTab('pharmacology',this)">Pharmacology</button>
-      <button class="tab-btn" onclick="switchTab('focus',this)">⚠ Focus Areas</button>
+      <button class="tab-btn active" onclick="switchTab('overview',this)" style="--theme-color: var(--theme-8);"><span class="tab-dot"></span>Overview</button>
+      <button class="tab-btn" onclick="switchTab('disciplines',this)" style="--theme-color: var(--theme-11);"><span class="tab-dot"></span>Disciplines</button>
+      <button class="tab-btn" onclick="switchTab('systems',this)" style="--theme-color: var(--theme-16);"><span class="tab-dot"></span>Systems</button>
+      <button class="tab-btn" onclick="switchTab('pharmacology',this)" style="--theme-color: var(--theme-1);"><span class="tab-dot"></span>Pharmacology</button>
+      <button class="tab-btn" onclick="switchTab('focus',this)" style="--theme-color: var(--theme-3);"><span class="tab-dot"></span>⚠ Focus Areas</button>
     </div>
   </div>
 </div>
@@ -82,7 +83,7 @@
     <div class="card-grid-4">
       <div class="card"><p class="stat-label">CBSE Score</p><div class="stat-num" style="color:var(--yellow)">58</div><p class="stat-sub">Dec 11, 2025</p></div>
       <div class="card"><p class="stat-label">CBSSA Score</p><div class="stat-num" style="color:var(--green)">64</div><p class="stat-sub">Feb 22, 2026</p></div>
-      <div class="card"><p class="stat-label">Score Improvement</p><div class="stat-num" style="color:var(--purple)">+6 pts</div><p class="stat-sub">+16% pass probability</p></div>
+      <div class="card"><p class="stat-label">Score Improvement</p><div class="stat-num" style="color:var(--theme-14)">+6 pts</div><p class="stat-sub">+16% pass probability</p></div>
       <div class="card"><p class="stat-label">Days to Exam</p><div class="stat-num" style="color:var(--sakura)" id="days-big"></div><p class="stat-sub">April 13, 2026</p></div>
     </div>
 
@@ -99,7 +100,7 @@
           <div class="prog-wrap"><div class="prog-fill" style="width:90%;background:linear-gradient(90deg,#2a8a6a,#3ab090)"></div></div>
         </div>
       </div>
-      <div style="margin-top:13px;padding:12px 16px;background:var(--green-light);border-radius:10px;border:1px solid rgba(42,138,106,0.18);">
+      <div style="margin-top:13px;padding:12px 16px;background:rgba(42,138,106,0.05);border-radius:10px;border:1px solid rgba(42,138,106,0.18);">
         <p style="font-size:12.5px;color:var(--muted);line-height:1.65;"><strong style="color:var(--green)">+16 percentage points</strong> improvement in pass probability over ~10 weeks. You're trending in the right direction — the remaining gap requires targeted work in Pharmacology, Cardiovascular, and Reproductive/Endocrine systems.</p>
       </div>
     </div>
@@ -137,13 +138,13 @@
         <div id="focus-critical"></div>
       </div>
       <div class="focus-box high-box">
-        <div class="focus-box-title" style="color:var(--orange)">🟠 High Priority — below avg or declining</div>
+        <div class="focus-box-title" style="color:var(--theme-3)">🟠 High Priority — below avg or declining</div>
         <div class="focus-box-sub">Targeted review needed</div>
         <div id="focus-high"></div>
       </div>
     </div>
     <div class="card">
-      <div class="section-label" style="color:var(--purple)">Recommended Study Action Plan</div>
+      <div class="section-label" style="color:var(--theme-14)">Recommended Study Action Plan</div>
       <div id="action-plan"></div>
     </div>
   </div>
@@ -151,14 +152,37 @@
 </div>
 
 <script>
-// ── Secure Authentication Check ────────────────────────
+// ── Secure Authentication & Sync ────────────────────────
 window.addEventListener('appAuthStateChanged', (e) => {
   const user = e.detail.user;
-  // This dashboard is locked strictly to your account
+  
+  // Handle Global Nav Auth Button
+  const authBtn = document.getElementById('auth-btn');
+  if (authBtn) {
+    authBtn.textContent = user ? 'Log out' : 'Log in';
+    if(user) authBtn.classList.add('is-logged-in');
+    else authBtn.classList.remove('is-logged-in');
+  }
+
+  // This dashboard is locked strictly to the user's account
   if (!user) {
     window.location.replace("index.html");
   }
 });
+
+// Setup Auth Button click behavior
+const authBtn = document.getElementById('auth-btn');
+if (authBtn) {
+  authBtn.addEventListener('click', () => {
+    if (!auth) return;
+    if (auth.currentUser) {
+      auth.signOut();
+    } else {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(console.error);
+    }
+  });
+}
 
 // ── Data Defensiveness Utilities ───────────────────────
 function safeSetHTML(id, html) {
@@ -214,8 +238,8 @@ const pharma=[
 
 const actionPlan=[
   {rank:"01",title:"Pharmacology",urgency:"CRITICAL",uc:"var(--red)",ub:"rgba(192,48,80,0.3)",note:"30 pts below avg on both tests — your single biggest lever. Prioritize CV pharm (35% correct), Nervous System (45%), and Toxicology (33%) using First Aid + Sketchy Pharm daily. Complete remaining UWorld Pharmacology blocks."},
-  {rank:"02",title:"Reproductive & Endocrine",urgency:"URGENT",uc:"var(--orange)",ub:"rgba(184,88,32,0.3)",note:"Dramatic 24-point DROP (77→53) between tests — the most alarming regression in your data. This system is 12–16% of the exam. Revisit endocrine pharmacology (insulin, thyroid, adrenal drugs) and reproductive hormones comprehensively."},
-  {rank:"03",title:"Cardiovascular System",urgency:"HIGH",uc:"var(--orange)",ub:"rgba(184,88,32,0.3)",note:"+14 from CBSE but still 16 below average, and your weakest UWorld Pharm subsection (35%). Heart failure, HTN, arrhythmia drug mechanisms are Step 1 staples — master the pharm alongside the pathophys."},
+  {rank:"02",title:"Reproductive & Endocrine",urgency:"URGENT",uc:"var(--theme-3)",ub:"rgba(184,88,32,0.3)",note:"Dramatic 24-point DROP (77→53) between tests — the most alarming regression in your data. This system is 12–16% of the exam. Revisit endocrine pharmacology (insulin, thyroid, adrenal drugs) and reproductive hormones comprehensively."},
+  {rank:"03",title:"Cardiovascular System",urgency:"HIGH",uc:"var(--theme-3)",ub:"rgba(184,88,32,0.3)",note:"+14 from CBSE but still 16 below average, and your weakest UWorld Pharm subsection (35%). Heart failure, HTN, arrhythmia drug mechanisms are Step 1 staples — master the pharm alongside the pathophys."},
   {rank:"04",title:"Genetics",urgency:"WATCH",uc:"var(--yellow)",ub:"rgba(184,120,32,0.3)",note:"Dropped 14 pts (70→56), crossing below average. A focused session on inheritance patterns, molecular genetics, and genetic disorders can recover this quickly."},
   {rank:"05",title:"Multisystem Processes",urgency:"WATCH",uc:"var(--yellow)",ub:"rgba(184,120,32,0.3)",note:"Minimal gain (+2 pts), still 19 below average. Covers neoplasia, inflammation, connective tissue — high-yield concepts throughout Step 1. Review Robbins key concepts and related UWorld blocks."},
 ];
@@ -323,7 +347,7 @@ try {
   const highs = fa.filter(d => d.priority === "high").sort((a,b) => a.cbssa - b.cbssa);
   
   function fiHTML(d, cls) {
-    const c = cls === "critical-item" ? "var(--red)" : "var(--orange)";
+    const c = cls === "critical-item" ? "var(--red)" : "var(--theme-3)";
     return `<div class="focus-item ${cls}">
       <div><div class="focus-item-name">${d.name}</div><div class="focus-item-meta">${d.weight} of exam · gap: ${d.cbssa - d.avg} vs avg</div></div>
       <div><div class="focus-item-score" style="color:${c}">${d.cbssa}</div><div class="focus-item-avg">avg ${d.avg}</div></div>
