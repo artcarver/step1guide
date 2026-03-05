@@ -63,61 +63,31 @@
 
   <!-- ══ UWORLD TRACKER WIDGET ══════════════════════════════════════════ -->
   <div class="sec-label">📝 &nbsp;UWorld Progress</div>
-  <a href="uworld_tracker.html" class="uw-widget">
-    <div class="uw-widget-inner">
+<a href="uworld_tracker.html" class="widget-card" style="text-decoration: none; color: inherit; display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; transition: border-color 0.15s;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+    <h3 style="margin: 0; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);">UWorld Step 1</h3>
+    <span id="widget-uw-pct" style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--fuji);">0%</span>
+  </div>
 
-      <!-- Ring -->
-      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-        <div class="uw-ring-wrap">
-          <svg class="uw-ring-svg" viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--surface2)" stroke-width="7"/>
-            <circle cx="40" cy="40" r="34" fill="none" stroke="url(#uwGrad)" stroke-width="7"
-              stroke-linecap="round" stroke-dasharray="213.6"
-              stroke-dashoffset="213.6" id="uw-ring-fill"
-              transform="rotate(-90 40 40)"/>
-            <defs>
-              <linearGradient id="uwGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="var(--fuji)"/>
-                <stop offset="100%" stop-color="var(--sakura2)"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div class="uw-ring-pct" id="uw-ring-pct">0%</div>
-        </div>
-        <div class="uw-ring-label">Complete</div>
-      </div>
+  <div style="height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 16px;">
+    <div id="widget-uw-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--fuji), var(--sakura2)); border-radius: 99px; transition: width 0.5s ease;"></div>
+  </div>
 
-      <!-- Stats -->
-      <div class="uw-widget-stats">
-        <div>
-          <div class="uw-widget-stat-num" id="uw-done">—</div>
-          <div class="uw-widget-stat-lbl">Done</div>
-        </div>
-        <div>
-          <div class="uw-widget-stat-num" id="uw-remain">—</div>
-          <div class="uw-widget-stat-lbl">Left</div>
-        </div>
-        <div>
-          <div class="uw-widget-stat-num" id="uw-today">—</div>
-          <div class="uw-widget-stat-lbl">Today's Goal</div>
-        </div>
-        <div>
-          <div class="uw-widget-stat-num" id="uw-needed">—</div>
-          <div class="uw-widget-stat-lbl">Needed / Day</div>
-        </div>
-      </div>
-
-      <!-- Pace + CTA -->
-      <div class="uw-widget-right">
-        <div class="uw-widget-pace">
-          <div class="uw-pace-dot" id="uw-pace-dot"></div>
-          <div class="uw-widget-pace-msg" id="uw-pace-msg">Set up tracker →</div>
-        </div>
-        <div class="uw-widget-cta">Open Tracker ↗</div>
-      </div>
-
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+    <div>
+      <div id="widget-uw-done" style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--fuji); line-height: 1;">0</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 4px;">Unique Done</div>
     </div>
-  </a>
+    <div style="border-left: 1px solid var(--border);">
+      <div id="widget-uw-remain" style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink2); line-height: 1;">0</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 4px;">Remaining</div>
+    </div>
+    <div style="border-left: 1px solid var(--border);">
+      <div id="widget-uw-needed" style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink2); line-height: 1;">N/A</div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); margin-top: 4px;">Needed / Day</div>
+    </div>
+  </div>
+</a>
   <!-- ══ END UWORLD WIDGET ═══════════════════════════════════════════════ -->
 
   <div class="sec-label">🌸 &nbsp;My Study Tools</div>
@@ -578,6 +548,72 @@ function initUWorldWidget() {
   } catch(e) { /* widget silently fails if no data */ }
 }
 initUWorldWidget();
+function initUWorldWidget() {
+  let settings = { total: 3661, currentUnique: 0, done: 0, finishBy: '', studyDays: [0,1,2,3,4,5] };
+  let entries = [];
+  
+  try {
+    const s = localStorage.getItem('uw-settings');
+    if (s) {
+      const parsedS = JSON.parse(s);
+      // Fallback for previous variable names
+      if (parsedS.done !== undefined && parsedS.currentUnique === undefined) {
+        parsedS.currentUnique = parsedS.done;
+      }
+      settings = { ...settings, ...parsedS };
+    }
+    const e = localStorage.getItem('uw-entries');
+    if (e) entries = JSON.parse(e);
+  } catch(err) {
+    console.error('Could not load UWorld widget data');
+  }
+
+  // Calculate Unique Questions Done
+  let done = 0;
+  if (settings.currentUnique !== undefined && settings.currentUnique > 0) {
+    done = settings.currentUnique;
+  } else {
+    // Legacy fallback
+    done = (settings.done || 0) + entries.reduce((sum, entry) => sum + (entry.qs || 0), 0);
+  }
+
+  const total = settings.total || 3661;
+  const remaining = Math.max(0, total - done);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  // Calculate Needed / Day
+  let needed = "N/A";
+  if (settings.finishBy) {
+    const now = new Date(); now.setHours(0,0,0,0);
+    const finish = new Date(settings.finishBy + 'T12:00:00');
+    finish.setHours(0,0,0,0);
+    
+    let daysLeft = 0;
+    let cur = new Date(now);
+    while (cur <= finish) {
+      if ((settings.studyDays || []).includes(cur.getDay())) daysLeft++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    needed = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : remaining;
+  }
+
+  // Update DOM
+  const elDone = document.getElementById('widget-uw-done');
+  const elRemain = document.getElementById('widget-uw-remain');
+  const elNeeded = document.getElementById('widget-uw-needed');
+  const elPct = document.getElementById('widget-uw-pct');
+  const elFill = document.getElementById('widget-uw-fill');
+
+  if (elDone) elDone.textContent = done.toLocaleString();
+  if (elRemain) elRemain.textContent = remaining.toLocaleString();
+  if (elNeeded) elNeeded.textContent = needed;
+  if (elPct) elPct.textContent = pct + '%';
+  if (elFill) elFill.style.width = pct + '%';
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', initUWorldWidget);
+  
 </script>
 </body>
 </html>
