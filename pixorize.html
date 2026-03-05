@@ -509,10 +509,11 @@ function toggleReview(id) {
 }
 
 function toggleCategory(catId) {
-  const body = document.getElementById(`cat-body-${catId}`);
-  if (body) {
-    const isHidden = body.style.display === 'none';
-    body.style.display = isHidden ? 'block' : 'none';
+  try {
+    const section = document.getElementById(`cat-section-${catId}`);
+    if (section) section.classList.toggle('open');
+  } catch (err) {
+    console.error("Toggle error:", err);
   }
 }
 
@@ -542,20 +543,33 @@ function renderCategories() {
   const container = document.getElementById("tracker-container");
   if (!container) return;
 
+  // Preserve open states across re-renders
+  const openSections = new Set(
+    [...document.querySelectorAll('.cat-section.open')].map(el => el.id)
+  );
+
   let html = "";
-  categories.forEach(cat => {
+  categories.forEach((cat, idx) => {
     const total = cat.videos.length;
     const done = cat.videos.filter(v => watchedState[v.id] && reviewedState[v.id]).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+    
+    // Apply one of the 20 theme colors systematically
+    const themeNum = (idx % 20) + 1;
+    const themeColor = `var(--theme-${themeNum})`;
+    const sectionId = `cat-section-${cat.id}`;
+    const isOpenClass = openSections.has(sectionId) ? " open" : "";
     
     html += `
-    <div class="cat-section">
+    <div class="cat-section${isOpenClass}" id="${sectionId}" style="--theme-color: ${themeColor};">
       <div class="cat-header" onclick="toggleCategory('${cat.id}')">
         <div>
           <div class="cat-name">${cat.icon} ${cat.name}</div>
           <div class="cat-why">${cat.why}</div>
         </div>
         <div class="cat-meta">
-          <div>${done} / ${total} Complete</div>
+          <div class="cat-meta-txt">${done} / ${total} Complete</div>
+          <div class="cat-prog-wrap"><div class="cat-prog-fill" style="width:${pct}%"></div></div>
         </div>
       </div>
       <div class="cat-body" id="cat-body-${cat.id}">
@@ -568,10 +582,10 @@ function renderCategories() {
             <div class="video-name">${v.name}</div>
             <div class="video-time">${v.time}</div>
             <div class="check-pair">
-              <button class="check-btn ${w ? 'watched' : ''}" onclick="toggleWatch('${v.id}')">
+              <button class="check-btn ${w ? 'watched' : ''}" onclick="toggleWatch('${v.id}'); event.stopPropagation();">
                 ${w ? '✓ Watched' : 'Watch'}
               </button>
-              <button class="check-btn ${r ? 'reviewed' : ''}" onclick="toggleReview('${v.id}')">
+              <button class="check-btn ${r ? 'reviewed' : ''}" onclick="toggleReview('${v.id}'); event.stopPropagation();">
                 ${r ? '✓ Reviewed' : 'Review'}
               </button>
             </div>
