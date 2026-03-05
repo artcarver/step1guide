@@ -1,529 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<title>UWorld Tracker · Step 1</title>
-<style>
-/* ── Page shell ── */
-.uw-wrap { max-width: 860px; margin: 0 auto; padding: 28px 24px 80px; }
-
-/* ── Auth banner ── */
-.uw-auth-banner {
-  background: #fdf6e8; border: 1px solid #e8d08a; border-radius: 10px;
-  padding: 11px 16px; font-size: 12.5px; color: #7a6020;
-  margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
-}
-.uw-auth-banner a { color: #7a6020; font-weight: 600; }
-.uw-auth-banner.hidden { display: none; }
-
-/* ── Page header ── */
-.uw-back { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--muted); text-decoration:none;
-  display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; }
-.uw-back:hover { color:var(--ink2); }
-.uw-eyebrow { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2.5px;
-  text-transform:uppercase; color:var(--sakura2); margin-bottom:6px;
-  display:flex; align-items:center; gap:8px; }
-.uw-page-title { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,6vw,52px);
-  font-weight:300; color:var(--ink); line-height:1.05; margin:0 0 28px; }
-.uw-page-title em { font-style:italic; color:var(--sakura2); font-weight:400; }
-
-/* ── Log card ── */
-.log-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px 22px; margin-bottom: 20px;
-}
-.log-tabs { display:flex; gap:0; margin-bottom:18px; border-bottom:1px solid var(--border); }
-.log-tab {
-  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--muted); background:none; border:none;
-  padding:8px 14px 10px; cursor:pointer; position:relative; transition:color .15s;
-}
-.log-tab.active { color:var(--ink2); }
-.log-tab.active::after {
-  content:''; position:absolute; bottom:-1px; left:0; right:0; height:2px;
-  background:var(--sakura2); border-radius:2px 2px 0 0;
-}
-.log-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
-.log-field { display:flex; flex-direction:column; gap:5px; }
-.log-field label { font-family:'DM Mono',monospace; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.log-field input, .log-field select {
-  background:var(--bg); border:1px solid var(--border2);
-  border-radius:8px; padding:9px 12px; font-family:'Jost',sans-serif;
-  font-size:13px; color:var(--ink); outline:none; transition:border-color .15s;
-}
-.log-field input:focus, .log-field select:focus { border-color:var(--sakura); }
-.log-field input[type=date] { width:148px; }
-.log-field input[type=number] { width:100px; }
-.log-field select { min-width:180px; }
-.log-btn {
-  background:var(--fuji); color:#fff; border:none; border-radius:8px;
-  padding:10px 22px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
-  transition:all .15s; white-space:nowrap; align-self:flex-end;
-}
-.log-btn.editing { background:var(--sakura2); }
-.log-btn:hover { opacity:.85; }
-.cancel-edit { 
-  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--dim); cursor:pointer; background:none; 
-  border:none; padding:10px; display:none; 
-}
-
-/* ── Progress strip ── */
-.prog-strip {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:18px 22px; margin-bottom:20px;
-  display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0;
-}
-.prog-stat { text-align:center; padding:4px 8px; }
-.prog-stat + .prog-stat { border-left:1px solid var(--border); }
-.stat-clickable { cursor:pointer; transition: opacity .15s; }
-.stat-clickable:hover { opacity: 0.6; }
-.prog-stat-num {
-  font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600;
-  color:var(--fuji); line-height:1; margin-bottom:3px;
-}
-.prog-stat-num.ok    { color: #4a8c6a; }
-.prog-stat-num.warn  { color: #b87a2a; }
-.prog-stat-num.alert { color: #b84040; }
-.prog-stat-lbl { font-family:'DM Mono',monospace; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.click-hint { font-size:7px; color:var(--dim); display:block; margin-top:3px; }
-
-/* ── Progress bar ── */
-.prog-bar-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:16px 22px; margin-bottom:20px;
-}
-.prog-bar-head { display:flex; justify-content:space-between; align-items:baseline;
-  margin-bottom:10px; }
-.prog-bar-title { font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:8px;}
-.edit-unique-btn {
-  background:var(--bg); border:1px solid var(--border2); border-radius:4px;
-  color:var(--ink2); font-family:'DM Mono',monospace; font-size:8px; cursor:pointer;
-  padding:3px 6px; letter-spacing:1px; transition:all .15s;
-}
-.edit-unique-btn:hover { border-color:var(--sakura); color:var(--sakura); }
-.prog-bar-pct { font-family:'Cormorant Garamond',serif; font-size:20px;
-  font-weight:600; color:var(--fuji); }
-.prog-bar-bg { height:7px; background:var(--border); border-radius:99px; overflow:hidden; }
-.prog-bar-fill { height:100%; background:linear-gradient(90deg,var(--fuji),var(--sakura2));
-  border-radius:99px; transition:width .5s ease; }
-.prog-bar-sub { display:flex; justify-content:space-between; margin-top:7px;
-  font-size:11.5px; color:var(--muted); }
-.pace-row { display:flex; align-items:center; gap:8px; margin-top:10px;
-  padding-top:10px; border-top:1px solid var(--border); font-size:12.5px; color:var(--ink2); }
-.pace-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-.pace-dot.ok    { background:#4a8c6a; }
-.pace-dot.warn  { background:#b87a2a; }
-.pace-dot.behind { background:#b84040; }
-
-/* ── Charts section ── */
-.charts-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px 22px; margin-bottom:20px;
-}
-.charts-head { display:flex; justify-content:space-between; align-items:center;
-  flex-wrap:wrap; gap:10px; margin-bottom:18px; }
-.charts-title { font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.view-tabs { display:flex; gap:2px; background:var(--bg);
-  border:1px solid var(--border); border-radius:8px; padding:3px; }
-.view-tab { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--muted); background:none; border:none;
-  padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .15s; }
-.view-tab.active { background:var(--fuji); color:#fff; }
-.chart-label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
-.chart-canvas-wrap { position:relative; height:190px;
-  border-radius:10px; padding:12px; background:var(--bg); margin-bottom:18px; }
-.chart-canvas-wrap:last-child { margin-bottom:0; }
-.charts-empty { text-align:center; padding:40px 20px;
-  font-family:'Cormorant Garamond',serif; font-size:18px; font-style:italic;
-  color:var(--dim); }
-.import-link { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--dim); background:none; border:none;
-  cursor:pointer; text-decoration:underline; text-underline-offset:3px;
-  padding:0; transition:color .15s; }
-.import-link:hover { color:var(--muted); }
-
-/* ── History table ── */
-.history-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px 22px; margin-bottom:20px;
-}
-.history-head { display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:14px; }
-.history-title { font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.uw-table { width:100%; border-collapse:collapse; font-size:12.5px; }
-.uw-table th { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--dim); padding:6px 10px 10px;
-  text-align:left; border-bottom:1px solid var(--border); }
-.uw-table td { padding:9px 10px; border-bottom:1px solid var(--border);
-  color:var(--ink2); vertical-align:middle; }
-.uw-table tr:last-child td { border-bottom:none; }
-.uw-table tr:hover td { background:var(--bg); }
-.uw-badge { display:inline-block; padding:2px 8px; border-radius:99px;
-  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.5px;
-  border:1px solid transparent; }
-.uw-badge.qs   { background:rgba(61,46,110,.08); color:var(--fuji2); border-color:rgba(61,46,110,.15); }
-.uw-badge.good { background:rgba(74,140,106,.1);  color:#2e6b50; border-color:rgba(74,140,106,.25); }
-.uw-badge.warn { background:rgba(184,122,42,.1);  color:#7a4e10; border-color:rgba(184,122,42,.25); }
-.uw-badge.bad  { background:rgba(184,64,64,.1);   color:#7a2020; border-color:rgba(184,64,64,.25); }
-.uw-badge.csv  { background:rgba(61,46,110,.06);  color:var(--fuji2); border-color:rgba(61,46,110,.12); font-size:8px; }
-.uw-badge.pred { background:rgba(212,96,122,.1);  color:var(--sakura2); border-color:rgba(212,96,122,.2); }
-.action-btn { background:none; border:none; color:var(--dim); cursor:pointer;
-  font-size:11px; padding:3px 6px; border-radius:4px; transition:all .15s; }
-.action-btn:hover { background:rgba(61,46,110,.08); color:var(--ink2); }
-.action-btn.del:hover { background:rgba(184,64,64,.1); color:#b84040; }
-.uw-empty { text-align:center; padding:28px; font-family:'Cormorant Garamond',serif;
-  font-size:16px; font-style:italic; color:var(--dim); }
-
-/* ── Setup (collapsible) ── */
-.setup-toggle {
-  display:flex; align-items:center; gap:8px; background:none; border:none;
-  cursor:pointer; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--dim);
-  padding:0; margin-bottom:16px; transition:color .15s;
-}
-.setup-toggle:hover { color:var(--muted); }
-.setup-toggle svg { transition:transform .2s; }
-.setup-toggle.open svg { transform:rotate(180deg); }
-.setup-panel {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:14px; padding:20px 22px; margin-bottom:20px;
-  display:none;
-}
-.setup-panel.open { display:block; }
-.setup-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-.setup-field { display:flex; flex-direction:column; gap:5px; }
-.setup-field label { font-family:'DM Mono',monospace; font-size:8px;
-  letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
-.setup-field input { background:var(--bg); border:1px solid var(--border2);
-  border-radius:8px; padding:9px 12px; font-family:'Jost',sans-serif;
-  font-size:13px; color:var(--ink); outline:none; width:100%;
-  box-sizing:border-box; transition:border-color .15s; }
-.setup-field input:focus { border-color:var(--sakura); }
-.day-chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
-.day-chip { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:1px;
-  padding:6px 12px; border-radius:99px; border:1px solid var(--border2);
-  cursor:pointer; background:var(--bg); color:var(--muted); transition:all .15s; }
-.day-chip.active { background:var(--fuji); color:#fff; border-color:var(--fuji); }
-.save-btn { background:var(--fuji); color:#fff; border:none; border-radius:8px;
-  padding:10px 22px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
-  margin-top:16px; transition:opacity .15s; }
-.save-btn:hover { opacity:.85; }
-
-/* ── Import modal ── */
-.modal-overlay {
-  position:fixed; inset:0; background:rgba(26,20,40,.5);
-  display:flex; align-items:center; justify-content:center;
-  z-index:1000; padding:20px; opacity:0; pointer-events:none;
-  transition:opacity .2s;
-}
-.modal-overlay.open { opacity:1; pointer-events:all; }
-.modal {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:16px; padding:28px; width:100%; max-width:520px;
-  max-height:85vh; overflow-y:auto;
-  transform:translateY(12px); transition:transform .2s;
-}
-.modal-overlay.open .modal { transform:translateY(0); }
-.modal-title { font-family:'Cormorant Garamond',serif; font-size:22px;
-  font-weight:600; color:var(--ink); margin:0 0 4px; }
-.modal-sub { font-size:12.5px; color:var(--muted); margin:0 0 20px; line-height:1.55; }
-.modal-close { float:right; background:none; border:none; cursor:pointer;
-  color:var(--dim); font-size:18px; line-height:1; padding:0; margin-left:12px; }
-.modal-close:hover { color:var(--ink2); }
-.drop-zone {
-  border:2px dashed var(--border2); border-radius:10px;
-  padding:28px 20px; text-align:center; cursor:pointer;
-  transition:border-color .18s, background .18s; margin-bottom:16px;
-}
-.drop-zone:hover, .drop-zone.drag-over {
-  border-color:var(--sakura); background:rgba(236,180,195,.06);
-}
-.drop-zone-icon { font-size:24px; margin-bottom:6px; }
-.drop-zone-text { font-size:13px; color:var(--ink2); font-weight:500; }
-.drop-zone-sub { font-size:11px; color:var(--dim); margin-top:4px; }
-.mapper-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:12px; }
-.map-row { display:flex; flex-direction:column; gap:5px; }
-.map-label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px;
-  text-transform:uppercase; color:var(--muted); }
-.map-select { background:var(--bg); border:1px solid var(--border2);
-  border-radius:7px; padding:8px 10px; font-family:'Jost',sans-serif;
-  font-size:12px; color:var(--ink); outline:none; width:100%; }
-.map-select:focus { border-color:var(--sakura); }
-.modal-actions { display:flex; gap:10px; margin-top:16px; }
-.modal-btn-primary { background:var(--fuji); color:#fff; border:none; border-radius:8px;
-  padding:10px 20px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:opacity .15s; }
-.modal-btn-primary:hover { opacity:.85; }
-.modal-btn-ghost { background:none; border:1px solid var(--border2); color:var(--muted);
-  border-radius:8px; padding:10px 16px; font-family:'DM Mono',monospace; font-size:9px;
-  letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .15s; }
-.modal-btn-ghost:hover { border-color:var(--muted); color:var(--ink2); }
-.file-info { font-size:11.5px; color:var(--dim); margin-bottom:12px; }
-
-/* ── Toast ── */
-.uw-toast {
-  position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px);
-  background:rgba(26,20,40,.9); color:#fff; padding:10px 20px; border-radius:99px;
-  font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1px;
-  pointer-events:none; opacity:0; transition:all .25s; z-index:2000; white-space:nowrap;
-}
-.uw-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-
-@media (max-width:640px) {
-  .prog-strip { grid-template-columns:1fr 1fr; }
-  .prog-stat:nth-child(3) { border-left:none; border-top:1px solid var(--border); }
-  .setup-grid { grid-template-columns:1fr; }
-  .mapper-grid { grid-template-columns:1fr; }
-  .log-field input[type=date] { width:130px; }
-}
-</style>
-</head>
-<body>
-
-<div class="petals" aria-hidden="true">
-  <div class="petal p1"></div><div class="petal p2"></div><div class="petal p3"></div>
-  <div class="petal p4"></div><div class="petal p5"></div><div class="petal p6"></div>
-  <div class="petal p7"></div><div class="petal p8"></div><div class="petal p9"></div>
-</div>
-
-<div class="uw-wrap">
-
-  <a class="uw-back" href="index.html">← Back to Study Hub</a>
-
-  <div class="uw-eyebrow">📝 Question Bank</div>
-  <h1 class="uw-page-title">UWorld <em>Tracker</em></h1>
-
-  <div class="uw-auth-banner hidden" id="auth-banner">
-    ⚠️ Not logged in — data saves to this device only.
-    <a href="index.html">Log in on the hub</a> to sync across devices.
-  </div>
-
-  <button class="setup-toggle" id="setup-toggle" onclick="toggleSetup()">
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-      <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
-    Settings
-  </button>
-  <div class="setup-panel" id="setup-panel">
-    <div class="setup-grid">
-      <div class="setup-field">
-        <label>Total QBank Size</label>
-        <input type="number" id="setup-total" value="3661" min="1"/>
-      </div>
-      <div class="setup-field">
-        <label>Finish QBank By</label>
-        <input type="date" id="setup-finish"/>
-      </div>
-    </div>
-    <div class="setup-field">
-      <label>Study Days Per Week</label>
-      <div class="day-chips" id="day-chips">
-        <div class="day-chip active" data-day="0">Sun</div>
-        <div class="day-chip active" data-day="1">Mon</div>
-        <div class="day-chip active" data-day="2">Tue</div>
-        <div class="day-chip active" data-day="3">Wed</div>
-        <div class="day-chip active" data-day="4">Thu</div>
-        <div class="day-chip active" data-day="5">Fri</div>
-        <div class="day-chip" data-day="6">Sat</div>
-      </div>
-    </div>
-    <button class="save-btn" onclick="saveSetup()">Save Settings ✦</button>
-  </div>
-
-  <div class="log-card">
-    <div class="log-tabs">
-      <button class="log-tab active" id="mode-qs" onclick="setMode('questions')">Log Questions</button>
-      <button class="log-tab" id="mode-exam" onclick="setMode('exam')">Log Practice Exam</button>
-    </div>
-    <div id="log-questions-panel">
-      <div class="log-row">
-        <div class="log-field">
-          <label>Date</label>
-          <input type="date" id="log-date"/>
-        </div>
-        <div class="log-field">
-          <label>Total Qs (Volume)</label>
-          <input type="number" id="log-qs" min="1" max="120" placeholder="e.g. 40"/>
-        </div>
-        <div class="log-field">
-          <label>% Correct</label>
-          <input type="number" id="log-score" min="0" max="100" placeholder="optional"/>
-        </div>
-        <button class="log-btn" id="btn-log-qs" onclick="logEntry()">Log ✦</button>
-        <button class="cancel-edit" id="cancel-edit-qs" onclick="cancelEditEntry()">Cancel</button>
-      </div>
-    </div>
-    <div id="log-exam-panel" style="display:none;">
-      <div class="log-row">
-        <div class="log-field">
-          <label>Date</label>
-          <input type="date" id="exam-date"/>
-        </div>
-        <div class="log-field" style="flex:2;">
-          <label>Exam Name</label>
-          <select id="exam-name">
-            <option value="">Select exam…</option>
-            <option>NBME 25</option><option>NBME 26</option><option>NBME 27</option>
-            <option>NBME 28</option><option>NBME 29</option><option>NBME 30</option>
-            <option>NBME 31</option><option>Free 120</option>
-            <option>UWorld Self-Assessment 1</option>
-            <option>UWorld Self-Assessment 2</option>
-            <option>UWorld Self-Assessment 3</option>
-            <option>Amboss SA</option><option>Other</option>
-          </select>
-        </div>
-        <div class="log-field">
-          <label>EPC (%)</label>
-          <input type="number" id="exam-epc" min="0" max="100" placeholder="e.g. 72"/>
-        </div>
-        <div class="log-field">
-          <label>Est. Prob Pass (%)</label>
-          <input type="number" id="exam-epp" min="0" max="100" placeholder="e.g. 99"/>
-        </div>
-        <button class="log-btn" id="btn-log-exam" onclick="logExam()">Log ✦</button>
-        <button class="cancel-edit" id="cancel-edit-exam" onclick="cancelEditExam()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="prog-strip">
-    <div class="prog-stat">
-      <div class="prog-stat-num" id="stat-done">—</div>
-      <div class="prog-stat-lbl">Unique Done</div>
-    </div>
-    <div class="prog-stat">
-      <div class="prog-stat-num" id="stat-remain">—</div>
-      <div class="prog-stat-lbl">Remaining</div>
-    </div>
-    <div class="prog-stat">
-      <div class="prog-stat-num" id="stat-pct">—</div>
-      <div class="prog-stat-lbl">Complete</div>
-    </div>
-    <div class="prog-stat stat-clickable" onclick="showPaceMath()">
-      <div class="prog-stat-num" id="stat-needed">—</div>
-      <div class="prog-stat-lbl">Needed / Day <span class="click-hint">(Click for calc)</span></div>
-    </div>
-  </div>
-
-  <div class="prog-bar-wrap">
-    <div class="prog-bar-head">
-      <span class="prog-bar-title">
-        QBank Completion 
-        <button class="edit-unique-btn" onclick="promptUpdateUnique()">✎ Edit Progress</button>
-      </span>
-      <span class="prog-bar-pct" id="prog-pct">0%</span>
-    </div>
-    <div class="prog-bar-bg">
-      <div class="prog-bar-fill" id="prog-fill" style="width:0%"></div>
-    </div>
-    <div class="prog-bar-sub">
-      <span id="prog-sub-left"></span>
-      <span id="prog-sub-right"></span>
-    </div>
-  </div>
-
-  <div class="charts-wrap">
-    <div class="charts-head">
-      <span class="charts-title">Activity Charts</span>
-      <div style="display:flex;gap:12px;align-items:center;">
-        <button class="import-link" onclick="openImportModal()">↑ Import past data</button>
-        <div class="view-tabs" id="chart-view-toggle">
-          <button class="view-tab active" data-view="daily"   onclick="setChartView('daily')">Daily</button>
-          <button class="view-tab"        data-view="weekly"  onclick="setChartView('weekly')">Weekly</button>
-          <button class="view-tab"        data-view="monthly" onclick="setChartView('monthly')">Monthly</button>
-        </div>
-      </div>
-    </div>
-    <div id="charts-body">
-      <div class="charts-empty">Log your first session to start tracking 🌸</div>
-    </div>
-  </div>
-
-  <div class="history-wrap">
-    <div class="history-head">
-      <span class="history-title">Session Log</span>
-    </div>
-    <div id="history-container">
-      <div class="uw-empty">No entries yet 🌸</div>
-    </div>
-  </div>
-
-  <div class="history-wrap">
-    <div class="history-head">
-      <span class="history-title">Practice Exams</span>
-    </div>
-    <div id="exam-container">
-      <div class="uw-empty">No practice exams logged yet 🌸</div>
-    </div>
-  </div>
-
-</div>
-
-<div class="modal-overlay" id="import-modal" onclick="handleModalClick(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeImportModal()">✕</button>
-    <div class="modal-title">Import Past Data</div>
-    <p class="modal-sub">Upload a CSV to load your history. Needs a <strong>date</strong> and <strong>questions</strong> column (score is optional). Maps to your log automatically.</p>
-    
-    <div style="font-size:12px; color:var(--muted); margin-bottom:20px; background:var(--bg); padding:16px; border-radius:10px; border: 1px solid var(--border2);">
-      <div style="color:var(--ink2); font-weight:600; margin-bottom:8px; font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase;">How to export your data</div>
-      <ol style="margin:0 0 0 20px; padding:0; display:flex; flex-direction:column; gap:6px; line-height:1.4;">
-        <li>Go to the UWorld <strong>Previous Tests</strong> page and set "Items per page" to 100.</li>
-        <li>Highlight the entire table and copy it.</li>
-        <li>Paste the text into an AI with this prompt:<br>
-          <code style="background:rgba(0,0,0,0.05); padding:4px 6px; border-radius:4px; color:var(--ink); display:inline-block; margin-top:4px;">"Convert this UWorld data into a clean CSV. Keep only three columns: Date, # QS, and Percent Correct. Ignore all other data."</code>
-        </li>
-        <li>Save the generated text as a <strong>.csv</strong> file and upload it below.</li>
-      </ol>
-    </div>
-
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('csv-file-input').click()">
-      <div class="drop-zone-icon">📂</div>
-      <div class="drop-zone-text">Drop CSV here or <span style="color:var(--sakura2);">click to browse</span></div>
-      <div class="drop-zone-sub">UWorld exports, spreadsheets, any CSV</div>
-      <input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none"/>
-    </div>
-    <div id="col-mapper" style="display:none;">
-      <div class="file-info" id="csv-file-info"></div>
-      <div class="mapper-grid" id="col-mapper-grid"></div>
-      <div id="csv-preview"></div>
-      <div class="modal-actions">
-        <button class="modal-btn-primary" onclick="importCSV()">Import ✦</button>
-        <button class="modal-btn-ghost" onclick="resetImport()">Clear</button>
-      </div>
-    </div>
-    <div id="import-success" style="display:none;">
-      <div style="text-align:center;padding:16px 0;">
-        <div style="font-size:28px;margin-bottom:8px;">✦</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ink);margin-bottom:4px;" id="import-success-msg"></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Your stats, progress, and charts have been updated.</div>
-        <div style="display:flex;gap:8px;justify-content:center;">
-          <button class="modal-btn-primary" onclick="closeImportModal()">Done</button>
-          <button class="modal-btn-ghost" onclick="resetImport()">Re-import</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="uw-toast" id="toast"></div>
-
 <script>
 // ── Firebase ──────────────────────────────────────────
 let auth = null, db = null;
@@ -543,7 +17,7 @@ try {
 
 let currentUser = null;
 const TOTAL_DEFAULT = 3661;
-let settings = { currentUnique:0, total:TOTAL_DEFAULT, finishBy:'', studyDays:[0,1,2,3,4,5] };
+let settings = { total:TOTAL_DEFAULT, finishBy:'', studyDays:[0,1,2,3,4,5], uniqueOffset: 0 };
 let entries = [], exams = [];
 let editingEntryId = null;
 let editingExamId = null;
@@ -556,49 +30,52 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Persistence ───────────────────────────────────────
+// ── Persistence & Migration ───────────────────────────
 function saveLocal() {
   localStorage.setItem('uw-settings', JSON.stringify(settings));
   localStorage.setItem('uw-entries',  JSON.stringify(entries));
   localStorage.setItem('uw-exams',    JSON.stringify(exams));
 }
+
+function runMigration() {
+  let needsSave = false;
+  // Convert old manual unique overrides into the new offset system
+  if (settings.currentUnique !== undefined) {
+    settings.uniqueOffset = settings.currentUnique - getRawVolume();
+    delete settings.currentUnique;
+    needsSave = true;
+  }
+  if (settings.done !== undefined) {
+    delete settings.done;
+    needsSave = true;
+  }
+  if (needsSave) saveLocal();
+}
+
 function loadLocal() {
   try {
-    const s = localStorage.getItem('uw-settings'); 
-    if (s) {
-      const parsedS = JSON.parse(s);
-      // Migrate old 'done' setting to 'currentUnique' automatically
-      if (parsedS.done !== undefined && parsedS.currentUnique === undefined) {
-        parsedS.currentUnique = parsedS.done;
-        delete parsedS.done;
-      }
-      settings = {...settings, ...parsedS};
-    }
     const e = localStorage.getItem('uw-entries');  if (e) entries  = JSON.parse(e);
     const x = localStorage.getItem('uw-exams');    if (x) exams    = JSON.parse(x);
+    const s = localStorage.getItem('uw-settings'); if (s) settings = {...settings, ...JSON.parse(s)};
   } catch(e) {}
 }
+
 async function syncToFirebase() {
   if (!currentUser || !db) return;
   try { await db.collection('users').doc(currentUser.uid).set(
     { uwSettings:settings, uwEntries:entries, uwExams:exams }, { merge:true }); }
   catch(e) { console.error(e); }
 }
+
 async function loadFromFirebase() {
   if (!currentUser || !db) return;
   try {
     const doc = await db.collection('users').doc(currentUser.uid).get();
     if (doc.exists) {
       const d = doc.data();
-      if (d.uwSettings) {
-        if (d.uwSettings.done !== undefined && d.uwSettings.currentUnique === undefined) {
-            d.uwSettings.currentUnique = d.uwSettings.done;
-            delete d.uwSettings.done;
-        }
-        settings = {...settings, ...d.uwSettings};
-      }
       if (d.uwEntries)  entries  = d.uwEntries;
       if (d.uwExams)    exams    = d.uwExams;
+      if (d.uwSettings) settings = {...settings, ...d.uwSettings};
       saveLocal();
     }
   } catch(e) { console.error(e); }
@@ -609,6 +86,7 @@ if (auth) {
     currentUser = user;
     document.getElementById('auth-banner').classList.toggle('hidden', !!user);
     if (user) { await loadFromFirebase(); }
+    runMigration();
     renderAll();
   });
 } else {
@@ -622,6 +100,7 @@ function toggleSetup() {
   panel.classList.toggle('open');
   btn.classList.toggle('open');
 }
+
 function initSetupUI() {
   document.getElementById('setup-total').value  = settings.total || TOTAL_DEFAULT;
   document.getElementById('setup-finish').value = settings.finishBy  || '';
@@ -631,6 +110,7 @@ function initSetupUI() {
     chip.onclick = () => chip.classList.toggle('active');
   });
 }
+
 function saveSetup() {
   settings.total     = parseInt(document.getElementById('setup-total').value) || TOTAL_DEFAULT;
   settings.finishBy  = document.getElementById('setup-finish').value;
@@ -642,16 +122,25 @@ function saveSetup() {
   showToast('Settings saved ✦');
 }
 
-// ── Manual Unique Progress ────────────────────────────
+// ── Auto vs Manual Unique Progress ────────────────────
+function getRawVolume() {
+  return entries.reduce((sum, e) => sum + (e.qs || 0), 0);
+}
+
+function getCurrentUnique() {
+  // Defaults to sum of all logged questions. Edited offset handles incorrects.
+  return Math.max(0, getRawVolume() + (settings.uniqueOffset || 0));
+}
+
 function promptUpdateUnique() {
-  const current = settings.currentUnique || 0;
-  const input = prompt("Enter your current Unique Questions Completed count (effects top progress bar):", current);
+  const current = getCurrentUnique();
+  const input = prompt("Enter your actual Unique Questions Completed count:", current);
   if (input !== null) {
     const num = parseInt(input);
     if (!isNaN(num) && num >= 0) {
-      settings.currentUnique = num;
+      settings.uniqueOffset = num - getRawVolume();
       saveLocal(); syncToFirebase(); renderStats();
-      showToast(`Progress updated to ${num} ✦`);
+      showToast(`Progress calibrated to ${num} ✦`);
     } else {
       showToast('Please enter a valid number.');
     }
@@ -661,11 +150,12 @@ function promptUpdateUnique() {
 // ── Stats Calculation ─────────────────────────────────
 function calcNeededMath() {
   if (!settings.finishBy) return null;
-  const remaining = Math.max(0, settings.total - (settings.currentUnique || 0));
+  const done = getCurrentUnique();
+  const remaining = Math.max(0, settings.total - done);
   if (remaining <= 0) return { remaining, daysLeft: 0, needed: 0 };
   
   const now = new Date(); now.setHours(0,0,0,0);
-  const finish = new Date(settings.finishBy + 'T12:00:00'); // avoid timezone shifts
+  const finish = new Date(settings.finishBy + 'T12:00:00');
   finish.setHours(0,0,0,0);
   
   let daysLeft = 0;
@@ -684,13 +174,13 @@ function calcNeededMath() {
 
 function showPaceMath() {
   const math = calcNeededMath();
-  if (!math) return showToast("Set a 'Finish QBank By' date in settings first!");
-  if (math.remaining <= 0) return showToast("QBank complete! No questions needed per day.");
+  if (!math) return showToast("Set a 'Finish QBank By' date in settings first.");
+  if (math.remaining <= 0) return showToast("QBank complete. No questions needed per day.");
   alert(`Pace Calculation:\n\n${math.remaining.toLocaleString()} remaining questions\n÷ ${math.daysLeft} study days left\n= ${math.needed} questions/day`);
 }
 
 function renderStats() {
-  const done = settings.currentUnique || 0;
+  const done = getCurrentUnique();
   const remaining = Math.max(0, settings.total - done);
   const pct  = settings.total > 0 ? Math.round((done/settings.total)*100) : 0;
   
@@ -704,7 +194,6 @@ function renderStats() {
   const nel = document.getElementById('stat-needed');
   nel.textContent = needed;
   if (math) {
-    // Basic color coding for pace
     nel.className = 'prog-stat-num' + (needed > 80 ? ' alert' : needed > 40 ? ' warn' : ' ok');
   } else {
     nel.className = 'prog-stat-num';
@@ -760,7 +249,7 @@ function aggregate(rows) {
     result[view] = { keys, map };
   });
   
-  let cum = 0; // Cumulative logic is strictly raw volume, not connected to manual unique progress
+  let cum = 0;
   result.cumul = { labels:[], values:[] };
   result.daily.keys.forEach(k => {
     cum += result.daily.map[k].qs;
@@ -776,7 +265,7 @@ function renderCharts() {
   const data = buildLiveChartData();
   const body = document.getElementById('charts-body');
   if (!data) {
-    body.innerHTML = '<div class="charts-empty">Log your first session to start tracking 🌸</div>';
+    body.innerHTML = '<div class="charts-empty">Log your first session to start tracking</div>';
     Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
     return;
   }
@@ -844,6 +333,7 @@ function chartDefaults() {
     }
   };
 }
+
 function buildBarChart(id, labels, data) {
   destroyChart(id);
   const ctx = document.getElementById(id); if (!ctx) return;
@@ -852,6 +342,7 @@ function buildBarChart(id, labels, data) {
     options:chartDefaults()
   });
 }
+
 function buildLineChart(id, labels, data) {
   destroyChart(id);
   const ctx = document.getElementById(id); if (!ctx) return;
@@ -865,12 +356,12 @@ function buildLineChart(id, labels, data) {
     options:opts
   });
 }
+
 function buildCumulChart(id, labels, data) {
   destroyChart(id);
   const ctx = document.getElementById(id); if (!ctx) return;
   const opts = chartDefaults();
   
-  // Dynamic max depending on if volume exceeds total qbank
   const maxVal = Math.max(settings.total || TOTAL_DEFAULT, ...data);
   opts.scales.y.max = maxVal + 100;
   opts.scales.y.ticks.callback = v => v.toLocaleString();
@@ -1020,7 +511,7 @@ function deleteExam(id) {
 // ── Render Views ──────────────────────────────────────
 function renderHistory() {
   const el = document.getElementById('history-container');
-  if (!entries.length) { el.innerHTML='<div class="uw-empty">No entries yet 🌸</div>'; return; }
+  if (!entries.length) { el.innerHTML='<div class="uw-empty">No entries yet</div>'; return; }
   const asc=[...entries].sort((a,b)=>a.date.localeCompare(b.date));
   const totalsMap={};
   let cum = 0;
@@ -1053,7 +544,7 @@ function renderHistory() {
 
 function renderExams() {
   const el=document.getElementById('exam-container');
-  if (!exams.length){el.innerHTML='<div class="uw-empty">No practice exams logged yet 🌸</div>';return;}
+  if (!exams.length){el.innerHTML='<div class="uw-empty">No practice exams logged yet</div>';return;}
   const sorted=[...exams].sort((a,b)=>b.date.localeCompare(a.date));
   let html=`<table class="uw-table"><thead><tr>
     <th>Date</th><th>Exam</th><th>EPC (%)</th><th>Prob. Pass (%)</th><th>Actions</th>
@@ -1099,6 +590,7 @@ function handleFile(file) {
   r.onload=e=>{try{parseCSV(e.target.result,file.name);}catch(err){showToast('Could not read file');}};
   r.readAsText(file);
 }
+
 function parseCSV(text,filename) {
   const lines=text.trim().split(/\r?\n/);
   if(lines.length<2){showToast('File appears empty');return;}
@@ -1116,6 +608,7 @@ function parseCSV(text,filename) {
   document.getElementById('col-mapper').style.display='';
   document.getElementById('drop-zone').style.display='none';
 }
+
 function splitCSVLine(line) {
   const result=[]; let cur='',inQ=false;
   for(let i=0;i<line.length;i++){
@@ -1127,6 +620,7 @@ function splitCSVLine(line) {
   }
   result.push(cur.trim()); return result;
 }
+
 function autoDetectCols() {
   const lower=csvHeaders.map(h=>h.toLowerCase());
   const find=kws=>{for(const kw of kws){const i=lower.findIndex(h=>h.includes(kw));if(i>=0)return csvHeaders[i];}return '';};
@@ -1134,6 +628,7 @@ function autoDetectCols() {
   colMap.questions=find(['question','qs','count','num','total','completed','done']);
   colMap.score=find(['score','correct','pct','percent','accuracy','grade','result']);
 }
+
 function renderColMapper() {
   const fields=[
     {key:'date',label:'Date *'},
@@ -1149,6 +644,7 @@ function renderColMapper() {
       </select>
     </div>`).join('');
 }
+
 function importCSV() {
   if(!colMap.date||!colMap.questions){showToast('Map Date and Questions columns');return;}
   const parsed=[]; let fails=0;
@@ -1167,6 +663,7 @@ function importCSV() {
     qs:r.qs, score:r.score!==null?r.score:undefined, fromCSV:true
   }));
   entries=[...imported, ...entries.filter(e=>!e.fromCSV)];
+  
   saveLocal(); syncToFirebase(); renderAll();
   
   document.getElementById('col-mapper').style.display='none';
@@ -1175,6 +672,7 @@ function importCSV() {
   document.getElementById('import-success-msg').textContent=
     `${parsed.length} sessions · ${totalQs.toLocaleString()} questions imported`;
 }
+
 function resetImport() {
   csvRawRows=[]; csvHeaders=[]; colMap={date:'',questions:'',score:''};
   document.getElementById('csv-file-input').value='';
@@ -1213,7 +711,6 @@ function parseFlexDate(str) {
 document.getElementById('log-date').value  = todayStr();
 document.getElementById('exam-date').value = todayStr();
 loadLocal();
+runMigration();
 renderAll();
 </script>
-</body>
-</html>
