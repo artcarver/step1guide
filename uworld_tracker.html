@@ -246,17 +246,26 @@
 <div class="uw-toast" id="toast"></div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
-  authDomain: "sketchy-tracker.firebaseapp.com",
-  projectId: "sketchy-tracker",
-  storageBucket: "sketchy-tracker.firebasestorage.app",
-  messagingSenderId: "970470066509",
-  appId: "1:970470066509:web:14c7300fb1dd882a038f04"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db   = firebase.firestore();
+// Firebase init — identical pattern to sketchypharm.html (working)
+let auth = null;
+let db   = null;
+
+try {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
+    authDomain: "sketchy-tracker.firebaseapp.com",
+    projectId: "sketchy-tracker",
+    storageBucket: "sketchy-tracker.firebasestorage.app",
+    messagingSenderId: "970470066509",
+    appId: "1:970470066509:web:14c7300fb1dd882a038f04",
+    measurementId: "G-2KVBCP4THR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db   = firebase.firestore();
+} catch(e) {
+  console.log('Firebase not available, using localStorage only');
+}
 
 let currentUser = null;
 const TOTAL_DEFAULT = 3661;
@@ -288,14 +297,15 @@ function loadLocal() {
 }
 
 async function syncToFirebase() {
-  if (!currentUser) return;
-  try { await db.collection('users').doc(currentUser.uid).set(
-    { uwSettings:settings, uwEntries:entries, uwExams:exams }, { merge:true }); }
-  catch(e) { console.error(e); }
+  if (!currentUser || !db) return;
+  try {
+    await db.collection('users').doc(currentUser.uid).set(
+      { uwSettings:settings, uwEntries:entries, uwExams:exams }, { merge:true });
+  } catch(e) { console.error(e); }
 }
 
 async function loadFromFirebase() {
-  if (!currentUser) return;
+  if (!currentUser || !db) return;
   try {
     const doc = await db.collection('users').doc(currentUser.uid).get();
     if (doc.exists) {
@@ -303,44 +313,25 @@ async function loadFromFirebase() {
       if (d.uwSettings) settings = {...settings, ...d.uwSettings};
       if (d.uwEntries)  entries  = d.uwEntries;
       if (d.uwExams)    exams    = d.uwExams;
-      saveLocal(); renderAll();
-    } else {
-      renderAll();
+      saveLocal();
     }
-  } catch(e) { console.error(e); renderAll(); }
+  } catch(e) { console.error('Firebase load error:', e); }
 }
 
-// Hide banner until Firebase confirms auth state — prevents flash of "not logged in"
-document.getElementById('auth-banner').classList.add('hidden');
-
-// CRITICAL: setPersistence must fully resolve BEFORE registering onAuthStateChanged.
-// If onAuthStateChanged fires first (which it will if setPersistence is fire-and-forget),
-// it reads the old SESSION persistence and returns null, ignoring the existing login.
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-  .then(() => {
-    auth.onAuthStateChanged(async (user) => {
-      currentUser = user;
-      document.getElementById('auth-banner').classList.toggle('hidden', !!user);
-      if (user) {
-        await loadFromFirebase();
-      } else {
-        renderAll();
-      }
-    });
-  })
-  .catch((err) => {
-    // Persistence failed (e.g. private browsing) — still register auth listener
-    console.warn('setPersistence failed, falling back:', err);
-    auth.onAuthStateChanged(async (user) => {
-      currentUser = user;
-      document.getElementById('auth-banner').classList.toggle('hidden', !!user);
-      if (user) {
-        await loadFromFirebase();
-      } else {
-        renderAll();
-      }
-    });
+// Auth — no setPersistence (Firebase compat already defaults to LOCAL).
+// Matches the exact pattern in sketchypharm.html which persists correctly.
+if (auth) {
+  auth.onAuthStateChanged(async (user) => {
+    currentUser = user;
+    document.getElementById('auth-banner').classList.toggle('hidden', !!user);
+    if (user) {
+      await loadFromFirebase();
+    }
+    renderAll();
   });
+} else {
+  document.getElementById('auth-banner').classList.remove('hidden');
+}
 
 function initSetupUI() {
   document.getElementById('setup-done').value   = settings.done      || '';
