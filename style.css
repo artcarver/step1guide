@@ -338,7 +338,7 @@ a { text-decoration: none; color: inherit; }
 /* ── Tab Navigation ──────────────────────────────────────── */
 .tabs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
   padding: 14px 0 0;
   border-bottom: none;
@@ -695,8 +695,7 @@ a { text-decoration: none; color: inherit; }
 /* ── Class Groups (Organism / Drug Groups) ───────────────── */
 .class-group {
   margin-bottom: 28px;
-  --theme-color: var(--sakura2);
-  --theme-color-light: var(--petal);
+  /* theme-color is set via inline style by renderSection(); no default override here */
 }
 
 .class-group-header {
@@ -2208,7 +2207,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 @media (max-width: 480px) {
-  .tabs { gap: 4px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .tabs { gap: 4px; grid-template-columns: repeat(3, 1fr); }
   .tab-btn { font-size: 10.5px; padding: 8px 10px; }
   .card-grid-4 { grid-template-columns: 1fr; }
   .ds-grid { grid-template-columns: 1fr; }
