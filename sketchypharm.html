@@ -5,555 +5,342 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
-<title>Sketchy Pharm Priority - Step 1</title>
-
-
-
+<title>Sketchy Pharm Tracker · Step 1</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
 </head>
 <body>
 
 <div class="header">
   <div class="header-inner">
-    <a href="index.html" class="back-link">&#8592; Back to Hub</a>
-    <h1 class="brand-title">Sketchy Pharm Tracker</h1>
-    <p class="brand-sub"><span id="header-remaining">0</span> remaining &nbsp;·&nbsp; <span id="header-total">0</span> hrs total</p>
-
-    <div class="stats-row">
-      <div class="stat-chip"><div class="num" style="color:var(--t1)" id="chip-t1">0</div><div class="lbl">Tier 1 · High Yield</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--t2)" id="chip-t2">0</div><div class="lbl">Tier 2 · Important</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--t3)" id="chip-t3">0</div><div class="lbl">Tier 3 · Review</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--t4)" id="chip-t4">0</div><div class="lbl">Tier 4 · Low Yield</div></div>
-      <div class="stat-chip"><div class="num" style="color:var(--green)" id="header-completed">0 / 0</div><div class="lbl">Fully Complete</div></div>
+    <div class="global-nav">
+      <a href="index.html" style="font-size:18px; font-weight:600; color:var(--sakura2);">🌸 Step 1 Hub</a>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <a href="uworld_tracker.html">UWorld</a>
+        <a href="step1_dashboard.html">Dashboard</a>
+        <a href="drugfacts.html">Pharm</a>
+        <a href="microfacts.html">Micro</a>
+      </div>
     </div>
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('bytier',this)">By Priority Tier</button>
-      <button class="tab-btn" onclick="switchTab('bycat',this)">By Category</button>
-      <button class="tab-btn" onclick="switchTab('tracker',this)">Progress Tracker</button>
+    <div class="header-top">
+      <div>
+        <p class="brand-super">Progress Tracker</p>
+        <h1 class="brand-title">Sketchy Pharm</h1>
+        <p class="brand-sub" id="header-stats">Loading progress...</p>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="content">
-  <div id="tab-bycat" class="tab-panel"><div id="bycat-content"></div></div>
-  
-  <div id="tab-bytier" class="tab-panel active">
-    <div class="alert">
-      <strong>Start with Tier 1.</strong> These <span id="tier1-count">0</span> videos cover topics that appear on almost every Step 1 exam. Complete all of Tier 1 before moving to Tier 2.
-    </div>
-    <div id="bytier-content"></div>
+  <div class="alert hidden" id="auth-banner">
+    ⚠️ <strong>Not logged in.</strong> Please <a href="index.html" style="color:var(--sakura2); font-weight:600;">log in on the hub</a> to sync and save your progress.
   </div>
 
-  <div id="tab-tracker" class="tab-panel">
-    <div class="overall-progress">
-      <div class="op-top"><span class="op-label">Overall Completion</span><span class="op-pct" id="tracker-pct">0%</span></div>
-      <div class="op-bar"><div class="op-bar-fill" id="tracker-bar" style="width:0%"></div></div>
-      <div class="op-note" id="tracker-note">0 of 0 videos completed (Watch + Review)</div>
+  <div class="overall-progress">
+    <div class="op-top">
+      <span class="op-label">Overall Course Completion</span>
+      <span class="op-pct" id="tracker-pct">0%</span>
     </div>
-    <div id="tracker-content"></div>
+    <div class="op-bar">
+      <div class="op-bar-fill" id="tracker-bar" style="width:0%"></div>
+    </div>
+    <div class="op-note" id="tracker-note">0 / 0 videos completed (Watched & Reviewed)</div>
   </div>
+
+  <div id="tracker-container">
+    </div>
 </div>
 
 <script>
-// Firebase Config - graceful fallback if SDK not loaded
-let auth = null;
-let db = null;
-let currentUser = null;
-let watchedState = {};
-let reviewedState = {};
-
-try {
-  const firebaseConfig = {
-    apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
-    authDomain: "sketchy-tracker.firebaseapp.com",
-    projectId: "sketchy-tracker",
-    storageBucket: "sketchy-tracker.firebasestorage.app",
-    messagingSenderId: "970470066509",
-    appId: "1:970470066509:web:14c7300fb1dd882a038f04",
-    measurementId: "G-2KVBCP4THR"
-  };
-  firebase.initializeApp(firebaseConfig);
-  auth = firebase.auth();
-  db = firebase.firestore();
-} catch(e) {
-  console.log("Firebase not available, using local storage");
-}
-
+// ── Cleaned Data Array (Tiers & Yields Stripped) ─────────────
 const categories = [
   {
-    id:"autonomic", name:"Autonomic", totalTime:"2.5 hrs",
-    why:"Foundational for CV, neuro, and organ systems - appears on 8-12% of pharm questions",
-    videos:[
-      {id:"au1",num:"1.1",name:"Cholinomimetics",time:"16min",tier:1,yield:9,reason:"Muscarinic agonists, glaucoma, ileus - high-yield"},
-      {id:"au2",num:"1.2",name:"Cholinesterase Inhibitors",time:"21min",tier:1,yield:9,reason:"Myasthenia gravis, Alzheimer's, organophosphate poisoning"},
-      {id:"au3",num:"1.3",name:"Muscarinic Antagonists",time:"20min",tier:1,yield:9,reason:"Atropine, ipratropium - classic SE questions"},
-      {id:"au4",num:"2.1",name:"Sympathomimetics",time:"30min",tier:1,yield:9,reason:"Epinephrine, dopamine - anaphylaxis, shock"},
-      {id:"au5",num:"2.2",name:"Indirect Sympathomimetics",time:"17min",tier:2,yield:7,reason:"Amphetamines, cocaine - MOA and toxicity"},
-      {id:"au6",num:"2.3",name:"Alpha Drugs",time:"22min",tier:2,yield:8,reason:"Phenoxybenzamine, prazosin - pheo, BPH"},
-      {id:"au7",num:"2.4",name:"Beta Blockers",time:"24min",tier:1,yield:9,reason:"Most-tested CV class; contraindications are classic vignettes"},
+    id: "autonomic", name: "Autonomic", totalTime: "2.5 hrs", why: "Foundational for CV, neuro, and organ systems",
+    videos: [
+      { id: "au1", num: "1.1", name: "Cholinomimetics", time: "16min" },
+      { id: "au2", num: "1.2", name: "Cholinesterase Inhibitors", time: "21min" },
+      { id: "au3", num: "1.3", name: "Muscarinic Antagonists", time: "20min" },
+      { id: "au4", num: "2.1", name: "Sympathomimetics", time: "30min" },
+      { id: "au5", num: "2.2", name: "Indirect Sympathomimetics", time: "17min" },
+      { id: "au6", num: "2.3", name: "Alpha Drugs", time: "22min" },
+      { id: "au7", num: "2.4", name: "Beta Blockers", time: "24min" }
     ]
   },
   {
-    id:"cv", name:"Cardiovascular & Renal", totalTime:"4 hrs",
-    why:"CV drugs are among the single most-tested drug classes on Step 1",
-    videos:[
-      {id:"cv1",num:"1.1",name:"Digoxin, Milrinone, Nesiritide",time:"20min",tier:2,yield:8,reason:"Digoxin toxicity and ECG changes - classic Step 1 question"},
-      {id:"cv2",num:"1.2",name:"ACE Inhibitors, ARBs, Aliskiren",time:"26min",tier:1,yield:10,reason:"#1 most-tested antihypertensive - DM nephropathy, HF, cough SE"},
-      {id:"cv3",num:"2.1",name:"Acetazolamide, Mannitol",time:"24min",tier:2,yield:7,reason:"Glaucoma, altitude sickness, increased ICP"},
-      {id:"cv4",num:"2.2",name:"Loop Diuretics",time:"21min",tier:1,yield:9,reason:"Furosemide - HF, hypokalemia, ototoxicity: all classic"},
-      {id:"cv5",num:"2.3",name:"Thiazides",time:"20min",tier:1,yield:9,reason:"Hypokalemia, hypercalcemia, hyperlipidemia - heavily tested SEs"},
-      {id:"cv6",num:"2.4",name:"K+ Sparing Diuretics",time:"25min",tier:2,yield:8,reason:"Spironolactone in HF; hyperkalemia risk"},
-      {id:"cv7",num:"3.1",name:"Calcium Channel Blockers",time:"21min",tier:1,yield:9,reason:"Nifedipine vs verapamil/diltiazem distinction - Step 1 favorite"},
-      {id:"cv8",num:"3.2",name:"Primary HTN & Hypertensive Emergency",time:"25min",tier:2,yield:8,reason:"Nitroprusside, hydralazine - emergencies and pregnancy HTN"},
-      {id:"cv9",num:"4.1",name:"Antiarrhythmics - Class I A-C",time:"24min",tier:2,yield:8,reason:"Na+ channel blockers; Class IC proarrhythmia and QT prolongation"},
-      {id:"cv10",num:"4.2",name:"Antiarrhythmics - Class II",time:"10min",tier:2,yield:8,reason:"Metoprolol - SVT, post-MI"},
-      {id:"cv11",num:"4.3",name:"Antiarrhythmics - Class III",time:"12min",tier:2,yield:8,reason:"Amiodarone toxicity (pulmonary, thyroid, liver) - very high yield"},
-      {id:"cv12",num:"4.4",name:"Antiarrhythmics - Class IV",time:"9min",tier:2,yield:7,reason:"Verapamil, diltiazem in SVT"},
-      {id:"cv13",num:"4.5",name:"Antiarrhythmics - Class V (Adenosine, Mg)",time:"13min",tier:3,yield:6,reason:"Adenosine for SVT diagnosis and treatment"},
+    id: "cv", name: "Cardiovascular & Renal", totalTime: "4 hrs", why: "CV drugs are heavily tested on Step 1",
+    videos: [
+      { id: "cv1", num: "1.1", name: "Digoxin, Milrinone, Nesiritide", time: "20min" },
+      { id: "cv2", num: "1.2", name: "ACE Inhibitors, ARBs, Aliskiren", time: "26min" },
+      { id: "cv3", num: "2.1", name: "Acetazolamide, Mannitol", time: "24min" },
+      { id: "cv4", num: "2.2", name: "Loop Diuretics", time: "21min" },
+      { id: "cv5", num: "2.3", name: "Thiazides", time: "20min" },
+      { id: "cv6", num: "2.4", name: "K+ Sparing Diuretics", time: "25min" },
+      { id: "cv7", num: "3.1", name: "Calcium Channel Blockers", time: "21min" },
+      { id: "cv8", num: "3.2", name: "Primary HTN & Hypertensive Emergency", time: "25min" },
+      { id: "cv9", num: "4.1", name: "Antiarrhythmics - Class I A-C", time: "24min" },
+      { id: "cv10", num: "4.2", name: "Antiarrhythmics - Class II", time: "10min" },
+      { id: "cv11", num: "4.3", name: "Antiarrhythmics - Class III", time: "12min" },
+      { id: "cv12", num: "4.4", name: "Antiarrhythmics - Class IV", time: "9min" },
+      { id: "cv13", num: "4.5", name: "Antiarrhythmics - Class V (Adenosine, Mg)", time: "13min" }
     ]
   },
   {
-    id:"blood", name:"Blood & Inflammation", totalTime:"3.5 hrs",
-    why:"Anticoagulants and NSAIDs appear on nearly every Step 1 exam",
-    videos:[
-      {id:"bl1",num:"1.1",name:"Heparin, LMWH, Fondaparinux, Direct Thrombin Inhibitors, Direct Xa Inhibitors",time:"30min",tier:1,yield:10,reason:"HIT, reversal - extremely tested; know all agents"},
-      {id:"bl2",num:"1.2",name:"Warfarin",time:"21min",tier:1,yield:10,reason:"Drug interactions, INR, reversal - #1 anticoagulant question"},
-      {id:"bl3",num:"1.3",name:"Anti-Platelet Agents",time:"29min",tier:1,yield:9,reason:"Aspirin MOA, clopidogrel, GP IIb/IIIa - post-MI and stents"},
-      {id:"bl4",num:"1.4",name:"Thrombolytics",time:"15min",tier:2,yield:7,reason:"tPA in stroke/STEMI - timing windows and contraindications"},
-      {id:"bl5",num:"2.1",name:"Statins (HMG-CoA Reductase Inhibitors)",time:"26min",tier:1,yield:9,reason:"Rhabdomyolysis SE; most-prescribed drug class"},
-      {id:"bl6",num:"2.2",name:"Cholestyramine, Ezetimibe",time:"17min",tier:3,yield:5,reason:"Bile acid sequestrants - bile acid recycling; lower yield"},
-      {id:"bl7",num:"2.3",name:"Fibrates, Niacin",time:"16min",tier:3,yield:5,reason:"Niacin flushing (prostaglandin) - classic but lower frequency"},
-      {id:"bl8",num:"3.1",name:"NSAIDs",time:"34min",tier:1,yield:10,reason:"COX-1 vs COX-2; GI toxicity; aspirin OD - classic toxicology"},
-      {id:"bl9",num:"3.2",name:"Gout Drugs",time:"24min",tier:2,yield:8,reason:"Allopurinol, colchicine - distinct MOAs; well-tested SEs"},
+    id: "blood", name: "Blood & Inflammation", totalTime: "3.5 hrs", why: "Anticoagulants and NSAIDs appear on nearly every exam",
+    videos: [
+      { id: "bl1", num: "1.1", name: "Heparin, LMWH, Fondaparinux, DTIs, Direct Xa", time: "30min" },
+      { id: "bl2", num: "1.2", name: "Warfarin", time: "21min" },
+      { id: "bl3", num: "1.3", name: "Anti-Platelet Agents", time: "29min" },
+      { id: "bl4", num: "1.4", name: "Thrombolytics", time: "15min" },
+      { id: "bl5", num: "2.1", name: "Statins (HMG-CoA Reductase Inhibitors)", time: "26min" },
+      { id: "bl6", num: "2.2", name: "Cholestyramine, Ezetimibe", time: "17min" },
+      { id: "bl7", num: "2.3", name: "Fibrates, Niacin", time: "16min" },
+      { id: "bl8", num: "3.1", name: "NSAIDs", time: "34min" },
+      { id: "bl9", num: "3.2", name: "Gout Drugs", time: "24min" }
     ]
   },
   {
-    id:"smooth", name:"Smooth Muscle", totalTime:"1.5 hrs",
-    why:"Asthma and migraine drugs test MOA and receptor specificity",
-    videos:[
-      {id:"sm1",num:"1.1",name:"Nitrates",time:"19min",tier:1,yield:8,reason:"Angina; NO mechanism; headache, tolerance - classic questions"},
-      {id:"sm2",num:"1.2",name:"Triptans & Migraine",time:"9min",tier:2,yield:7,reason:"5-HT1B/D agonists; contraindicated in CAD"},
-      {id:"sm3",num:"1.3",name:"Prostaglandins, Prostacyclin, Bosentan, PDE5 Inhibitors",time:"16min",tier:3,yield:6,reason:"Pulmonary arterial hypertension - sildenafil MOA"},
-      {id:"sm4",num:"2.1",name:"Anti-Histamines",time:"16min",tier:2,yield:7,reason:"H1 vs H2; diphenhydramine anticholinergic SEs - frequent"},
-      {id:"sm5",num:"2.2",name:"Asthma Therapy",time:"22min",tier:1,yield:9,reason:"Beta-2 agonists, steroids, cromolyn, montelukast - step therapy"},
+    id: "smooth", name: "Smooth Muscle", totalTime: "1.5 hrs", why: "Asthma and migraine drugs test MOA and specificity",
+    videos: [
+      { id: "sm1", num: "1.1", name: "Nitrates", time: "19min" },
+      { id: "sm2", num: "1.2", name: "Triptans & Migraine", time: "9min" },
+      { id: "sm3", num: "1.3", name: "Prostaglandins, Prostacyclin, Bosentan, PDE5i", time: "16min" },
+      { id: "sm4", num: "2.1", name: "Anti-Histamines", time: "16min" },
+      { id: "sm5", num: "2.2", name: "Asthma Therapy", time: "22min" }
     ]
   },
   {
-    id:"gi", name:"GI & Endocrine", totalTime:"3.75 hrs",
-    why:"Diabetes drugs are extremely high-yield; glucocorticoids and thyroid pharm link to many systems",
-    videos:[
-      {id:"gi1",num:"1.1",name:"Anti-Emetic Agents",time:"19min",tier:3,yield:6,reason:"Ondansetron, metoclopramide - chemo-related nausea"},
-      {id:"gi2",num:"1.2",name:"H2 Receptor Blockers, PPIs",time:"23min",tier:1,yield:8,reason:"Most-prescribed drugs in the US - mechanism and B12 deficiency"},
-      {id:"gi3",num:"1.3",name:"Laxative Agents",time:"17min",tier:3,yield:5,reason:"Loperamide, osmotic laxatives - low yield but clean questions"},
-      {id:"gi4",num:"2.1",name:"Insulin, Sulfonylureas, Meglitinides, GLP-1 Agonists, DPP-4 Inhibitors",time:"30min",tier:1,yield:10,reason:"Diabetes is massive on Step 1 - all drug classes and their SEs"},
-      {id:"gi5",num:"2.2",name:"Metformin, Thiazolidinediones, Pramlintide, SGLT2 Inhibitors",time:"24min",tier:1,yield:9,reason:"Metformin lactic acidosis; SGLT2 UTI/DKA - extremely tested"},
-      {id:"gi6",num:"3.1",name:"Propylthiouracil, Methimazole, Levothyroxine",time:"22min",tier:2,yield:8,reason:"Thyroid pharm - agranulocytosis (PTU/methimazole), hypothyroid Rx"},
-      {id:"gi7",num:"3.2",name:"Bisphosphonates, Raloxifene, Denosumab, Calcitonin",time:"18min",tier:2,yield:7,reason:"Osteoporosis pharm - esophagitis from bisphosphonates"},
-      {id:"gi8",num:"3.3",name:"Teriparatide, Vitamin D, Cinacalcet, Sevelamer",time:"19min",tier:3,yield:5,reason:"Calcium/phosphate homeostasis - CKD context; lower yield"},
-      {id:"gi9",num:"3.4",name:"Glucocorticoids",time:"21min",tier:1,yield:9,reason:"Mechanism, SEs (HPA suppression, hyperglycemia, osteoporosis), uses - extremely high yield"},
-      {id:"gi10",num:"4.1",name:"ADH, DDAVP, ADH Receptor Antagonists",time:"19min",tier:2,yield:7,reason:"SIADH vs DI - vaptans, desmopressin; classic vignettes"},
-      {id:"gi11",num:"4.2",name:"Growth Hormone, Mecasermin, Octreotide, Pegvisomant",time:"18min",tier:3,yield:6,reason:"Acromegaly treatment, octreotide in carcinoid - tested MOA"},
+    id: "gi", name: "GI & Endocrine", totalTime: "3.75 hrs", why: "Diabetes drugs are extremely high-yield",
+    videos: [
+      { id: "gi1", num: "1.1", name: "Anti-Emetic Agents", time: "19min" },
+      { id: "gi2", num: "1.2", name: "H2 Receptor Blockers, PPIs", time: "23min" },
+      { id: "gi3", num: "1.3", name: "Laxative Agents", time: "17min" },
+      { id: "gi4", num: "2.1", name: "Insulin, Sulfonylureas, Meglitinides, GLP-1, DPP-4", time: "30min" },
+      { id: "gi5", num: "2.2", name: "Metformin, TZDs, Pramlintide, SGLT2 Inhibitors", time: "24min" },
+      { id: "gi6", num: "3.1", name: "Propylthiouracil, Methimazole, Levothyroxine", time: "22min" },
+      { id: "gi7", num: "3.2", name: "Bisphosphonates, Raloxifene, Denosumab, Calcitonin", time: "18min" },
+      { id: "gi8", num: "3.3", name: "Teriparatide, Vitamin D, Cinacalcet, Sevelamer", time: "19min" },
+      { id: "gi9", num: "3.4", name: "Glucocorticoids", time: "21min" },
+      { id: "gi10", num: "4.1", name: "ADH, DDAVP, ADH Receptor Antagonists", time: "19min" },
+      { id: "gi11", num: "4.2", name: "Growth Hormone, Mecasermin, Octreotide, Pegvisomant", time: "18min" }
     ]
   },
   {
-    id:"neuro", name:"Neuro & Psych", totalTime:"4.5 hrs",
-    why:"Psych block is heavily tested; antidepressants and antipsychotics appear constantly",
-    videos:[
-      {id:"np1",num:"1.1",name:"Benzodiazepines, Flumazenil",time:"20min",tier:1,yield:9,reason:"Mechanism, tolerance, reversal - ubiquitous in Step 1 vignettes"},
-      {id:"np2",num:"1.2",name:"Nonbenzodiazepine Hypnotics, Melatonin, Ramelteon",time:"13min",tier:3,yield:6,reason:"Zolpidem - lower yield; ramelteon for shift workers"},
-      {id:"np3",num:"1.3",name:"Barbiturates",time:"14min",tier:3,yield:6,reason:"CYP450 induction; phenobarbital for neonatal seizures"},
-      {id:"np4",num:"2.1",name:"Propofol, Etomidate, Ketamine",time:"10min",tier:2,yield:7,reason:"Ketamine dissociative anesthesia - phencyclidine-like MOA"},
-      {id:"np5",num:"2.2",name:"Inhaled Anesthetics, Dantrolene",time:"15min",tier:2,yield:7,reason:"Malignant hyperthermia + dantrolene - classic question"},
-      {id:"np6",num:"2.3",name:"Opiates, Naloxone, Naltrexone",time:"21min",tier:1,yield:9,reason:"Opioid toxicity triad, reversal - extremely high yield"},
-      {id:"np7",num:"3.1",name:"SSRIs, SNRIs, Cyproheptadine",time:"21min",tier:1,yield:9,reason:"Serotonin syndrome, first-line for depression/anxiety - top pharm"},
-      {id:"np8",num:"3.2",name:"Tricyclic Antidepressants",time:"16min",tier:1,yield:8,reason:"TCA overdose (wide QRS, anticholinergic) - classic toxicology"},
-      {id:"np9",num:"3.3",name:"MAO Inhibitors",time:"13min",tier:2,yield:7,reason:"Tyramine interaction, serotonin syndrome - vignette favorite"},
-      {id:"np10",num:"3.4",name:"Bupropion, Mirtazapine, Trazodone",time:"15min",tier:2,yield:7,reason:"Bupropion - seizure risk, smoking cessation; unique SE profiles"},
-      {id:"np11",num:"4.1",name:"Lithium",time:"12min",tier:1,yield:9,reason:"Toxicity signs, narrow therapeutic index - extremely high yield"},
-      {id:"np12",num:"4.2",name:"Valproate, Topiramate, Lamotrigine, Levetiracetam",time:"14min",tier:2,yield:8,reason:"Valproate teratogenicity, lamotrigine in bipolar - Step 1 staples"},
-      {id:"np13",num:"4.3",name:"Carbamazepine, Phenytoin, Gabapentin, Tiagabine, Vigabatrin",time:"19min",tier:2,yield:8,reason:"Phenytoin zero-order kinetics + gingival hyperplasia - classic"},
-      {id:"np14",num:"4.4",name:"Ethosuximide",time:"6min",tier:2,yield:7,reason:"Absence seizures specifically - clean board question"},
-      {id:"np15",num:"5.1",name:"First Generation Antipsychotics",time:"20min",tier:1,yield:9,reason:"EPS, tardive dyskinesia, NMS - very frequently tested"},
-      {id:"np16",num:"5.2",name:"Second Generation Antipsychotics",time:"17min",tier:1,yield:8,reason:"Clozapine agranulocytosis, olanzapine metabolic SE - high yield"},
-      {id:"np17",num:"5.3",name:"Levodopa/Carbidopa, Entacapone, Tolcapone, Selegiline, Ropinirole, Pramipexole, Amantadine",time:"20min",tier:2,yield:8,reason:"Parkinson's pharmacology - full drug cascade"},
+    id: "neuro", name: "Neuro & Psych", totalTime: "4.5 hrs", why: "Antidepressants and antipsychotics appear constantly",
+    videos: [
+      { id: "np1", num: "1.1", name: "Benzodiazepines, Flumazenil", time: "20min" },
+      { id: "np2", num: "1.2", name: "Nonbenzo Hypnotics, Melatonin, Ramelteon", time: "13min" },
+      { id: "np3", num: "1.3", name: "Barbiturates", time: "14min" },
+      { id: "np4", num: "2.1", name: "Propofol, Etomidate, Ketamine", time: "10min" },
+      { id: "np5", num: "2.2", name: "Inhaled Anesthetics, Dantrolene", time: "15min" },
+      { id: "np6", num: "2.3", name: "Opiates, Naloxone, Naltrexone", time: "21min" },
+      { id: "np7", num: "3.1", name: "SSRIs, SNRIs, Cyproheptadine", time: "21min" },
+      { id: "np8", num: "3.2", name: "Tricyclic Antidepressants", time: "16min" },
+      { id: "np9", num: "3.3", name: "MAO Inhibitors", time: "13min" },
+      { id: "np10", num: "3.4", name: "Bupropion, Mirtazapine, Trazodone", time: "15min" },
+      { id: "np11", num: "4.1", name: "Lithium", time: "12min" },
+      { id: "np12", num: "4.2", name: "Valproate, Topiramate, Lamotrigine, Levetiracetam", time: "14min" },
+      { id: "np13", num: "4.3", name: "Carbamazepine, Phenytoin, Gabapentin, Tiagabine, Vigabatrin", time: "19min" },
+      { id: "np14", num: "4.4", name: "Ethosuximide", time: "6min" },
+      { id: "np15", num: "5.1", name: "First Generation Antipsychotics", time: "20min" },
+      { id: "np16", num: "5.2", name: "Second Generation Antipsychotics", time: "17min" },
+      { id: "np17", num: "5.3", name: "Parkinson's Pharmacology", time: "20min" }
     ]
   },
   {
-    id:"antimicro", name:"Antimicrobials", totalTime:"5.5 hrs",
-    why:"Infections are the largest Step 1 category; know mechanism + key side effects",
-    videos:[
-      {id:"am1",num:"1.1",name:"Penicillin",time:"13min",tier:1,yield:9,reason:"Cell wall; cross-reactivity with cephalosporins - foundational"},
-      {id:"am2",num:"1.2",name:"Nafcillin, Oxacillin, Methicillin, Dicloxacillin",time:"6min",tier:2,yield:7,reason:"MSSA coverage; methicillin-resistant = MRSA concept"},
-      {id:"am3",num:"1.3",name:"Ampicillin, Amoxicillin, Piperacillin, Ticarcillin",time:"13min",tier:2,yield:7,reason:"Extended-spectrum penicillins + beta-lactamase inhibitors"},
-      {id:"am4",num:"1.4",name:"Cephalosporins",time:"15min",tier:1,yield:9,reason:"Generation coverage rules - tested on every Step 1 meningitis Q"},
-      {id:"am5",num:"1.5",name:"Monobactams & Carbapenems",time:"9min",tier:2,yield:7,reason:"Imipenem + cilastatin; broad spectrum for resistant bugs"},
-      {id:"am6",num:"1.6",name:"Vancomycin",time:"11min",tier:1,yield:9,reason:"MRSA drug of choice; Red Man Syndrome; nephrotoxicity"},
-      {id:"am7",num:"1.7",name:"Daptomycin",time:"6min",tier:3,yield:5,reason:"MRSA alternative; inactivated by lung surfactant - lower yield"},
-      {id:"am8",num:"2.1",name:"Tetracyclines",time:"13min",tier:2,yield:7,reason:"Rickettsiae, Chlamydia, Lyme - key coverage to memorize"},
-      {id:"am9",num:"2.2",name:"Macrolides",time:"7min",tier:2,yield:7,reason:"Azithromycin for atypicals; QT prolongation; CYP interactions"},
-      {id:"am10",num:"2.3",name:"Clindamycin",time:"11min",tier:2,yield:7,reason:"Anaerobes, C. diff risk - classic clinical vignette setup"},
-      {id:"am11",num:"2.4",name:"Chloramphenicol",time:"5min",tier:3,yield:5,reason:"Gray baby syndrome - still appears occasionally"},
-      {id:"am12",num:"2.5",name:"Linezolid",time:"7min",tier:3,yield:5,reason:"MRSA/VRE; serotonin syndrome risk with MAOIs"},
-      {id:"am13",num:"2.6",name:"Aminoglycosides",time:"13min",tier:1,yield:8,reason:"Nephrotoxicity + ototoxicity; synergy with beta-lactams"},
-      {id:"am14",num:"3.1",name:"Tuberculosis Drugs",time:"17min",tier:1,yield:9,reason:"RIPE therapy SEs memorized by mnemonics - a Step 1 given"},
-      {id:"am15",num:"3.2",name:"Leprosy Drugs",time:"7min",tier:4,yield:3,reason:"Dapsone only - low priority"},
-      {id:"am16",num:"4.1",name:"Trimethoprim / Sulfamethoxazole",time:"17min",tier:2,yield:7,reason:"PCP prophylaxis, UTIs; folate synthesis inhibition"},
-      {id:"am17",num:"4.2",name:"Fluoroquinolones",time:"12min",tier:2,yield:7,reason:"Tendon rupture, QT prolongation, avoid in children"},
-      {id:"am18",num:"4.3",name:"Metronidazole",time:"9min",tier:1,yield:8,reason:"Anaerobes, C. diff, Giardia, Trichomonas; disulfiram-like reaction"},
-      {id:"am19",num:"5.1",name:"Amphotericin B, Flucytosine",time:"12min",tier:2,yield:7,reason:"Nephrotoxicity, infusion reactions - classic toxicity question"},
-      {id:"am20",num:"5.2",name:"Azoles",time:"12min",tier:2,yield:7,reason:"Fluconazole - Candida, Crypto; CYP450 inhibition"},
-      {id:"am21",num:"5.3",name:"Griseofulvin, Terbinafine, Echinocandins",time:"9min",tier:3,yield:5,reason:"Dermatophytes; microtubule inhibition (griseofulvin)"},
-      {id:"am22",num:"6.1",name:"NRTIs",time:"11min",tier:1,yield:8,reason:"AZT - bone marrow suppression; tenofovir nephrotoxicity"},
-      {id:"am23",num:"6.2",name:"NNRTIs",time:"5min",tier:2,yield:6,reason:"Efavirenz - vivid dreams, CYP inducer"},
-      {id:"am24",num:"6.3",name:"Protease Inhibitors",time:"7min",tier:2,yield:7,reason:"Lipodystrophy, hyperglycemia - drug class SEs tested"},
-      {id:"am25",num:"6.4",name:"Maraviroc, Fusion Inhibitors, Integrase Inhibitors",time:"10min",tier:3,yield:5,reason:"Newer HIV drugs; MOA questions only"},
-      {id:"am26",num:"7.1",name:"IFN-α, IFN-β, IFN-γ",time:"10min",tier:3,yield:5,reason:"Hep B/C, MS, chronic granulomatous disease"},
-      {id:"am27",num:"7.2",name:"Ribavirin, Sofosbuvir, Simeprevir",time:"11min",tier:3,yield:5,reason:"Hep C; ribavirin teratogenicity"},
-      {id:"am28",num:"8.1",name:"Acyclovir, Valacyclovir, Famciclovir, Cidofovir, Foscarnet",time:"14min",tier:1,yield:8,reason:"HSV/VZV treatment; nephrotoxicity; CMV resistance"},
-      {id:"am29",num:"8.2",name:"Ganciclovir, Valganciclovir, Foscarnet, Cidofovir",time:"12min",tier:2,yield:6,reason:"CMV retinitis; foscarnet for acyclovir-resistant HSV"},
+    id: "antimicro", name: "Antimicrobials", totalTime: "5.5 hrs", why: "Infections are the largest Step 1 category",
+    videos: [
+      { id: "am1", num: "1.1", name: "Penicillin", time: "13min" },
+      { id: "am2", num: "1.2", name: "Nafcillin, Oxacillin, Methicillin, Dicloxacillin", time: "6min" },
+      { id: "am3", num: "1.3", name: "Ampicillin, Amoxicillin, Piperacillin, Ticarcillin", time: "13min" },
+      { id: "am4", num: "1.4", name: "Cephalosporins", time: "15min" },
+      { id: "am5", num: "1.5", name: "Monobactams & Carbapenems", time: "9min" },
+      { id: "am6", num: "1.6", name: "Vancomycin", time: "11min" },
+      { id: "am7", num: "1.7", name: "Daptomycin", time: "6min" },
+      { id: "am8", num: "2.1", name: "Tetracyclines", time: "13min" },
+      { id: "am9", num: "2.2", name: "Macrolides", time: "7min" },
+      { id: "am10", num: "2.3", name: "Clindamycin", time: "11min" },
+      { id: "am11", num: "2.4", name: "Chloramphenicol", time: "5min" },
+      { id: "am12", num: "2.5", name: "Linezolid", time: "7min" },
+      { id: "am13", num: "2.6", name: "Aminoglycosides", time: "13min" },
+      { id: "am14", num: "3.1", name: "Tuberculosis Drugs", time: "17min" },
+      { id: "am15", num: "3.2", name: "Leprosy Drugs", time: "7min" },
+      { id: "am16", num: "4.1", name: "Trimethoprim / Sulfamethoxazole", time: "17min" },
+      { id: "am17", num: "4.2", name: "Fluoroquinolones", time: "12min" },
+      { id: "am18", num: "4.3", name: "Metronidazole", time: "9min" },
+      { id: "am19", num: "5.1", name: "Amphotericin B, Flucytosine", time: "12min" },
+      { id: "am20", num: "5.2", name: "Azoles", time: "12min" },
+      { id: "am21", num: "5.3", name: "Griseofulvin, Terbinafine, Echinocandins", time: "9min" },
+      { id: "am22", num: "6.1", name: "NRTIs", time: "11min" },
+      { id: "am23", num: "6.2", name: "NNRTIs", time: "5min" },
+      { id: "am24", num: "6.3", name: "Protease Inhibitors", time: "7min" },
+      { id: "am25", num: "6.4", name: "Maraviroc, Fusion Inhibitors, Integrase Inhibitors", time: "10min" },
+      { id: "am26", num: "7.1", name: "IFN-α, IFN-β, IFN-γ", time: "10min" },
+      { id: "am27", num: "7.2", name: "Ribavirin, Sofosbuvir, Simeprevir", time: "11min" },
+      { id: "am28", num: "8.1", name: "Acyclovir, Valacyclovir, Famciclovir, Cidofovir, Foscarnet", time: "14min" },
+      { id: "am29", num: "8.2", name: "Ganciclovir, Valganciclovir, Foscarnet, Cidofovir", time: "12min" }
     ]
   },
   {
-    id:"onco", name:"Antineoplastics", totalTime:"~2 hrs",
-    why:"Chemo toxicities are tested more than mechanisms - focus on unique side effects",
-    videos:[
-      {id:"on1",num:"1.1",name:"Methotrexate, Leucovorin, 5-Fluorouracil, Hydroxyurea",time:"29min",tier:1,yield:8,reason:"Folate analog; mucositis, myelosuppression; leucovorin rescue"},
-      {id:"on2",num:"1.2",name:"Azathioprine, 6-Mercaptopurine, Mycophenolate Mofetil",time:"16min",tier:2,yield:7,reason:"Immunosuppressants; allopurinol interaction with AZA - kill question"},
-      {id:"on3",num:"1.3",name:"Cladribine, Cytarabine, Gemcitabine",time:"7min",tier:4,yield:3,reason:"Hairy cell leukemia (cladribine) - low yield"},
-      {id:"on4",num:"2.1",name:"Cyclophosphamide, Ifosfamide, Busulfan, Nitrosureas",time:"12min",tier:2,yield:7,reason:"Hemorrhagic cystitis (mesna), SIADH, bladder cancer risk"},
-      {id:"on5",num:"2.2",name:"Cisplatin, Carboplatin, Amifostine",time:"6min",tier:2,yield:7,reason:"Nephrotoxicity, ototoxicity, peripheral neuropathy - all tested"},
-      {id:"on6",num:"2.3",name:"Bleomycin, Doxorubicin, Daunorubicin",time:"8min",tier:2,yield:7,reason:"Bleomycin → pulmonary fibrosis; Doxorubicin → cardiotoxicity"},
-      {id:"on7",num:"2.4",name:"Etoposide, Teniposide, Topotecan, Irinotecan",time:"6min",tier:3,yield:5,reason:"Topoisomerase inhibitors; secondary AML risk"},
-      {id:"on8",num:"2.5",name:"Vincristine, Vinblastine, Paclitaxel",time:"7min",tier:2,yield:7,reason:"Peripheral neuropathy (vincristine) - NOT myelosuppressive"},
-      {id:"on9",num:"3.1",name:"Imatinib, Erlotinib, Sorafenib, Sunitinib, Vemurafenib",time:"15min",tier:2,yield:7,reason:"BCR-ABL in CML - classic targeted therapy concept"},
-      {id:"on10",num:"3.2",name:"Rituximab, Cetuximab, Bevacizumab, Alemtuzumab, Trastuzumab",time:"23min",tier:3,yield:6,reason:"Anti-CD20 (rituximab), VEGF (bevacizumab) - targeted MOAs"},
+    id: "onco", name: "Antineoplastics", totalTime: "~2 hrs", why: "Focus heavily on unique drug toxicities",
+    videos: [
+      { id: "on1", num: "1.1", name: "Methotrexate, Leucovorin, 5-FU, Hydroxyurea", time: "29min" },
+      { id: "on2", num: "1.2", name: "Azathioprine, 6-MP, Mycophenolate Mofetil", time: "16min" },
+      { id: "on3", num: "1.3", name: "Cladribine, Cytarabine, Gemcitabine", time: "7min" },
+      { id: "on4", num: "2.1", name: "Cyclophosphamide, Ifosfamide, Busulfan, Nitrosureas", time: "12min" },
+      { id: "on5", num: "2.2", name: "Cisplatin, Carboplatin, Amifostine", time: "6min" },
+      { id: "on6", num: "2.3", name: "Bleomycin, Doxorubicin, Daunorubicin", time: "8min" },
+      { id: "on7", num: "2.4", name: "Etoposide, Teniposide, Topotecan, Irinotecan", time: "6min" },
+      { id: "on8", num: "2.5", name: "Vincristine, Vinblastine, Paclitaxel", time: "7min" },
+      { id: "on9", num: "3.1", name: "Imatinib, Erlotinib, Sorafenib, Sunitinib, Vemurafenib", time: "15min" },
+      { id: "on10", num: "3.2", name: "Rituximab, Cetuximab, Bevacizumab, Alemtuzumab, Trastuzumab", time: "23min" }
     ]
-  },
+  }
 ];
 
-const TIER_COLORS = {1:"#c03050",2:"#b85820",3:"#8a6e10",4:"#5a7060"};
-const TIER_BG     = {1:"rgba(192,48,80,0.08)",2:"rgba(184,88,32,0.08)",3:"rgba(138,110,16,0.07)",4:"rgba(90,112,96,0.07)"};
-const TIER_NAMES  = {1:"HIGH YIELD",2:"IMPORTANT",3:"REVIEW",4:"LOW YIELD"};
+// ── Global State & Auth Listener ───────────────────────────
+let watchedState = {};
+let reviewedState = {};
+const allVideos = categories.flatMap(c => c.videos);
 
-const TIER_DATA = {
-  1:{label:"Tier 1 — High Yield",sub:"Highest-frequency Step 1 topics. Each video covers multiple guaranteed questions.",color:"var(--t1)"},
-  2:{label:"Tier 2 — Important",sub:"High-yield content that consolidates your foundation and covers common vignettes.",color:"var(--t2)"},
-  3:{label:"Tier 3 — Review",sub:"Medium-yield topics. Worth watching but only after Tiers 1 & 2 are complete.",color:"var(--t3)"},
-  4:{label:"Tier 4 — Low Yield",sub:"Lower-yield. Skim First Aid instead if time is short.",color:"var(--t4)"},
-};
+window.addEventListener('appAuthStateChanged', async (e) => {
+  const user = e.detail.user;
+  const banner = document.getElementById('auth-banner');
+  if (banner) banner.classList.toggle('hidden', !!user);
+  
+  if (user) {
+    await fetchStateFromFirebase(user.uid);
+  } else {
+    watchedState = {};
+    reviewedState = {};
+  }
+  renderAll();
+});
 
-// ========== AUTH (inherited from index page) ==========
-if (auth) {
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      currentUser = user;
-      await fetchStateFromFirebase();
-    } else {
-      currentUser = null;
-      loadStateFromLocal();
-    }
-    updateAll();
-  });
-} else {
-  loadStateFromLocal();
-  updateAll();
-}
-
-async function fetchStateFromFirebase() {
-  if (!currentUser) return;
+// ── Database Operations ────────────────────────────────────
+async function fetchStateFromFirebase(uid) {
+  if (!db) return;
   try {
-    const doc = await db.collection('users').doc(currentUser.uid).get();
+    const doc = await db.collection('users').doc(uid).collection('trackers').doc('sketchypharm').get();
     if (doc.exists) {
-      watchedState = doc.data().watched || {};
-      reviewedState = doc.data().reviewed || {};
+      const data = doc.data();
+      watchedState = data.watched || {};
+      reviewedState = data.reviewed || {};
     } else {
       watchedState = {};
       reviewedState = {};
     }
-  } catch (err) { console.error("Error fetching state:", err); }
-}
-
-function loadStateFromLocal() {
-  try { watchedState = JSON.parse(localStorage.getItem('sketchy_local_progress') || '{}'); } catch(e) { watchedState = {}; }
-  try { reviewedState = JSON.parse(localStorage.getItem('sketchy_local_reviewed') || '{}'); } catch(e) { reviewedState = {}; }
-}
-
-function saveState() {
-  if (currentUser) {
-    db.collection('users').doc(currentUser.uid).set({ watched: watchedState, reviewed: reviewedState }, { merge: true }).catch(console.error);
-  } else {
-    localStorage.setItem('sketchy_local_progress', JSON.stringify(watchedState));
-    localStorage.setItem('sketchy_local_reviewed', JSON.stringify(reviewedState));
+  } catch (err) {
+    console.error("Error fetching state:", err);
   }
 }
 
-function isWatched(id) { return !!watchedState[id]; }
-function isReviewed(id) { return !!reviewedState[id]; }
-function isComplete(id) { return isWatched(id) && isReviewed(id); }
+async function saveState() {
+  if (!currentUser || !db) return;
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('trackers').doc('sketchypharm').set({
+      watched: watchedState,
+      reviewed: reviewedState
+    }, { merge: true });
+  } catch (err) {
+    console.error("Error saving state:", err);
+  }
+}
 
-function toggleWatch(id, event) {
-  event.stopPropagation();
+// ── Action Handlers ────────────────────────────────────────
+function toggleWatch(id) {
+  if (!currentUser) return alert("Please log in to track your progress.");
   watchedState[id] = !watchedState[id];
   saveState();
-  updateAll();
+  renderAll();
 }
-function toggleReview(id, event) {
-  event.stopPropagation();
+
+function toggleReview(id) {
+  if (!currentUser) return alert("Please log in to track your progress.");
   reviewedState[id] = !reviewedState[id];
   saveState();
-  updateAll();
+  renderAll();
 }
 
-// ========== RENDERING ==========
-function allVideos() { return categories.flatMap(c => c.videos); }
-function updateAll() { updateTracker(); renderByCat(); renderByTier(); renderTracker(); }
-
-function colHeaderHTML() {
-  return `<div class="col-hdr">
-    <span>Watched</span><span>Reviewed</span><span></span>
-    <span style="text-align:right">Time</span>
-    <span class="hide-mobile"></span>
-    <span class="hide-mobile"></span>
-  </div>`;
+function toggleCategory(catId) {
+  const body = document.getElementById(`cat-body-${catId}`);
+  if (body) {
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+  }
 }
 
-function videoRowHTML(v, showCat) {
-  const w = isWatched(v.id);
-  const r = isReviewed(v.id);
-  const complete = w && r;
-  const tc = TIER_COLORS[v.tier];
-  const yp = (v.yield / 10) * 100;
-  const yc = v.yield >= 9 ? "var(--t1)" : v.yield >= 7 ? "var(--t2)" : v.yield >= 5 ? "var(--t3)" : "var(--t4)";
-  const catName = showCat ? categories.find(c => c.videos.some(vv => vv.id === v.id))?.name : null;
+// ── Rendering Logic ────────────────────────────────────────
+function renderAll() {
+  renderSummary();
+  renderCategories();
+}
+
+function renderSummary() {
+  const total = allVideos.length;
+  const done = allVideos.filter(v => watchedState[v.id] && reviewedState[v.id]).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
   
-  return `<div class="video-row ${complete ? 'fully-done' : ''}" id="row-${v.id}">
-    <div class="check-box ${w ? 'checked' : ''}" data-tooltip="Watched" onclick="toggleWatch('${v.id}',event)">${w ? '✓' : ''}</div>
-    <div class="check-box ${r ? 'reviewed' : ''}" data-tooltip="Reviewed" onclick="toggleReview('${v.id}',event)">${r ? '✓' : ''}</div>
-    <div class="video-name">${v.name}${catName ? ` <span style="font-size:10px;color:var(--dim)">[${catName}]</span>` : ''}</div>
-    <div class="video-time">${v.time}</div>
-    <div class="yield-bar-wrap">
-      <div class="yield-bar-bg"><div class="yield-bar-fill" style="width:${yp}%;background:${yc}"></div></div>
-      <span class="yield-label" style="color:${yc}">${v.yield}/10</span>
-    </div>
-    <div><span class="reason-tag" style="background:${TIER_BG[v.tier]};color:${tc};border-color:${tc}40">${TIER_NAMES[v.tier]}</span></div>
-  </div>`;
+  const pctEl = document.getElementById("tracker-pct");
+  const barEl = document.getElementById("tracker-bar");
+  const noteEl = document.getElementById("tracker-note");
+  const statEl = document.getElementById("header-stats");
+
+  if (pctEl) pctEl.textContent = pct + "%";
+  if (barEl) barEl.style.width = pct + "%";
+  if (noteEl) noteEl.textContent = `${done} / ${total} videos fully completed`;
+  if (statEl) statEl.textContent = `${total - done} videos remaining`;
 }
 
-function renderByCat() {
-  const c = document.getElementById("bycat-content");
-  const openGroups = new Set(
-    [...document.querySelectorAll('.collapsible-group.is-open')].map(el => el.id)
-  );
+function renderCategories() {
+  const container = document.getElementById("tracker-container");
+  if (!container) return;
+
   let html = "";
-
   categories.forEach(cat => {
-    const done = cat.videos.filter(v => isComplete(v.id)).length;
     const total = cat.videos.length;
-    const pct = Math.round((done / total) * 100);
-    const minTier = Math.min(...cat.videos.map(v => v.tier));
-    const hc = TIER_COLORS[minTier];
-    const groupId = "grp-" + cat.id;
-    const isOpen = openGroups.has(groupId) ? " is-open" : "";
-
+    const done = cat.videos.filter(v => watchedState[v.id] && reviewedState[v.id]).length;
+    
     html += `
-    <div class="collapsible-group${isOpen}" id="${groupId}">
-      <div class="section-hdr" style="background:${TIER_BG[minTier]};border-left-color:${hc}" onclick="toggleGroup('${groupId}')">
-        <div style="flex:1;min-width:0">
-          <div class="section-title" style="color:${hc}">${cat.name}</div>
-          <div class="section-why">${cat.why}</div>
+    <div class="cat-section">
+      <div class="cat-header" onclick="toggleCategory('${cat.id}')">
+        <div>
+          <div class="cat-name">${cat.name}</div>
+          <div class="cat-why">${cat.why}</div>
         </div>
-        <div class="section-meta">
-          <span class="section-meta-text" style="color:${pct === 100 ? 'var(--green)' : 'var(--muted)'}">${done}/${total} &nbsp;·&nbsp; ${cat.totalTime}</span>
-          <div class="section-meta-bar">
-            <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : hc}"></div>
-          </div>
+        <div class="cat-meta">
+          <div>${done} / ${total} Complete</div>
+          <div style="font-size:12px;color:var(--dim);margin-top:2px;font-style:normal;">${cat.totalTime}</div>
         </div>
-        <span class="block-chevron">▶</span>
       </div>
-      <div class="collapsible-content">
-        <div class="video-list">
-          ${colHeaderHTML()}
-          ${cat.videos.map(v => videoRowHTML(v, false)).join("")}
-        </div>
+      <div class="cat-body" id="cat-body-${cat.id}">
+        ${cat.videos.map(v => {
+          const w = watchedState[v.id];
+          const r = reviewedState[v.id];
+          return `
+          <div class="video-row">
+            <div class="video-num">${v.num}</div>
+            <div class="video-name">${v.name}</div>
+            <div class="video-time">${v.time}</div>
+            <div class="check-pair">
+              <button class="check-btn ${w ? 'watched' : ''}" onclick="toggleWatch('${v.id}')">
+                ${w ? '✓ Watched' : 'Watch'}
+              </button>
+              <button class="check-btn ${r ? 'reviewed' : ''}" onclick="toggleReview('${v.id}')">
+                ${r ? '✓ Reviewed' : 'Review'}
+              </button>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   });
 
-  c.innerHTML = html;
+  container.innerHTML = html;
 }
-
-function toggleGroup(id) {
-  const group = document.getElementById(id);
-  if (group) group.classList.toggle("is-open");
-}
-
-function renderByTier() {
-  const c = document.getElementById("bytier-content");
-  const openGroups = new Set(
-    [...document.querySelectorAll('.collapsible-group.is-open, .tier-group.is-open')].map(el => el.id)
-  );
-  let html = "";
-
-  for (let t = 1; t <= 4; t++) {
-    const d = TIER_DATA[t];
-    const all = allVideos().filter(v => v.tier === t);
-    const done = all.filter(v => isComplete(v.id)).length;
-    const totalMins = all.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
-    const pct = all.length ? Math.round((done / all.length) * 100) : 0;
-    const tierId = `tier-group-${t}`;
-    const tierOpen = openGroups.has(tierId) ? " is-open" : "";
-
-    html += `
-    <div class="tier-group${tierOpen}" id="${tierId}">
-      <div class="tier-divider" style="border-left-color:${d.color};background:${TIER_BG[t]}" onclick="toggleTier('${tierId}')">
-        <div style="flex:1;min-width:0">
-          <div class="section-title" style="color:${d.color}">${d.label}</div>
-          <div class="section-why">${d.sub}</div>
-        </div>
-        <div class="section-meta">
-          <span class="section-meta-text">${done}/${all.length} &nbsp;·&nbsp; ~${Math.round(totalMins / 60 * 10) / 10} hrs</span>
-          <div class="section-meta-bar">
-            <div class="section-meta-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : d.color}"></div>
-          </div>
-        </div>
-        <span class="block-chevron">▶</span>
-      </div>
-      <div class="tier-group-body">`;
-
-    categories.forEach(cat => {
-      const cv = cat.videos.filter(v => v.tier === t).sort((a, b) => b.yield - a.yield);
-      if (!cv.length) return;
-      const cd = cv.filter(v => isComplete(v.id)).length;
-      const subId = `grp-tier${t}-${cat.id}`;
-      const isOpen = openGroups.has(subId) ? " is-open" : "";
-
-      html += `
-      <div class="collapsible-group${isOpen}" id="${subId}" style="margin-top:8px">
-        <div class="section-hdr" style="background:${TIER_BG[t]};border-left-color:${d.color}" onclick="toggleGroup('${subId}')">
-          <div style="flex:1;min-width:0">
-            <div class="section-title" style="color:${d.color}">${cat.name}</div>
-            <div class="section-why">${cat.why}</div>
-          </div>
-          <div class="section-meta">
-            <span class="section-meta-text">${cd}/${cv.length} videos</span>
-          </div>
-          <span class="block-chevron">▶</span>
-        </div>
-        <div class="collapsible-content">
-          <div class="video-list">
-            ${cv.map(v => videoRowHTML(v, false)).join("")}
-          </div>
-        </div>
-      </div>`;
-    });
-
-    html += `</div></div>`;
-  }
-  c.innerHTML = html;
-}
-
-function toggleTier(id) {
-  const group = document.getElementById(id);
-  if (group) group.classList.toggle("is-open");
-}
-
-function updateTracker() {
-  const av = allVideos();
-  const total = av.length;
-  const done = av.filter(v => isComplete(v.id)).length;
-  const pct = total ? Math.round((done / total) * 100) : 0;
-  const rem = total - done;
-  const totalMins = av.reduce((s, v) => s + (parseInt(v.time) || 0), 0);
-
-  [1, 2, 3, 4].forEach(t => {
-    const el = document.getElementById("chip-t" + t);
-    if (el) el.textContent = av.filter(v => v.tier === t).length;
-  });
-  const t1el = document.getElementById("tier1-count");
-  if (t1el) t1el.textContent = av.filter(v => v.tier === 1).length;
-  
-  const el = document.getElementById("tracker-pct");
-  const bar = document.getElementById("tracker-bar");
-  const note = document.getElementById("tracker-note");
-  const chip = document.getElementById("header-completed");
-  const hrem = document.getElementById("header-remaining");
-  const htot = document.getElementById("header-total");
-  
-  if (el) el.textContent = pct + "%";
-  if (bar) bar.style.width = pct + "%";
-  if (note) note.textContent = `${done} of ${total} videos completed (Watch + Review)`;
-  if (chip) chip.textContent = `${done} / ${total}`;
-  if (hrem) hrem.textContent = rem;
-  if (htot) htot.textContent = `~${Math.round(totalMins / 60 * 10) / 10}`;
-}
-
-function renderTracker() {
-  const c = document.getElementById("tracker-content");
-  const av = allVideos();
-
-  let html = `<table class="cat-table" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:22px;box-shadow:var(--card-shadow)">
-    <thead><tr>
-      <th>Category</th><th>Progress (W+R)</th><th>Done / Total</th><th>Time Left</th><th>Top Tier</th>
-    </tr></thead><tbody>`;
-  
-  categories.forEach(cat => {
-    const done = cat.videos.filter(v => isComplete(v.id)).length;
-    const total = cat.videos.length;
-    const pct = Math.round((done / total) * 100);
-    const ml = cat.videos.filter(v => !isComplete(v.id)).reduce((s, v) => s + (parseInt(v.time) || 0), 0);
-    const mt = Math.min(...cat.videos.map(v => v.tier));
-    const tc = TIER_COLORS[mt];
-    
-    html += `<tr>
-      <td style="font-weight:500;color:var(--ink2)">${cat.name}</td>
-      <td style="min-width:120px">
-        <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pct}%;background:${pct === 100 ? 'var(--green)' : tc}"></div></div>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${pct}%</span>
-      </td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${done} / ${total}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${ml ? `~${Math.round(ml / 60 * 10) / 10} hrs` : '✓ Done'}</td>
-      <td><span class="tier-pill" style="background:${TIER_BG[mt]};color:${tc};border-color:${tc}50">${TIER_NAMES[mt]}</span></td>
-    </tr>`;
-  });
-  html += `</tbody></table>`;
-
-  const completed = av.filter(v => isComplete(v.id));
-  const upcoming = av.filter(v => !isComplete(v.id)).sort((a, b) => a.tier - b.tier || b.yield - a.yield).slice(0, 10);
-
-  html += `<div class="tracker-grid">
-    <div class="tracker-card">
-      <p class="tracker-card-title" style="color:var(--green)">✓ Fully Completed (${completed.length})</p>
-      ${completed.length
-        ? completed.map(v => `<div class="tracker-card-item"><span style="color:var(--muted)">${v.name}</span><span style="color:var(--green);font-size:11px">✓✓</span></div>`).join("")
-        : '<div class="empty-state" style="padding:24px 0"><div class="empty-state-text">None yet. Watch & Review to complete.</div></div>'}
-    </div>
-    <div class="tracker-card">
-      <p class="tracker-card-title" style="color:var(--t1)">▶ Up Next (Top Priority)</p>
-      ${upcoming.map(v => {
-        const tc = TIER_COLORS[v.tier];
-        return `<div class="tracker-card-item">
-          <span style="color:var(--ink2)">${v.name}</span>
-          <span class="tier-pill" style="background:${TIER_BG[v.tier]};color:${tc};border-color:${tc}40;font-size:8px">${TIER_NAMES[v.tier]}</span>
-        </div>`;
-      }).join("")}
-    </div>
-  </div>`;
-  
-  c.innerHTML = html;
-}
-
-function switchTab(name, btn) {
-  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("tab-" + name).classList.add("active");
-  if (btn) btn.classList.add("active");
-}
-
-updateAll();
 </script>
 </body>
 </html>
