@@ -5,25 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Mono:wght@400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
+
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="auth.js"></script>
 <title>UWorld Tracker · Step 1</title>
 </head>
 <body>
 
+<div class="header">
+  <div class="header-inner">
+    <div class="global-nav">
+      <a href="index.html" style="font-size:18px; font-weight:600; color:var(--sakura2);">🌸 Step 1 Hub</a>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <a href="uworld_tracker.html">UWorld</a>
+        <a href="step1_dashboard.html">Dashboard</a>
+        <a href="drugfacts.html">Pharm</a>
+        <a href="microfacts.html">Micro</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="uw-wrap">
-
-  <a class="uw-back" href="index.html">← Back to Study Hub</a>
 
   <div class="uw-eyebrow">Question Bank</div>
   <h1 class="uw-page-title">UWorld <em>Tracker</em></h1>
 
   <div class="uw-auth-banner hidden" id="auth-banner">
-    ⚠️ Not logged in — data saves to this device only.
-    <a href="index.html">Log in on the hub</a> to sync across devices.
+    ⚠️ Not logged in. Please <a href="index.html">log in on the hub</a> to sync and save your data.
   </div>
 
   <button class="setup-toggle" id="setup-toggle" onclick="toggleSetup()">
@@ -236,127 +248,125 @@
 <div class="uw-toast" id="toast"></div>
 
 <script>
-// ── Firebase ──────────────────────────────────────────
-let auth = null, db = null;
-try {
-  firebase.initializeApp({
-    apiKey: "AIzaSyBBzOGRAhCD5AOnHnAN47q-j_coCMx2buo",
-    authDomain: "sketchy-tracker.firebaseapp.com",
-    projectId: "sketchy-tracker",
-    storageBucket: "sketchy-tracker.firebasestorage.app",
-    messagingSenderId: "970470066509",
-    appId: "1:970470066509:web:14c7300fb1dd882a038f04",
-    measurementId: "G-2KVBCP4THR"
-  });
-  auth = firebase.auth();
-  db   = firebase.firestore();
-} catch(e) { console.log('Firebase unavailable'); }
-
-let currentUser = null;
+// ── Global State & Defensiveness ──────────────────────
 const TOTAL_DEFAULT = 3661;
-let settings = { total:TOTAL_DEFAULT, finishBy:'', studyDays:[0,1,2,3,4,5], uniqueOffset: 0 };
+let settings = { total: TOTAL_DEFAULT, finishBy: '', studyDays: [0,1,2,3,4,5], uniqueOffset: 0 };
 let entries = [], exams = [];
 let editingEntryId = null;
 let editingExamId = null;
+let unsubLogs = null;
+let unsubConfig = null;
 
 const todayStr = () => new Date().toISOString().slice(0,10);
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  if (!t) return;
+  t.textContent = msg; 
+  t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Persistence & Migration ───────────────────────────
-function saveLocal() {
-  localStorage.setItem('uw-settings', JSON.stringify(settings));
-  localStorage.setItem('uw-entries',  JSON.stringify(entries));
-  localStorage.setItem('uw-exams',    JSON.stringify(exams));
-}
-
-function runMigration() {
-  let needsSave = false;
-  // Convert old manual unique overrides into the new offset system
-  if (settings.currentUnique !== undefined) {
-    settings.uniqueOffset = settings.currentUnique - getRawVolume();
-    delete settings.currentUnique;
-    needsSave = true;
-  }
-  if (settings.done !== undefined) {
-    delete settings.done;
-    needsSave = true;
-  }
-  if (needsSave) saveLocal();
-}
-
-function loadLocal() {
-  try {
-    const e = localStorage.getItem('uw-entries');  if (e) entries  = JSON.parse(e);
-    const x = localStorage.getItem('uw-exams');    if (x) exams    = JSON.parse(x);
-    const s = localStorage.getItem('uw-settings'); if (s) settings = {...settings, ...JSON.parse(s)};
-  } catch(e) {}
-}
-
-async function syncToFirebase() {
-  if (!currentUser || !db) return;
-  try { await db.collection('users').doc(currentUser.uid).set(
-    { uwSettings:settings, uwEntries:entries, uwExams:exams }, { merge:true }); }
-  catch(e) { console.error(e); }
-}
-
-async function loadFromFirebase() {
-  if (!currentUser || !db) return;
-  try {
-    const doc = await db.collection('users').doc(currentUser.uid).get();
-    if (doc.exists) {
-      const d = doc.data();
-      if (d.uwEntries)  entries  = d.uwEntries;
-      if (d.uwExams)    exams    = d.uwExams;
-      if (d.uwSettings) settings = {...settings, ...d.uwSettings};
-      saveLocal();
-    }
-  } catch(e) { console.error(e); }
-}
-
-if (auth) {
-  auth.onAuthStateChanged(async (user) => {
-    currentUser = user;
-    document.getElementById('auth-banner').classList.toggle('hidden', !!user);
-    if (user) { await loadFromFirebase(); }
-    runMigration();
+// ── Realtime Firebase Synchronization ─────────────────
+window.addEventListener('appAuthStateChanged', (e) => {
+  const user = e.detail.user;
+  const banner = document.getElementById('auth-banner');
+  if (banner) banner.classList.toggle('hidden', !!user);
+  
+  if (user) {
+    setupRealtimeListeners(user.uid);
+  } else {
+    // Clear data if logged out
+    if (unsubLogs) unsubLogs();
+    if (unsubConfig) unsubConfig();
+    entries = [];
+    exams = [];
+    settings = { total: TOTAL_DEFAULT, finishBy: '', studyDays: [0,1,2,3,4,5], uniqueOffset: 0 };
     renderAll();
-  });
-} else {
-  document.getElementById('auth-banner').classList.remove('hidden');
+  }
+});
+
+function setupRealtimeListeners(uid) {
+  if (!db) return;
+
+  try {
+    // Listen to UWorld Config
+    if (unsubConfig) unsubConfig();
+    unsubConfig = db.collection('users').doc(uid).collection('uworld').doc('config').onSnapshot((doc) => {
+      if (doc.exists) {
+        settings = { ...settings, ...doc.data() };
+      }
+      renderAll();
+    }, err => console.error("Config Listener Error:", err));
+
+    // Listen to all UWorld Logs (Exams and Questions combined via type)
+    if (unsubLogs) unsubLogs();
+    unsubLogs = db.collection('users').doc(uid).collection('uworld_logs').onSnapshot((snap) => {
+      entries = [];
+      exams = [];
+      snap.forEach((doc) => {
+        const data = doc.data();
+        data._id = doc.id; // Store reference ID for editing/deleting
+        if (data.type === 'exam') {
+          exams.push(data);
+        } else {
+          entries.push(data);
+        }
+      });
+      renderAll();
+    }, err => console.error("Logs Listener Error:", err));
+  } catch (err) {
+    console.error("Error setting up listeners:", err);
+  }
 }
 
 // ── Setup ─────────────────────────────────────────────
 function toggleSetup() {
   const panel = document.getElementById('setup-panel');
   const btn   = document.getElementById('setup-toggle');
-  panel.classList.toggle('open');
-  btn.classList.toggle('open');
+  if (panel) panel.classList.toggle('open');
+  if (btn) btn.classList.toggle('open');
 }
 
 function initSetupUI() {
-  document.getElementById('setup-total').value  = settings.total || TOTAL_DEFAULT;
-  document.getElementById('setup-finish').value = settings.finishBy  || '';
+  const totEl = document.getElementById('setup-total');
+  const finEl = document.getElementById('setup-finish');
+  if (totEl) totEl.value = settings.total || TOTAL_DEFAULT;
+  if (finEl) finEl.value = settings.finishBy || '';
+  
   document.querySelectorAll('.day-chip').forEach(chip => {
     const day = parseInt(chip.dataset.day);
-    chip.classList.toggle('active', (settings.studyDays||[0,1,2,3,4,5]).includes(day));
+    chip.classList.toggle('active', (settings.studyDays || [0,1,2,3,4,5]).includes(day));
     chip.onclick = () => chip.classList.toggle('active');
   });
 }
 
-function saveSetup() {
-  settings.total     = parseInt(document.getElementById('setup-total').value) || TOTAL_DEFAULT;
-  settings.finishBy  = document.getElementById('setup-finish').value;
-  settings.studyDays = [...document.querySelectorAll('.day-chip.active')].map(c=>parseInt(c.dataset.day));
-  
-  saveLocal(); syncToFirebase(); renderAll();
-  document.getElementById('setup-panel').classList.remove('open');
-  document.getElementById('setup-toggle').classList.remove('open');
-  showToast('Settings saved ✦');
+async function saveSetup() {
+  try {
+    const totEl = document.getElementById('setup-total');
+    const finEl = document.getElementById('setup-finish');
+    
+    settings.total = parseInt(totEl?.value) || TOTAL_DEFAULT;
+    settings.finishBy = finEl?.value || '';
+    
+    const activeChips = document.querySelectorAll('.day-chip.active');
+    settings.studyDays = activeChips ? Array.from(activeChips).map(c => parseInt(c.dataset.day)) : [0,1,2,3,4,5];
+    
+    if (currentUser && db) {
+      await db.collection('users').doc(currentUser.uid).collection('uworld').doc('config').set(settings, { merge: true });
+      showToast('Settings saved ✦');
+    } else {
+      showToast('Log in to save settings.');
+    }
+    
+    const panel = document.getElementById('setup-panel');
+    const btn = document.getElementById('setup-toggle');
+    if (panel) panel.classList.remove('open');
+    if (btn) btn.classList.remove('open');
+    
+  } catch (err) {
+    console.error("Error saving setup:", err);
+  }
 }
 
 // ── Auto vs Manual Unique Progress ────────────────────
@@ -365,19 +375,24 @@ function getRawVolume() {
 }
 
 function getCurrentUnique() {
-  // Defaults to sum of all logged questions. Edited offset handles incorrects.
   return Math.max(0, getRawVolume() + (settings.uniqueOffset || 0));
 }
 
-function promptUpdateUnique() {
+async function promptUpdateUnique() {
   const current = getCurrentUnique();
   const input = prompt("Enter your actual Unique Questions Completed count:", current);
   if (input !== null) {
     const num = parseInt(input);
     if (!isNaN(num) && num >= 0) {
       settings.uniqueOffset = num - getRawVolume();
-      saveLocal(); syncToFirebase(); renderStats();
-      showToast(`Progress calibrated to ${num} ✦`);
+      try {
+        if (currentUser && db) {
+          await db.collection('users').doc(currentUser.uid).collection('uworld').doc('config').set({ uniqueOffset: settings.uniqueOffset }, { merge: true });
+          showToast(`Progress calibrated to ${num} ✦`);
+        }
+      } catch (err) {
+        console.error("Error updating unique count:", err);
+      }
     } else {
       showToast('Please enter a valid number.');
     }
@@ -424,25 +439,28 @@ function renderStats() {
   const math = calcNeededMath();
   const needed = math ? math.needed : '—';
 
-  document.getElementById('stat-done').textContent    = done.toLocaleString();
-  document.getElementById('stat-remain').textContent  = remaining.toLocaleString();
-  document.getElementById('stat-pct').textContent     = pct+'%';
+  const sDone = document.getElementById('stat-done');
+  const sRemain = document.getElementById('stat-remain');
+  const sPct = document.getElementById('stat-pct');
+  const sNeeded = document.getElementById('stat-needed');
+  const pPct = document.getElementById('prog-pct');
+  const pFill = document.getElementById('prog-fill');
+  const pSubL = document.getElementById('prog-sub-left');
+  const pSubR = document.getElementById('prog-sub-right');
+
+  if (sDone) sDone.textContent = done.toLocaleString();
+  if (sRemain) sRemain.textContent = remaining.toLocaleString();
+  if (sPct) sPct.textContent = pct + '%';
   
-  const nel = document.getElementById('stat-needed');
-  nel.textContent = needed;
-  if (math) {
-    nel.className = 'prog-stat-num' + (needed > 80 ? ' alert' : needed > 40 ? ' warn' : ' ok');
-  } else {
-    nel.className = 'prog-stat-num';
+  if (sNeeded) {
+    sNeeded.textContent = needed;
+    sNeeded.className = 'prog-stat-num' + (needed > 80 ? ' alert' : needed > 40 ? ' warn' : ' ok');
   }
 
-  document.getElementById('prog-pct').textContent  = pct+'%';
-  document.getElementById('prog-fill').style.width = pct+'%';
-  document.getElementById('prog-sub-left').textContent =
-    `${done.toLocaleString()} / ${(settings.total||TOTAL_DEFAULT).toLocaleString()} unique questions`;
-  document.getElementById('prog-sub-right').textContent = settings.finishBy
-    ? `Finish by ${new Date(settings.finishBy+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`
-    : '';
+  if (pPct) pPct.textContent = pct + '%';
+  if (pFill) pFill.style.width = pct + '%';
+  if (pSubL) pSubL.textContent = `${done.toLocaleString()} / ${(settings.total || TOTAL_DEFAULT).toLocaleString()} unique questions`;
+  if (pSubR) pSubR.textContent = settings.finishBy ? `Finish by ${new Date(settings.finishBy + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '';
 }
 
 // ── Charts (Live from Volume Logs) ────────────────────
@@ -501,6 +519,8 @@ function aggregate(rows) {
 function renderCharts() {
   const data = buildLiveChartData();
   const body = document.getElementById('charts-body');
+  if (!body) return;
+
   if (!data) {
     body.innerHTML = '<div class="charts-empty">Log your first session to start tracking</div>';
     Object.keys(activeCharts).forEach(k => { activeCharts[k].destroy(); delete activeCharts[k]; });
@@ -525,6 +545,7 @@ function setChartView(view, data) {
   chartView = view;
   data = data || buildLiveChartData();
   if (!data) return;
+  
   document.querySelectorAll('#chart-view-toggle .view-tab').forEach(b =>
     b.classList.toggle('active', b.dataset.view === view));
 
@@ -559,14 +580,14 @@ function chartDefaults() {
       legend:{display:false},
       tooltip:{
         backgroundColor:'rgba(26,20,40,.88)',
-        titleFont:{family:"'DM Mono',monospace",size:9},
-        bodyFont:{family:"'Jost',sans-serif",size:12},
+        titleFont:{family:"'DM Mono',monospace",size:12},
+        bodyFont:{family:"'Jost',sans-serif",size:13},
         padding:10, cornerRadius:6
       }
     },
     scales:{
-      x:{grid:{color:'rgba(236,216,222,.3)'},ticks:{font:{family:"'DM Mono',monospace",size:8},color:'#c0a8b4',maxRotation:45,autoSkip:true,maxTicksLimit:16}},
-      y:{grid:{color:'rgba(236,216,222,.3)'},ticks:{font:{family:"'DM Mono',monospace",size:8},color:'#c0a8b4'},beginAtZero:true}
+      x:{grid:{color:'rgba(236,216,222,.3)'},ticks:{font:{family:"'DM Mono',monospace",size:12},color:'#c0a8b4',maxRotation:45,autoSkip:true,maxTicksLimit:16}},
+      y:{grid:{color:'rgba(236,216,222,.3)'},ticks:{font:{family:"'DM Mono',monospace",size:12},color:'#c0a8b4'},beginAtZero:true}
     }
   };
 }
@@ -614,195 +635,275 @@ function buildCumulChart(id, labels, data) {
        borderDash:[5,4], borderWidth:1.5, pointRadius:0, fill:false}
     ]},
     options:{...opts, plugins:{...opts.plugins, legend:{display:true,
-      labels:{font:{family:"'DM Mono',monospace",size:8},color:'#c0a8b4',boxWidth:10}}}}
+      labels:{font:{family:"'DM Mono',monospace",size:12},color:'#c0a8b4',boxWidth:10}}}}
   });
 }
 
 // ── Log and Edit Entries ──────────────────────────────
 function setMode(mode) {
-  document.getElementById('log-questions-panel').style.display = mode==='questions'?'':'none';
-  document.getElementById('log-exam-panel').style.display      = mode==='exam'?'':'none';
-  document.getElementById('mode-qs').classList.toggle('active',   mode==='questions');
-  document.getElementById('mode-exam').classList.toggle('active', mode==='exam');
+  const pQs = document.getElementById('log-questions-panel');
+  const pExam = document.getElementById('log-exam-panel');
+  const tQs = document.getElementById('mode-qs');
+  const tExam = document.getElementById('mode-exam');
+  
+  if (pQs) pQs.style.display = mode === 'questions' ? '' : 'none';
+  if (pExam) pExam.style.display = mode === 'exam' ? '' : 'none';
+  if (tQs) tQs.classList.toggle('active', mode === 'questions');
+  if (tExam) tExam.classList.toggle('active', mode === 'exam');
 }
 
-function logEntry() {
-  const date  = document.getElementById('log-date').value  || todayStr();
-  const qs    = parseInt(document.getElementById('log-qs').value);
-  const score = document.getElementById('log-score').value;
-  if (!qs || qs<1) { showToast('Enter number of questions ✦'); return; }
+async function logEntry() {
+  try {
+    const dEl = document.getElementById('log-date');
+    const qEl = document.getElementById('log-qs');
+    const sEl = document.getElementById('log-score');
+    
+    const date  = dEl?.value || todayStr();
+    const qs    = parseInt(qEl?.value);
+    const scoreStr = sEl?.value;
+    const score = scoreStr !== '' && scoreStr != null ? Number(scoreStr) : null;
+    
+    if (!qs || qs < 1) { showToast('Enter number of questions ✦'); return; }
+    if (!currentUser || !db) { showToast('Must be logged in to save.'); return; }
 
-  const entryData = {
-    _id: editingEntryId || Date.now().toString(),
-    date, 
-    qs, 
-    score: score !== '' ? Number(score) : undefined
-  };
+    const entryData = {
+      type: 'qs',
+      date: date,
+      qs: qs,
+      score: score
+    };
 
-  if (editingEntryId) {
-    entries = entries.map(e => e._id === editingEntryId ? entryData : e);
-    showToast('Entry updated ✦');
-  } else {
-    entries.push(entryData);
-    showToast(`${qs} questions logged ✦`);
+    if (editingEntryId) {
+      await db.collection('users').doc(currentUser.uid).collection('uworld_logs').doc(editingEntryId).set(entryData, { merge: true });
+      showToast('Entry updated ✦');
+    } else {
+      await db.collection('users').doc(currentUser.uid).collection('uworld_logs').add(entryData);
+      showToast(`${qs} questions logged ✦`);
+    }
+
+    cancelEditEntry();
+  } catch (err) {
+    console.error("Error logging entry:", err);
   }
-
-  saveLocal(); syncToFirebase(); renderAll();
-  cancelEditEntry();
 }
 
 function editEntry(id) {
   const e = entries.find(x => x._id === id);
   if (!e) return;
-  document.getElementById('log-date').value = e.date;
-  document.getElementById('log-qs').value = e.qs;
-  document.getElementById('log-score').value = e.score !== undefined ? e.score : '';
+  const dEl = document.getElementById('log-date');
+  const qEl = document.getElementById('log-qs');
+  const sEl = document.getElementById('log-score');
+  
+  if (dEl) dEl.value = e.date;
+  if (qEl) qEl.value = e.qs;
+  if (sEl) sEl.value = e.score !== undefined && e.score !== null ? e.score : '';
+  
   editingEntryId = id;
   const btn = document.getElementById('btn-log-qs');
-  btn.textContent = 'Update ✦';
-  btn.classList.add('editing');
-  document.getElementById('cancel-edit-qs').style.display = 'inline-block';
+  const cBtn = document.getElementById('cancel-edit-qs');
+  
+  if (btn) {
+    btn.textContent = 'Update ✦';
+    btn.classList.add('editing');
+  }
+  if (cBtn) cBtn.style.display = 'inline-block';
+  
   setMode('questions');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function cancelEditEntry() {
   editingEntryId = null;
-  document.getElementById('log-qs').value = '';
-  document.getElementById('log-score').value = '';
-  document.getElementById('log-date').value = todayStr();
+  const dEl = document.getElementById('log-date');
+  const qEl = document.getElementById('log-qs');
+  const sEl = document.getElementById('log-score');
+  
+  if (dEl) dEl.value = todayStr();
+  if (qEl) qEl.value = '';
+  if (sEl) sEl.value = '';
+  
   const btn = document.getElementById('btn-log-qs');
-  btn.textContent = 'Log ✦';
-  btn.classList.remove('editing');
-  document.getElementById('cancel-edit-qs').style.display = 'none';
+  const cBtn = document.getElementById('cancel-edit-qs');
+  if (btn) {
+    btn.textContent = 'Log ✦';
+    btn.classList.remove('editing');
+  }
+  if (cBtn) cBtn.style.display = 'none';
 }
 
-function logExam() {
-  const date = document.getElementById('exam-date').value || todayStr();
-  const name = document.getElementById('exam-name').value;
-  const epc = document.getElementById('exam-epc').value;
-  const epp = document.getElementById('exam-epp').value;
-  
-  if (!name) { showToast('Select an exam name ✦'); return; }
+async function logExam() {
+  try {
+    const dEl = document.getElementById('exam-date');
+    const nEl = document.getElementById('exam-name');
+    const epcEl = document.getElementById('exam-epc');
+    const eppEl = document.getElementById('exam-epp');
+    
+    const date = dEl?.value || todayStr();
+    const name = nEl?.value;
+    const epcStr = epcEl?.value;
+    const eppStr = eppEl?.value;
+    
+    if (!name) { showToast('Select an exam name ✦'); return; }
+    if (!currentUser || !db) { showToast('Must be logged in to save.'); return; }
 
-  const examData = {
-    _id: editingExamId || Date.now().toString(),
-    date,
-    name,
-    epc: epc !== '' ? Number(epc) : undefined, 
-    epp: epp !== '' ? Number(epp) : undefined
-  };
+    const examData = {
+      type: 'exam',
+      date: date,
+      name: name,
+      epc: epcStr !== '' && epcStr != null ? Number(epcStr) : null,
+      epp: eppStr !== '' && eppStr != null ? Number(eppStr) : null
+    };
 
-  if (editingExamId) {
-    exams = exams.map(e => e._id === editingExamId ? examData : e);
-    showToast('Exam updated ✦');
-  } else {
-    exams.push(examData);
-    showToast(`${name} logged ✦`);
+    if (editingExamId) {
+      await db.collection('users').doc(currentUser.uid).collection('uworld_logs').doc(editingExamId).set(examData, { merge: true });
+      showToast('Exam updated ✦');
+    } else {
+      await db.collection('users').doc(currentUser.uid).collection('uworld_logs').add(examData);
+      showToast(`${name} logged ✦`);
+    }
+
+    cancelEditExam();
+  } catch (err) {
+    console.error("Error logging exam:", err);
   }
-
-  saveLocal(); syncToFirebase(); renderExams();
-  cancelEditExam();
 }
 
 function editExam(id) {
   const e = exams.find(x => x._id === id);
   if (!e) return;
-  document.getElementById('exam-date').value = e.date;
-  document.getElementById('exam-name').value = e.name;
-  document.getElementById('exam-epc').value = e.epc !== undefined ? e.epc : '';
-  document.getElementById('exam-epp').value = e.epp !== undefined ? e.epp : '';
+  
+  const dEl = document.getElementById('exam-date');
+  const nEl = document.getElementById('exam-name');
+  const epcEl = document.getElementById('exam-epc');
+  const eppEl = document.getElementById('exam-epp');
+  
+  if (dEl) dEl.value = e.date;
+  if (nEl) nEl.value = e.name;
+  if (epcEl) epcEl.value = e.epc !== undefined && e.epc !== null ? e.epc : '';
+  if (eppEl) eppEl.value = e.epp !== undefined && e.epp !== null ? e.epp : '';
+  
   editingExamId = id;
   const btn = document.getElementById('btn-log-exam');
-  btn.textContent = 'Update ✦';
-  btn.classList.add('editing');
-  document.getElementById('cancel-edit-exam').style.display = 'inline-block';
+  const cBtn = document.getElementById('cancel-edit-exam');
+  if (btn) {
+    btn.textContent = 'Update ✦';
+    btn.classList.add('editing');
+  }
+  if (cBtn) cBtn.style.display = 'inline-block';
+  
   setMode('exam');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function cancelEditExam() {
   editingExamId = null;
-  document.getElementById('exam-name').value = '';
-  document.getElementById('exam-epc').value = '';
-  document.getElementById('exam-epp').value = '';
-  document.getElementById('exam-date').value = todayStr();
+  const dEl = document.getElementById('exam-date');
+  const nEl = document.getElementById('exam-name');
+  const epcEl = document.getElementById('exam-epc');
+  const eppEl = document.getElementById('exam-epp');
+  
+  if (dEl) dEl.value = todayStr();
+  if (nEl) nEl.value = '';
+  if (epcEl) epcEl.value = '';
+  if (eppEl) eppEl.value = '';
+  
   const btn = document.getElementById('btn-log-exam');
-  btn.textContent = 'Log ✦';
-  btn.classList.remove('editing');
-  document.getElementById('cancel-edit-exam').style.display = 'none';
+  const cBtn = document.getElementById('cancel-edit-exam');
+  
+  if (btn) {
+    btn.textContent = 'Log ✦';
+    btn.classList.remove('editing');
+  }
+  if (cBtn) cBtn.style.display = 'none';
 }
 
-function deleteEntry(id) {
-  entries = entries.filter(e => e._id !== id);
-  saveLocal(); syncToFirebase(); renderAll();
-  showToast('Entry removed');
+async function deleteEntry(id) {
+  try {
+    if (currentUser && db) {
+      await db.collection('users').doc(currentUser.uid).collection('uworld_logs').doc(id).delete();
+      showToast('Entry removed');
+    }
+  } catch (err) {
+    console.error("Error deleting entry:", err);
+  }
 }
 
-function deleteExam(id) {
-  exams = exams.filter(e => e._id !== id);
-  saveLocal(); syncToFirebase(); renderExams();
-  showToast('Exam removed');
+async function deleteExam(id) {
+  try {
+    if (currentUser && db) {
+      await db.collection('users').doc(currentUser.uid).collection('uworld_logs').doc(id).delete();
+      showToast('Exam removed');
+    }
+  } catch (err) {
+    console.error("Error deleting exam:", err);
+  }
 }
 
 // ── Render Views ──────────────────────────────────────
 function renderHistory() {
   const el = document.getElementById('history-container');
+  if (!el) return;
   if (!entries.length) { el.innerHTML='<div class="uw-empty">No entries yet</div>'; return; }
-  const asc=[...entries].sort((a,b)=>a.date.localeCompare(b.date));
-  const totalsMap={};
+  
+  const asc = [...entries].sort((a,b) => a.date.localeCompare(b.date));
+  const totalsMap = {};
   let cum = 0;
   asc.forEach(e => { cum += (e.qs||0); totalsMap[e._id] = cum; });
-  const sorted=[...entries].sort((a,b)=>b.date.localeCompare(a.date));
-  let html=`<table class="uw-table"><thead><tr>
+  const sorted = [...entries].sort((a,b) => b.date.localeCompare(a.date));
+  
+  let html = `<div class="table-responsive"><table class="uw-table"><thead><tr>
     <th>Date</th><th>Questions</th><th>% Correct</th><th>Running Total</th><th>Actions</th>
   </tr></thead><tbody>`;
-  sorted.forEach(e=>{
-    const ds=new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    let sc='—';
-    if (e.score!==undefined&&e.score!==null&&e.score!=='') {
-      const s=Number(e.score);
-      sc=`<span class="uw-badge ${s>=70?'good':s>=55?'warn':'bad'}">${s}%</span>`;
+  
+  sorted.forEach(e => {
+    const ds = new Date(e.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    let sc = '—';
+    if (e.score !== undefined && e.score !== null && e.score !== '') {
+      const s = Number(e.score);
+      sc = `<span class="uw-badge ${s>=70?'good':s>=55?'warn':'bad'}">${s}%</span>`;
     }
     const actions = e.fromCSV
-      ? `<span class="uw-badge csv">csv</span>`
+      ? `<button class="action-btn del" onclick="deleteEntry('${e._id}')">✕</button> <span class="uw-badge csv">csv</span>`
       : `<button class="action-btn" onclick="editEntry('${e._id}')">✎ Edit</button>
          <button class="action-btn del" onclick="deleteEntry('${e._id}')">✕</button>`;
-    html+=`<tr>
+    html += `<tr>
       <td>${ds}</td>
       <td><span class="uw-badge qs">+${e.qs}</span></td>
       <td>${sc}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${(totalsMap[e._id]||0).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">${(totalsMap[e._id]||0).toLocaleString()}</td>
       <td>${actions}</td>
     </tr>`;
   });
-  el.innerHTML=html+'</tbody></table>';
+  el.innerHTML = html + '</tbody></table></div>';
 }
 
 function renderExams() {
-  const el=document.getElementById('exam-container');
-  if (!exams.length){el.innerHTML='<div class="uw-empty">No practice exams logged yet</div>';return;}
-  const sorted=[...exams].sort((a,b)=>b.date.localeCompare(a.date));
-  let html=`<table class="uw-table"><thead><tr>
+  const el = document.getElementById('exam-container');
+  if (!el) return;
+  if (!exams.length) { el.innerHTML='<div class="uw-empty">No practice exams logged yet</div>'; return; }
+  
+  const sorted = [...exams].sort((a,b) => b.date.localeCompare(a.date));
+  let html = `<div class="table-responsive"><table class="uw-table"><thead><tr>
     <th>Date</th><th>Exam</th><th>EPC (%)</th><th>Prob. Pass (%)</th><th>Actions</th>
   </tr></thead><tbody>`;
-  sorted.forEach(e=>{
-    const ds=new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    let epc='—', epp='—';
-    if(e.epc!==undefined&&e.epc!==''){const p=Number(e.epc);epc=`<span class="uw-badge ${p>=70?'good':p>=55?'warn':'bad'}">${p}%</span>`;}
-    if(e.epp!==undefined&&e.epp!==''){const p=Number(e.epp);epp=`<span class="uw-badge pred">${p}%</span>`;}
+  
+  sorted.forEach(e => {
+    const ds = new Date(e.date + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    let epc = '—', epp = '—';
+    if(e.epc !== undefined && e.epc !== null && e.epc !== '') { const p = Number(e.epc); epc = `<span class="uw-badge ${p>=70?'good':p>=55?'warn':'bad'}">${p}%</span>`; }
+    if(e.epp !== undefined && e.epp !== null && e.epp !== '') { const p = Number(e.epp); epp = `<span class="uw-badge pred">${p}%</span>`; }
     
-    const actions=`
+    const actions = `
       <button class="action-btn" onclick="editExam('${e._id}')">✎ Edit</button>
       <button class="action-btn del" onclick="deleteExam('${e._id}')">✕</button>`;
 
-    html+=`<tr>
+    html += `<tr>
       <td>${ds}</td><td style="font-weight:500;">${e.name||'—'}</td><td>${epc}</td>
       <td>${epp}</td>
       <td>${actions}</td>
     </tr>`;
   });
-  el.innerHTML=html+'</tbody></table>';
+  el.innerHTML = html + '</tbody></table></div>';
 }
 
 function renderAll() {
@@ -812,67 +913,92 @@ function renderAll() {
 // ── Import modal ──────────────────────────────────────
 let csvRawRows=[], csvHeaders=[], colMap={date:'',questions:'',score:''};
 
-function openImportModal()  { document.getElementById('import-modal').classList.add('open'); }
-function closeImportModal() { document.getElementById('import-modal').classList.remove('open'); }
-function handleModalClick(e) { if(e.target===document.getElementById('import-modal')) closeImportModal(); }
+function openImportModal() { 
+  const modal = document.getElementById('import-modal');
+  if (modal) modal.classList.add('open'); 
+}
+
+function closeImportModal() { 
+  const modal = document.getElementById('import-modal');
+  if (modal) modal.classList.remove('open'); 
+}
+
+function handleModalClick(e) { 
+  if(e.target === document.getElementById('import-modal')) closeImportModal(); 
+}
 
 const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
-dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f)handleFile(f);});
-document.getElementById('csv-file-input').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
+if (dropZone) {
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
+}
+
+const csvInput = document.getElementById('csv-file-input');
+if (csvInput) {
+  csvInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+}
 
 function handleFile(file) {
-  const r=new FileReader();
-  r.onload=e=>{try{parseCSV(e.target.result,file.name);}catch(err){showToast('Could not read file');}};
+  const r = new FileReader();
+  r.onload = e => { try { parseCSV(e.target.result, file.name); } catch(err) { showToast('Could not read file'); }};
   r.readAsText(file);
 }
 
-function parseCSV(text,filename) {
-  const lines=text.trim().split(/\r?\n/);
-  if(lines.length<2){showToast('File appears empty');return;}
-  csvHeaders=splitCSVLine(lines[0]);
-  csvRawRows=[];
-  for(let i=1;i<lines.length;i++){
-    const vals=splitCSVLine(lines[i]);
-    if(vals.every(v=>v.trim()===''))continue;
-    const row={};
-    csvHeaders.forEach((h,idx)=>{row[h]=(vals[idx]||'').trim().replace(/^["']|["']$/g,'');});
+function parseCSV(text, filename) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) { showToast('File appears empty'); return; }
+  csvHeaders = splitCSVLine(lines[0]);
+  csvRawRows = [];
+  
+  for(let i=1; i<lines.length; i++){
+    const vals = splitCSVLine(lines[i]);
+    if(vals.every(v=>v.trim()==='')) continue;
+    const row = {};
+    csvHeaders.forEach((h,idx) => { row[h] = (vals[idx]||'').trim().replace(/^["']|["']$/g,''); });
     csvRawRows.push(row);
   }
-  document.getElementById('csv-file-info').textContent=`${filename} · ${csvRawRows.length} rows`;
+  
+  const info = document.getElementById('csv-file-info');
+  if (info) info.textContent = `${filename} · ${csvRawRows.length} rows`;
+  
   autoDetectCols(); renderColMapper();
-  document.getElementById('col-mapper').style.display='';
-  document.getElementById('drop-zone').style.display='none';
+  
+  const mapper = document.getElementById('col-mapper');
+  const zone = document.getElementById('drop-zone');
+  if (mapper) mapper.style.display = '';
+  if (zone) zone.style.display = 'none';
 }
 
 function splitCSVLine(line) {
-  const result=[]; let cur='',inQ=false;
-  for(let i=0;i<line.length;i++){
-    const ch=line[i];
-    if(ch==='"'&&(i===0||line[i-1]===',')){inQ=true;continue;}
-    if(ch==='"'&&inQ){inQ=false;continue;}
-    if(ch===','&&!inQ){result.push(cur.trim());cur='';continue;}
-    cur+=ch;
+  const result = []; let cur = '', inQ = false;
+  for(let i=0; i<line.length; i++){
+    const ch = line[i];
+    if(ch === '"' && (i === 0 || line[i-1] === ',')) { inQ=true; continue; }
+    if(ch === '"' && inQ) { inQ=false; continue; }
+    if(ch === ',' && !inQ) { result.push(cur.trim()); cur=''; continue; }
+    cur += ch;
   }
   result.push(cur.trim()); return result;
 }
 
 function autoDetectCols() {
-  const lower=csvHeaders.map(h=>h.toLowerCase());
-  const find=kws=>{for(const kw of kws){const i=lower.findIndex(h=>h.includes(kw));if(i>=0)return csvHeaders[i];}return '';};
-  colMap.date=find(['date','day','time','when']);
-  colMap.questions=find(['question','qs','count','num','total','completed','done']);
-  colMap.score=find(['score','correct','pct','percent','accuracy','grade','result']);
+  const lower = csvHeaders.map(h => h.toLowerCase());
+  const find = kws => { for(const kw of kws){ const i = lower.findIndex(h=>h.includes(kw)); if(i>=0) return csvHeaders[i]; } return ''; };
+  colMap.date = find(['date','day','time','when']);
+  colMap.questions = find(['question','qs','count','num','total','completed','done']);
+  colMap.score = find(['score','correct','pct','percent','accuracy','grade','result']);
 }
 
 function renderColMapper() {
-  const fields=[
+  const fields = [
     {key:'date',label:'Date *'},
     {key:'questions',label:'Questions *'},
     {key:'score',label:'Score % (optional)'},
   ];
-  document.getElementById('col-mapper-grid').innerHTML=fields.map(f=>`
+  const grid = document.getElementById('col-mapper-grid');
+  if (!grid) return;
+  grid.innerHTML = fields.map(f => `
     <div class="map-row">
       <div class="map-label">${f.label}</div>
       <select class="map-select" id="map-${f.key}" onchange="colMap['${f.key}']=this.value">
@@ -882,73 +1008,89 @@ function renderColMapper() {
     </div>`).join('');
 }
 
-function importCSV() {
-  if(!colMap.date||!colMap.questions){showToast('Map Date and Questions columns');return;}
-  const parsed=[]; let fails=0;
-  csvRawRows.forEach(row=>{
-    const dt=parseFlexDate(row[colMap.date]);
-    const qs=parseFloat(row[colMap.questions]);
-    if(!dt||isNaN(qs)){fails++;return;}
-    const rawSc=colMap.score?row[colMap.score]:null;
-    const score=rawSc!==null&&rawSc!==''?parseFloat(rawSc):null;
-    parsed.push({dt,qs,score:isNaN(score)?null:score});
+async function importCSV() {
+  if (!colMap.date || !colMap.questions) { showToast('Map Date and Questions columns'); return; }
+  if (!currentUser || !db) { showToast('Log in to import data.'); return; }
+
+  const parsed = []; let fails = 0;
+  csvRawRows.forEach(row => {
+    const dt = parseFlexDate(row[colMap.date]);
+    const qs = parseFloat(row[colMap.questions]);
+    if (!dt || isNaN(qs)) { fails++; return; }
+    const rawSc = colMap.score ? row[colMap.score] : null;
+    const score = rawSc !== null && rawSc !== '' ? parseFloat(rawSc) : null;
+    parsed.push({ dt, qs, score: isNaN(score) ? null : score });
   });
-  if(!parsed.length){showToast('No valid rows — check mapping');return;}
-  const imported=parsed.map((r,i)=>({
-    _id:'csv_'+r.dt.toISOString().slice(0,10).replace(/-/g,'')+'_'+i,
-    date:r.dt.toISOString().slice(0,10),
-    qs:r.qs, score:r.score!==null?r.score:undefined, fromCSV:true
-  }));
-  entries=[...imported, ...entries.filter(e=>!e.fromCSV)];
-  
-  saveLocal(); syncToFirebase(); renderAll();
-  
-  document.getElementById('col-mapper').style.display='none';
-  document.getElementById('import-success').style.display='';
-  const totalQs=parsed.reduce((s,r)=>s+r.qs,0);
-  document.getElementById('import-success-msg').textContent=
-    `${parsed.length} sessions · ${totalQs.toLocaleString()} questions imported`;
+
+  if (!parsed.length) { showToast('No valid rows — check mapping'); return; }
+
+  try {
+    const batch = db.batch();
+    const logsRef = db.collection('users').doc(currentUser.uid).collection('uworld_logs');
+    
+    parsed.forEach((r) => {
+      const newDocRef = logsRef.doc();
+      batch.set(newDocRef, {
+        type: 'qs',
+        date: r.dt.toISOString().slice(0,10),
+        qs: r.qs,
+        score: r.score !== null ? r.score : null,
+        fromCSV: true
+      });
+    });
+
+    await batch.commit();
+
+    const mapper = document.getElementById('col-mapper');
+    const success = document.getElementById('import-success');
+    const msg = document.getElementById('import-success-msg');
+    
+    if (mapper) mapper.style.display = 'none';
+    if (success) success.style.display = '';
+    
+    const totalQs = parsed.reduce((s,r) => s+r.qs, 0);
+    if (msg) msg.textContent = `${parsed.length} sessions · ${totalQs.toLocaleString()} questions imported`;
+    
+  } catch (err) {
+    console.error("Batch import error:", err);
+    showToast('Import failed. Try again.');
+  }
 }
 
 function resetImport() {
-  csvRawRows=[]; csvHeaders=[]; colMap={date:'',questions:'',score:''};
-  document.getElementById('csv-file-input').value='';
-  document.getElementById('col-mapper').style.display='none';
-  document.getElementById('import-success').style.display='none';
-  document.getElementById('drop-zone').style.display='';
+  csvRawRows = []; csvHeaders = []; colMap = {date:'', questions:'', score:''};
+  const inp = document.getElementById('csv-file-input');
+  const mapper = document.getElementById('col-mapper');
+  const success = document.getElementById('import-success');
+  const drop = document.getElementById('drop-zone');
+  
+  if (inp) inp.value = '';
+  if (mapper) mapper.style.display = 'none';
+  if (success) success.style.display = 'none';
+  if (drop) drop.style.display = '';
 }
 
 function parseFlexDate(str) {
-  if(!str)return null;
-  str=str.trim().replace(/^["']|["']$/g,'');
-  let d=new Date(str);
-  if(!isNaN(d.getTime()))return d;
-  const mo={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-  const m1=str.match(/^([A-Za-z]{3})\.?\s+(\d{1,2}),?\s+(\d{4})/);
-  if(m1)return new Date(+m1[3],mo[m1[1].toLowerCase()],+m1[2]);
-  const m2=str.match(/^(\d{1,2})\s+([A-Za-z]{3})\.?\s+(\d{4})/);
-  if(m2)return new Date(+m2[3],mo[m2[2].toLowerCase()],+m2[1]);
-  const p=str.split(/[\/\-\.]/);
-  if(p.length===3){const[a,b,c]=p.map(Number);if(c>31)return new Date(c,a-1,b);if(a>12)return new Date(c,b-1,a);return new Date(c,a-1,b);}
+  if (!str) return null;
+  str = str.trim().replace(/^["']|["']$/g,'');
+  let d = new Date(str);
+  if (!isNaN(d.getTime())) return d;
+  const mo = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  const m1 = str.match(/^([A-Za-z]{3})\.?\s+(\d{1,2}),?\s+(\d{4})/);
+  if(m1) return new Date(+m1[3], mo[m1[1].toLowerCase()], +m1[2]);
+  const m2 = str.match(/^(\d{1,2})\s+([A-Za-z]{3})\.?\s+(\d{4})/);
+  if(m2) return new Date(+m2[3], mo[m2[2].toLowerCase()], +m2[1]);
+  const p = str.split(/[\/\-\.]/);
+  if(p.length === 3) { const [a,b,c] = p.map(Number); if(c>31) return new Date(c,a-1,b); if(a>12) return new Date(c,b-1,a); return new Date(c,a-1,b); }
   return null;
 }
 
-(function restoreCsvEntries() {
-  try {
-    const saved = localStorage.getItem('uw-entries');
-    if (!saved) return;
-    entries = entries.map(e => {
-      if (e._id && e._id.startsWith('csv_')) return {...e, fromCSV:true};
-      return e;
-    });
-  } catch(e) {}
-})();
+// ── Initialization ────────────────────────────────────
+const logDate = document.getElementById('log-date');
+const examDate = document.getElementById('exam-date');
+if (logDate) logDate.value = todayStr();
+if (examDate) examDate.value = todayStr();
 
-// ── Init ──────────────────────────────────────────────
-document.getElementById('log-date').value  = todayStr();
-document.getElementById('exam-date').value = todayStr();
-loadLocal();
-runMigration();
 renderAll();
 </script>
 </body>
