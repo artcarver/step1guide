@@ -170,9 +170,9 @@ a { text-decoration: none; color: inherit; }
 .content-wide {
   position: relative;
   z-index: 2;
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 24px 100px;
+  padding: 32px 32px 100px;
 }
 
 /* ── Global Navigation Header ────────────────────────────── */
@@ -185,12 +185,13 @@ a { text-decoration: none; color: inherit; }
   -webkit-backdrop-filter: blur(18px) saturate(1.5);
   border-bottom: 1.5px solid var(--border);
   box-shadow: 0 2px 20px rgba(180, 100, 140, 0.07);
+  padding-bottom: 12px;
 }
 
 .header-inner {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
 }
 
 .global-nav {
@@ -1192,7 +1193,7 @@ a { text-decoration: none; color: inherit; }
 
 /* ── UWorld Page ─────────────────────────────────────────── */
 .uw-wrap {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 32px 24px 100px;
   position: relative;
@@ -2218,6 +2219,8 @@ a { text-decoration: none; color: inherit; }
 
 @media (min-width: 1200px) {
   .drug-grid { grid-template-columns: repeat(3, 1fr); }
+  .tabs { grid-template-columns: repeat(10, 1fr); }
+  .tab-btn { padding: 9px 8px; font-size: 10.5px; letter-spacing: 0.03em; }
 }
 
 /* ── Print ───────────────────────────────────────────────── */
