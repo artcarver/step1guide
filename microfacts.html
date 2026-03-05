@@ -13,22 +13,14 @@
   <script src="auth.js"></script>
 
   <style>
-    /* ── Microfacts-specific extras ─────────────────── */
+    /* ── Microfacts-only overrides ───────────────────
+       Shared styles live in style.css.
+       Only truly page-specific rules belong here.    */
+
     .global-nav-brand {
       font-size: 18px;
       font-weight: 600;
       color: var(--sakura2);
-    }
-
-    .drug-card-meta {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .drug-tags-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
     }
   </style>
 </head>
@@ -63,17 +55,16 @@
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
         <input class="search-input" type="text" id="search-input"
-               placeholder="Search organism, disease, toxin..."
-               oninput="handleSearch(this.value)"/>
-        <button id="search-clear" onclick="clearSearch()">×</button>
+               placeholder="Search organism, disease, toxin..."/>
+        <button id="search-clear">×</button>
       </div>
     </div>
 
     <nav class="tabs" id="tabs">
-      <button class="tab-btn active" onclick="switchTab('bacteria', this)" style="--theme-color: var(--theme-12);"><span class="tab-dot"></span>Bacteria</button>
-      <button class="tab-btn"        onclick="switchTab('viruses', this)"  style="--theme-color: var(--theme-2);" ><span class="tab-dot"></span>Viruses</button>
-      <button class="tab-btn"        onclick="switchTab('parasites', this)"style="--theme-color: var(--theme-8);" ><span class="tab-dot"></span>Parasites</button>
-      <button class="tab-btn"        onclick="switchTab('fungi', this)"    style="--theme-color: var(--theme-18);"><span class="tab-dot"></span>Fungi</button>
+      <button class="tab-btn tab-btn--bacteria active"><span class="tab-dot"></span>Bacteria</button>
+      <button class="tab-btn tab-btn--viruses">        <span class="tab-dot"></span>Viruses</button>
+      <button class="tab-btn tab-btn--parasites">      <span class="tab-dot"></span>Parasites</button>
+      <button class="tab-btn tab-btn--fungi">          <span class="tab-dot"></span>Fungi</button>
     </nav>
 
   </div>
@@ -144,40 +135,27 @@
 
 <script src="micro_data.js"></script>
 <script>
-// ── Auth ───────────────────────────────────────────────────
-window.addEventListener('appAuthStateChanged', (e) => {
-  const user   = e.detail.user;
-  const btn    = document.getElementById('auth-btn');
-  if (!btn) return;
-  btn.textContent = user ? 'Log out' : 'Log in';
-  btn.classList.toggle('is-logged-in', !!user);
-});
-
-document.getElementById('auth-btn').addEventListener('click', () => {
-  if (!auth) return;
-  if (auth.currentUser) auth.signOut();
-  else auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
-});
-
 // ── Gram Stain Helper ──────────────────────────────────────
 function gramClass(gram) {
   if (!gram) return 'gram-none';
   const g = gram.toLowerCase();
-  if (g.includes('gp')   || g.includes('pos'))     return 'gram-gp';
-  if (g.includes('gn')   || g.includes('neg'))     return 'gram-gn';
-  if (g.includes('acid') || g.includes('afb'))     return 'gram-acid';
-  if (g.includes('para') || g.includes('helminth'))return 'gram-para';
-  if (g.includes('fung') || g.includes('yeast'))   return 'gram-fung';
+  if (g.includes('gp')   || g.includes('pos'))      return 'gram-gp';
+  if (g.includes('gn')   || g.includes('neg'))      return 'gram-gn';
+  if (g.includes('acid') || g.includes('afb'))      return 'gram-acid';
+  if (g.includes('para') || g.includes('helminth')) return 'gram-para';
+  if (g.includes('fung') || g.includes('yeast'))    return 'gram-fung';
   return 'gram-none';
 }
 
 // ── Format Helper ──────────────────────────────────────────
+// FIX: negative lookbehind (?<![A-Z]) prevents splitting on organism
+// abbreviations like "S. aureus", "E. coli", "M. tuberculosis".
 function formatLines(text) {
   if (!text) return '';
   try {
     let processed = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     const parts   = processed
-      .split(/\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/)
+      .split(/(?<![A-Z])\.\s+(?=(?:<[^>]+>)*[A-Z↑↓(0-9])/)
       .filter(p => p.trim().length > 0);
     if (parts.length <= 1) return processed;
     return `<ul>${parts.map(p => `<li>${p.endsWith('.') ? p : p + '.'}</li>`).join('')}</ul>`;
@@ -187,6 +165,45 @@ function formatLines(text) {
   }
 }
 
+// ── Card sub-renderers ─────────────────────────────────────
+// Broken out from orgCardHTML for readability and easier future edits.
+
+function renderGramBadge(org) {
+  if (!org.gram) return '';
+  return `<span class="gram-badge ${gramClass(org.gram)}">${org.gram}</span>`;
+}
+
+function renderInfoRows(org) {
+  const rows = [
+    { label: 'Virulence', value: org.virulence },
+    { label: 'Disease',   value: org.disease   },
+    { label: 'Treatment', value: org.tx        },
+  ];
+  return rows
+    .filter(r => r.value)
+    .map(r => `
+      <div class="info-row">
+        <span class="info-label">${r.label}</span>
+        <div class="info-text">${formatLines(r.value)}</div>
+      </div>`)
+    .join('');
+}
+
+function renderTagsRow(org) {
+  if (!org.tags || org.tags.length === 0) return '';
+  const tagsHTML = org.tags.map(t => `<span class="drug-tag">${t}</span>`).join('');
+  return `<div class="info-row tags-row"><div class="drug-tags-row">${tagsHTML}</div></div>`;
+}
+
+function renderPearlBox(org) {
+  if (!org.pearl) return '';
+  return `
+    <div class="pearl-box">
+      <span class="pearl-star">✦</span>
+      <div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div>
+    </div>`;
+}
+
 // ── Card HTML ──────────────────────────────────────────────
 function orgCardHTML(org, id, themeNum) {
   if (!org) return '';
@@ -194,32 +211,33 @@ function orgCardHTML(org, id, themeNum) {
   const themeLight = `color-mix(in srgb, ${themeColor} 12%, transparent)`;
   const styleAttr  = `style="--theme-color:${themeColor};--theme-color-light:${themeLight};"`;
 
-  const gc        = gramClass(org.gram || '');
-  const gramLabel = org.gram ? `<span class="gram-badge ${gc}">${org.gram}</span>` : '';
-  const tagsHTML  = (org.tags || []).map(t => `<span class="drug-tag">${t}</span>`).join('');
-
   return `
-  <div class="drug-card" id="${id}" onclick="toggleCard('${id}')" ${styleAttr}>
+  <div class="drug-card" id="${id}" ${styleAttr}>
     <div class="drug-card-header">
       <div class="drug-card-meta">
         <div class="drug-name">${org.name || 'Unknown'}</div>
-        ${gramLabel}
+        ${renderGramBadge(org)}
       </div>
       <span class="expand-arrow">▼</span>
     </div>
     ${org.summary ? `<div class="drug-summary">${org.summary}</div>` : ''}
     <div class="drug-body">
-      ${org.virulence ? `<div class="info-row"><span class="info-label">Virulence</span><div class="info-text">${formatLines(org.virulence)}</div></div>` : ''}
-      ${org.disease   ? `<div class="info-row"><span class="info-label">Disease</span><div class="info-text">${formatLines(org.disease)}</div></div>`   : ''}
-      ${org.tx        ? `<div class="info-row"><span class="info-label">Treatment</span><div class="info-text">${formatLines(org.tx)}</div></div>`       : ''}
-      ${tagsHTML ? `<div class="info-row tags-row"><div class="drug-tags-row">${tagsHTML}</div></div>` : ''}
-      ${org.pearl ? `<div class="pearl-box"><span class="pearl-star">✦</span><div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(org.pearl)}</div></div>` : ''}
+      ${renderInfoRows(org)}
+      ${renderTagsRow(org)}
+      ${renderPearlBox(org)}
     </div>
   </div>`;
 }
 
 // ── Render Engine ──────────────────────────────────────────
-const sysOffsets = { bacteria: 12, viruses: 2, parasites: 8, fungi: 18 };
+// Theme color rotation offsets (1–20 palette) so each tab section
+// starts on a visually distinct color group.
+const sysOffsets = {
+  bacteria:  12,  // starts at lemon chiffon family
+  viruses:    2,  // starts at sakura blush family
+  parasites:  8,  // starts at aqua mochi family
+  fungi:     18,  // starts at sage dew family
+};
 
 function renderSection(sectionId, sysKey) {
   try {
@@ -247,7 +265,7 @@ function renderSection(sectionId, sysKey) {
       <div class="class-group" id="${groupId}" style="--theme-color:${themeColor};--theme-color-light:${themeLight};">
         <div class="class-group-header">
           <span class="class-label">${group.group}</span>
-          <button class="group-expand-btn" onclick="toggleGroup('${groupId}', this)">▼ Expand</button>
+          <button class="group-expand-btn" data-group="${groupId}">▼ Expand</button>
         </div>
         <div class="drug-grid">
           ${sortedOrgs.map(o => orgCardHTML(o, `org-${globalIdx++}`, themeNum)).join('')}
@@ -256,43 +274,59 @@ function renderSection(sectionId, sysKey) {
     });
 
     container.innerHTML = html;
+    attachCardListeners(container);
+    attachGroupListeners(container);
   } catch (err) {
     console.error(`renderSection(${sectionId}) error:`, err);
   }
 }
 
-// Init
+// ── Event Listener Attachment ──────────────────────────────
+// FIX: all interactions use addEventListener instead of inline onclick.
+
+function attachCardListeners(container) {
+  container.querySelectorAll('.drug-card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (window.getSelection().toString().length > 0) return;
+      card.classList.toggle('open');
+    });
+  });
+}
+
+function attachGroupListeners(container) {
+  container.querySelectorAll('.group-expand-btn').forEach(btn => {
+    // FIX: stopPropagation so clicking Expand never accidentally toggles cards.
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const groupId = btn.dataset.group;
+      const group   = document.getElementById(groupId);
+      if (!group) return;
+      const cards   = group.querySelectorAll('.drug-card');
+      const anyOpen = [...cards].some(c => c.classList.contains('open'));
+      cards.forEach(c => c.classList.toggle('open', !anyOpen));
+      btn.textContent = anyOpen ? '▼ Expand' : '▲ Collapse';
+    });
+  });
+}
+
+// ── Init ───────────────────────────────────────────────────
 if (typeof MICRO !== 'undefined') {
-  renderSection('bacteria-content', 'bacteria');
-  renderSection('viruses-content',  'viruses');
-  renderSection('parasites-content','parasites');
-  renderSection('fungi-content',    'fungi');
+  renderSection('bacteria-content',  'bacteria');
+  renderSection('viruses-content',   'viruses');
+  renderSection('parasites-content', 'parasites');
+  renderSection('fungi-content',     'fungi');
 } else {
   console.error('micro_data.js failed to load — MICRO is undefined.');
 }
 
 // ── UI Interactions ────────────────────────────────────────
-function toggleCard(id) {
-  if (window.getSelection().toString().length > 0) return;
-  const card = document.getElementById(id);
-  if (card) card.classList.toggle('open');
-}
-
-function toggleGroup(groupId, btn) {
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  const cards   = group.querySelectorAll('.drug-card');
-  const anyOpen = [...cards].some(c => c.classList.contains('open'));
-  cards.forEach(c => c.classList.toggle('open', !anyOpen));
-  btn.textContent = anyOpen ? '▼ Expand' : '▲ Collapse';
-}
-
-function switchTab(name, btn) {
+function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  const target = document.getElementById('tab-' + name);
-  if (target) target.classList.add('active');
-  if (btn)    btn.classList.add('active');
+  const target  = document.getElementById('tab-' + name);
+  const tabBtn  = document.querySelector(`.tab-btn--${name}`);
+  if (target)  target.classList.add('active');
+  if (tabBtn)  tabBtn.classList.add('active');
   const searchInput   = document.getElementById('search-input');
   const searchResults = document.getElementById('search-results');
   if (searchInput)   searchInput.value = '';
@@ -333,13 +367,14 @@ function handleSearch(q) {
   );
 
   if (matches.length === 0) {
-    grid.innerHTML    = '';
+    grid.innerHTML      = '';
     empty.style.display = 'block';
     count.textContent   = `No results for "${q}"`;
   } else {
     empty.style.display = 'none';
     count.textContent   = `${matches.length} result${matches.length !== 1 ? 's' : ''} for "${q}"`;
     grid.innerHTML      = matches.map((o, i) => orgCardHTML(o, `search-${i}`, (i % 20) + 1)).join('');
+    attachCardListeners(grid);
   }
 }
 
@@ -347,6 +382,44 @@ function clearSearch() {
   const input = document.getElementById('search-input');
   if (input) { input.value = ''; handleSearch(''); }
 }
+
+// ── DOM-ready: attach all remaining listeners ──────────────
+// FIX: auth listener and button wiring wrapped in DOMContentLoaded
+// so #auth-btn is guaranteed to exist before we touch it.
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Auth state
+  window.addEventListener('appAuthStateChanged', (e) => {
+    const btn = document.getElementById('auth-btn');
+    if (!btn) return;
+    btn.textContent = e.detail.user ? 'Log out' : 'Log in';
+    btn.classList.toggle('is-logged-in', !!e.detail.user);
+  });
+
+  // Auth button click
+  document.getElementById('auth-btn').addEventListener('click', () => {
+    if (!auth) return;
+    if (auth.currentUser) auth.signOut();
+    else auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
+  });
+
+  // Tab buttons
+  document.querySelectorAll('.tab-btn[class*="tab-btn--"]').forEach(btn => {
+    const name = [...btn.classList]
+      .find(c => c.startsWith('tab-btn--'))
+      ?.replace('tab-btn--', '');
+    if (name) btn.addEventListener('click', () => switchTab(name));
+  });
+
+  // Search input
+  document.getElementById('search-input')
+    .addEventListener('input', (e) => handleSearch(e.target.value));
+
+  // Search clear
+  document.getElementById('search-clear')
+    .addEventListener('click', clearSearch);
+
+});
 </script>
 </body>
 </html>
