@@ -40,8 +40,8 @@
   --petal:     #fce8ef;
   --border:    #f0dce8;
   --ink:       #3d2c3e;
-  --muted:     #9b7fa0;
-  --dim:       #c4a8cc;
+  --muted:     #7a5c82;
+  --dim:       #a688b0;
   --card-bg:   #ffffff;
 
   /* ── Semantic State Colors ────────────────────── */
@@ -207,7 +207,7 @@ a { text-decoration: none; color: inherit; }
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 600;
-  color: #6b5070;
+  color: #5a3d60;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   transition: color 0.2s;
@@ -459,7 +459,7 @@ a { text-decoration: none; color: inherit; }
 
 .sys-intro-text {
   font-size: 13.5px;
-  color: #6b5070;
+  color: #4a3050;
   line-height: 1.7;
 }
 
@@ -547,7 +547,7 @@ a { text-decoration: none; color: inherit; }
 
 .drug-summary {
   font-size: 13.5px;
-  color: #6b5070;
+  color: #4a3050;
   line-height: 1.6;
   margin-top: 8px;
   font-weight: 400;
@@ -579,29 +579,26 @@ a { text-decoration: none; color: inherit; }
 /* ── Info Rows ───────────────────────────────────────────── */
 .info-row {
   display: flex;
-  gap: 10px;
-  padding: 8px 0;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 0;
   border-bottom: 1px solid rgba(240, 220, 232, 0.5);
-  align-items: flex-start;
 }
 
 .info-row:last-child { border-bottom: none; }
 
 .info-label {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--theme-color, var(--sakura2));
-  min-width: 80px;
-  padding-top: 2px;
-  flex-shrink: 0;
 }
 
 .info-text {
   font-size: 14px;
-  color: #3a2840;
+  color: #2a1a2e;
   line-height: 1.7;
   flex: 1;
 }
@@ -613,18 +610,18 @@ a { text-decoration: none; color: inherit; }
 }
 
 .info-text ul li {
-  padding-left: 14px;
-  position: relative;
-  margin-bottom: 2px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 3px;
 }
 
 .info-text ul li::before {
   content: '✦';
-  position: absolute;
-  left: 0;
   font-size: 7px;
   color: var(--theme-color, var(--sakura2));
-  top: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 /* ── Drug Tags ───────────────────────────────────────────── */
@@ -668,7 +665,7 @@ a { text-decoration: none; color: inherit; }
 
 .pearl-text {
   font-size: 13.5px;
-  color: #3a2840;
+  color: #2a1a2e;
   line-height: 1.7;
 }
 
