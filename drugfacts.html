@@ -357,12 +357,6 @@ const sysMap = {
   'toxicology-content': 'toxicology',
 };
 
-if (typeof DRUGS !== 'undefined') {
-  Object.entries(sysMap).forEach(([id, key]) => renderSection(id, key));
-} else {
-  console.error('drug_data.js failed to load — DRUGS is undefined.');
-}
-
 // ── Tab switching ──────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.group-expand-btn').forEach(b => b.textContent = '▼ Expand');
@@ -442,8 +436,15 @@ function clearSearch() {
   if (input) { input.value = ''; handleSearch(''); }
 }
 
-// ── DOM-ready ──────────────────────────────────────────────
+// ── DOM-ready: single unified block ───────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Render all sections
+  if (typeof DRUGS !== 'undefined') {
+    Object.entries(sysMap).forEach(([id, key]) => renderSection(id, key));
+  } else {
+    console.error('drug_data.js failed to load — DRUGS is undefined.');
+  }
 
   // Auth state
   window.addEventListener('appAuthStateChanged', (e) => {
@@ -459,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
     else auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
   });
 
-  // Tab buttons — derive tab name from modifier class
+  // Tab buttons
   document.querySelectorAll('.tab-btn[class*="tab-btn--df-"]').forEach(btn => {
     const name = [...btn.classList]
       .find(c => c.startsWith('tab-btn--df-'))
