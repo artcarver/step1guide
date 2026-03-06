@@ -236,9 +236,11 @@ function renderInfoRows(drug) {
 
 function renderPearlBox(drug) {
   if (!drug.pearl) return '';
+  // Pearl stays as flowing prose — no bullet splitting
+  const prose = drug.pearl.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   return `<div class="pearl-box">
     <span class="pearl-star">✦</span>
-    <div class="pearl-text"><strong>Step 1 Pearl:</strong> ${formatLines(drug.pearl)}</div>
+    <div class="pearl-text"><strong>Step 1 Pearl:</strong> ${prose}</div>
   </div>`;
 }
 
@@ -256,12 +258,12 @@ function drugCardHTML(drug, id, themeNum) {
       <div class="drug-card-meta">
         <div class="drug-name">${drug.name || 'Unknown'}</div>
         ${aka}
-        ${tags ? `<div class="drug-tags-row" style="margin-top:6px;">${tags}</div>` : ''}
       </div>
       <span class="expand-arrow">▼</span>
     </div>
     ${drug.summary ? `<div class="drug-summary">${drug.summary}</div>` : ''}
     <div class="drug-body">
+      ${tags ? `<div class="drug-tags-row" style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px dashed rgba(240,220,232,0.6);">${tags}</div>` : ''}
       ${renderInfoRows(drug)}
       ${renderPearlBox(drug)}
     </div>
